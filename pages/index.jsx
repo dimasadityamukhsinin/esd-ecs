@@ -57,7 +57,7 @@ export default function Home({ modul }) {
                 </span>
                 <div className="relative flex justify-center w-full h-52">
                   <Image
-                    src={`http://localhost:1337${attributes.Thumbnail.data.attributes.url}`}
+                    src={`${process.env.API_URL}${attributes.Thumbnail.data.attributes.url}`}
                     alt={attributes.title}
                     layout="fill"
                     objectFit="cover"
@@ -87,7 +87,7 @@ export default function Home({ modul }) {
 }
 
 export async function getStaticProps() {
-  const req = await fetch('http://localhost:1337/api/moduls?populate=deep')
+  const req = await fetch(`${process.env.API_URL}/api/moduls?populate=deep`)
   const res = await req.json()
 
   return {
