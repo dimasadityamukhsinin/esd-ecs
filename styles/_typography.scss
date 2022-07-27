@@ -1,0 +1,30 @@
+/* Content Stylings */
+
+/* Heading Defaults */
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3 {
+  -webkit-touch-callout: text; /* iOS Safari */
+  -webkit-user-select: text; /* Safari */
+  -khtml-user-select: text; /* Konqueror HTML */
+  -moz-user-select: text; /* Old versions of Firefox */
+  -ms-user-select: text; /* Internet Explorer/Edge */
+  user-select: text;
+}
+
+h1,
+.h1 {
+  @apply font-sans p-0 mt-0 mb-4;
+  @apply text-6xl sm:text-7xl md:text-8xl;
+  @apply select-text;
+}
+
+h2,
+.h2 {
+  @apply font-sans p-0 mt-0 mb-4;
+  @apply text-xl sm:text-2xl md:text-4xl lg:text-4xl;
+  @apply select-text;
+}

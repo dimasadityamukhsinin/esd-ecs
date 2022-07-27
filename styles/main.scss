@@ -1,0 +1,29 @@
+/* Tailwind base/components */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+/* Custom Style Imports */
+@import '_typography.scss';
+
+/* Other Styling */
+@import '_global.scss';
+@import '_utils.scss';
+
+/* Page Specific Styling */
+@import '_editorial.scss';
+
+
+/* Simple defaults */
+body {
+  @apply font-sans tracking-wide font-normal antialiased text-black bg-white;
+  overscroll-behavior: none;
+}
+
+.test {
+  & > a {
+    width: calc((100% / 3) - 1.5rem);
+    margin: 0.75rem;
+  }
+}

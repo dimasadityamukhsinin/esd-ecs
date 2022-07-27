@@ -1,0 +1,18 @@
+.editor {
+    ul {
+        @apply list-inside;
+    }
+
+    table {
+        @apply table-auto w-full;
+    }
+
+    .drops {
+        @apply pointer-events-none;
+        
+        p {
+            @apply inline;
+            
+        }
+    }
+}
