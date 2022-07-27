@@ -381,7 +381,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      modul: res.data[1],
+      modul: res.data[0],
     },
   }
 }
