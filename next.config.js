@@ -1,5 +1,5 @@
 module.exports = {
     images: {
-      domains: [process.env.API_URL]
+      domains: [process.env.IMAGE_URL]
     },
 };
