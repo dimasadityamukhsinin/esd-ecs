@@ -5,3 +5,9 @@
 .setflex-center-row {
   @apply flex flex-row justify-center items-center content-center;
 }
+
+.arrow {
+  polyline {
+      stroke: #f59e0b;
+  }
+}

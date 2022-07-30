@@ -1,11 +1,9 @@
 import Layout from '@/components/modules/layout'
 import Header from '@/components/modules/header'
 import { useState } from 'react'
-import FancyLink from '@/components/utils/fancyLink'
 import nookies from 'nookies'
-import Router from 'next/router'
 
-export default function Login() {
+export default function Register() {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -21,13 +19,13 @@ export default function Login() {
     })
   }
 
-  const doLogin = async (e) => {
+  const doRegister = async (e) => {
     e.preventDefault()
 
     setProgress(true)
 
     const req = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
       {
         method: 'POST',
         headers: {
@@ -39,30 +37,44 @@ export default function Login() {
     const res = await req.json()
 
     if (res.jwt) {
-      nookies.set(null, 'token', res.jwt)
-      Router.replace('/')
+      setField({})
+      e.target.reset()
+      setSuccess(true)
     }
 
     setProgress(false)
   }
-
   return (
     <Layout>
       <Header />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
           <h1 className="font-bold text-center text-2xl mb-5">ESD in ECS</h1>
+          {success && (
+            <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
+              Congratulations! Your account has been registered.
+            </div>
+          )}
           <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-            <form onSubmit={doLogin} className="px-5 py-7">
+            <form onSubmit={doRegister} className="px-5 py-7">
               {progress && (
                 <div className="absolute inset-0 z-10 bg-white/50" />
               )}
+              <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                onChange={setValue}
+                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+              />
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
                 Email
               </label>
               <input
                 type="email"
-                name="identifier"
+                name="email"
                 onChange={setValue}
                 className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
               />
@@ -80,7 +92,7 @@ export default function Login() {
                 type="submit"
                 className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block"
               >
-                <span className="inline-block mr-2">Login</span>
+                <span className="inline-block mr-2">Register</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -97,26 +109,6 @@ export default function Login() {
                 </svg>
               </button>
             </form>
-            <div className="p-5">
-              <button
-                type="button"
-                className="transition duration-200 border border-gray-200 text-gray-500 w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-normal text-center inline-block"
-              >
-                Login with Google
-              </button>
-            </div>
-            <div className="py-5">
-              <div className="grid grid-cols-2 gap-1">
-                <div className="text-center sm:text-left whitespace-nowrap">
-                  <FancyLink
-                    destination="/register"
-                    className="transition duration-200 mx-5 px-5 py-4 cursor-pointer font-normal text-sm rounded-lg text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-200 focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50 ring-inset"
-                  >
-                    <span className="inline-block ml-1">Register</span>
-                  </FancyLink>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -125,7 +117,7 @@ export default function Login() {
 }
 
 export async function getServerSideProps(ctx) {
-  const cookies = nookies.get(ctx);
+  const cookies = nookies.set(ctx);
 
   if(cookies.token) {
     return {

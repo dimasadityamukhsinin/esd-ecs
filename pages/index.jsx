@@ -4,6 +4,7 @@ import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import FancyLink from '@/components/utils/fancyLink'
 import Image from 'next/image'
+import nookies from 'nookies'
 
 export default function Home({ modul }) {
   const countdownData = (date) => {
@@ -45,7 +46,7 @@ export default function Home({ modul }) {
               Completed
             </FancyLink>
           </div>
-          <div className="flex flex-wrap test mt-6">
+          <div className="flex flex-wrap modul mt-6">
             {modul.map(({ attributes }, id) => (
               <FancyLink
                 key={id}
@@ -86,9 +87,21 @@ export default function Home({ modul }) {
   )
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps(ctx) {
+  const cookies = nookies.get(ctx);
   const req = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`)
   const res = await req.json()
+
+  if(!cookies.token) {
+    return {
+      props: {
+        modul: res.data,
+      },
+      redirect: {
+        destination: '/login'
+      }
+    }
+  }
 
   return {
     props: {
@@ -96,3 +109,14 @@ export async function getStaticProps() {
     },
   }
 }
+
+// export async function getStaticProps() {
+//   const req = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`)
+//   const res = await req.json()
+
+//   return {
+//     props: {
+//       modul: res.data,
+//     },
+//   }
+// }

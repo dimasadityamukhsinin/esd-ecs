@@ -2,8 +2,60 @@ import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import Layout from '@/components/modules/layout'
 import FancyLink from '@/components/utils/fancyLink'
+import nookies from 'nookies'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import flash from 'next-flash'
+import { useRouter } from 'next/router'
 
-export default function Email() {
+const Email = ({ user, token, flashData }) => {
+  const router = useRouter()
+  const [field, setField] = useState({
+    email: user.email,
+  })
+
+  const setValue = (e) => {
+    const target = e.target
+    const name = target.name
+    const value = target.value
+
+    setField({
+      ...field,
+      [name]: value,
+    })
+  }
+
+  const doUpdate = async (e) => {
+    e.preventDefault()
+    const req = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(field),
+      },
+    )
+    const res = await req.json()
+
+    if (res.error) {
+      router.reload(window.location.pathname)
+      flash.set(['error', res.error.message])
+    } else {
+      router.reload(window.location.pathname)
+      flash.set(['update', 'You’ve updated your email.'])
+    }
+  }
+
+  const ShowFlash = () => {
+    useEffect(() => {
+      flash.set(null)
+    },[])
+    return <>{flashData[1]}</>
+  }
+
   return (
     <Layout>
       <Header />
@@ -33,26 +85,42 @@ export default function Email() {
             </FancyLink>
           </div>
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
+            {flashData ? (
+              flashData[0] === 'update' ? (
+                <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
+                  <ShowFlash />
+                </div>
+              ) : (
+                <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+                  <ShowFlash />
+                </div>
+              )
+            ) : (
+              <></>
+            )}
             <div className="flex flex-col">
-              <span className="text-xl font-medium">Email address</span>
-              <span className="text-lg mt-4">
-                dimasadityamukhsinin@gmail.com
-              </span>
-            </div>
-            <div className="flex flex-col mt-12">
               <span className="text-xl font-medium">
                 Change the email address for your account
               </span>
-              <form className="mt-6">
+              <form method="post" onSubmit={doUpdate} className="mt-6">
                 <div className="h-full w-full flex flex-col">
                   <label className="font-medium">
                     Enter a new email address
                   </label>
-                  <input type="text" className="w-full h-11 border p-2 mt-2" />
+                  <input
+                    type="email"
+                    name="email"
+                    onChange={setValue}
+                    className="w-full h-11 border p-2 mt-2"
+                    value={field.email}
+                  />
                 </div>
-                  <FancyLink className="bg-yellow-400 w-full mt-6 text-white font-medium py-2 px-3">
-                    Change my email address
-                  </FancyLink>
+                <button
+                  type="submit"
+                  className="bg-yellow-400 w-full mt-6 text-white font-medium py-2 px-3"
+                >
+                  Change my email address
+                </button>
               </form>
             </div>
           </div>
@@ -61,3 +129,32 @@ export default function Email() {
     </Layout>
   )
 }
+
+Email.getInitialProps = async (ctx) => {
+  const cookies = nookies.get(ctx)
+
+  if (!cookies.token) {
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
+  }
+
+  const user = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  return {
+    token: cookies.token,
+    user: user.data,
+    flashData: flash.get(ctx),
+  }
+}
+
+export default Email
