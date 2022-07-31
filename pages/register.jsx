@@ -2,6 +2,7 @@ import Layout from '@/components/modules/layout'
 import Header from '@/components/modules/header'
 import { useState } from 'react'
 import nookies from 'nookies'
+import SEO from '@/components/utils/seo'
 
 export default function Register() {
   const [field, setField] = useState({})
@@ -47,6 +48,11 @@ export default function Register() {
   return (
     <Layout>
       <Header />
+      <SEO
+        title={'Register'}
+        defaultSEO={typeof seo !== 'undefined' && seo.seo}
+        webTitle={typeof seo !== 'undefined' && seo.webTitle}
+      />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
           <h1 className="font-bold text-center text-2xl mb-5">ESD in ECS</h1>

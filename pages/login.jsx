@@ -1,14 +1,18 @@
 import Layout from '@/components/modules/layout'
 import Header from '@/components/modules/header'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import FancyLink from '@/components/utils/fancyLink'
 import nookies from 'nookies'
+import SEO from '@/components/utils/seo'
+import flash from 'next-flash'
 import Router from 'next/router'
+import { useRouter } from 'next/router'
+import axios from 'axios'
 
-export default function Login() {
+const Login = ({ seo, flashData }) => {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const route = useRouter()
 
   const setValue = (e) => {
     const target = e.target
@@ -22,9 +26,8 @@ export default function Login() {
   }
 
   const doLogin = async (e) => {
-    e.preventDefault()
-
     setProgress(true)
+    e.preventDefault();
 
     const req = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
@@ -41,27 +44,47 @@ export default function Login() {
     if (res.jwt) {
       nookies.set(null, 'token', res.jwt)
       Router.replace('/')
+    } else {
+      route.reload(window.location.pathname)
+      flash.set('Wrong username or password!')
     }
 
     setProgress(false)
   }
 
+  const ShowFlash = () => {
+    useEffect(() => {
+      flash.set(null)
+    }, [])
+    return <>{flashData}</>
+  }
+
   return (
     <Layout>
       <Header />
+      <SEO
+        title={'Login'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
           <h1 className="font-bold text-center text-2xl mb-5">ESD in ECS</h1>
+          {flashData && (
+            <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+              <ShowFlash />
+            </div>
+          )}
           <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-            <form onSubmit={doLogin} className="px-5 py-7">
+            <form method="post" onSubmit={doLogin} className="px-5 py-7">
               {progress && (
                 <div className="absolute inset-0 z-10 bg-white/50" />
               )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                Email
+                Username
               </label>
               <input
-                type="email"
+                type="text"
                 name="identifier"
                 onChange={setValue}
                 className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
@@ -124,18 +147,24 @@ export default function Login() {
   )
 }
 
-export async function getServerSideProps(ctx) {
-  const cookies = nookies.get(ctx);
+Login.getInitialProps = async (ctx) => {
+  const cookies = nookies.get(ctx)
+  const req = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+  const seo = await req.json()
 
-  if(cookies.token) {
-    return {
-      redirect: {
-        destination: '/'
-      }
-    }
+  if (cookies.token) {
+    ctx.res.writeHead(302, {
+        Location: '/'
+    });
+    ctx.res.end();
   }
 
   return {
-    props: {}
+    seo: seo.data.attributes,
+    flashData: flash.get(ctx),
   }
 }
+
+export default Login

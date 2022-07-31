@@ -5,6 +5,7 @@ import Header from '@/components/modules/header'
 import FancyLink from '@/components/utils/fancyLink'
 import Image from 'next/image'
 import nookies from 'nookies'
+import SEO from '@/components/utils/seo'
 
 export default function Home({ modul }) {
   const countdownData = (date) => {
@@ -21,6 +22,11 @@ export default function Home({ modul }) {
   return (
     <Layout>
       <Header />
+      <SEO
+        title={'Your Learning'}
+        defaultSEO={typeof seo !== 'undefined' && seo.seo}
+        webTitle={typeof seo !== 'undefined' && seo.webTitle}
+      />
       <div className="w-full my-8 text-center font-medium">
         <h2>Your Learning</h2>
       </div>
@@ -58,7 +64,7 @@ export default function Home({ modul }) {
                 </span>
                 <div className="relative flex justify-center w-full h-52">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${attributes.Thumbnail.data.attributes.url}`}
+                    src={attributes.Thumbnail.data.attributes.url}
                     alt={attributes.title}
                     layout="fill"
                     objectFit="cover"
@@ -109,14 +115,3 @@ export async function getServerSideProps(ctx) {
     },
   }
 }
-
-// export async function getStaticProps() {
-//   const req = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`)
-//   const res = await req.json()
-
-//   return {
-//     props: {
-//       modul: res.data,
-//     },
-//   }
-// }

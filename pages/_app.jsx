@@ -10,7 +10,6 @@ export default function App({ Component, pageProps }) {
 
   return (
     <>
-      <DefaultSeo {...SEO} />
 
       <AnimatePresence exitBeforeEnter>
         <AppWrapper>

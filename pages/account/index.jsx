@@ -40,14 +40,14 @@ const Account = ({ user, token, flashData }) => {
     const res = await req.json()
 
     router.reload(window.location.pathname)
-    flash.set(['update', 'You’ve updated your profile.'])
+    flash.set('You’ve updated your profile.')
   }
 
   const ShowFlash = () => {
     useEffect(() => {
       flash.set(null)
     },[])
-    return <>{flashData[1]}</>
+    return <>{flashData}</>
   }
 
   return (
@@ -80,11 +80,11 @@ const Account = ({ user, token, flashData }) => {
           </div>
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
             <div className="flex flex-col">
-              {flashData && (
+              {/* {flashData && (
                 <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
                   <ShowFlash />
                 </div>
-              )}
+              )} */}
               <span className="text-2xl font-medium">About you</span>
               <form method="post" onSubmit={doUpdate} className="mt-6">
                 <div className="flex flex-col">
