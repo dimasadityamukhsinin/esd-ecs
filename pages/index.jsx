@@ -6,6 +6,8 @@ import FancyLink from '@/components/utils/fancyLink'
 import Image from 'next/image'
 import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
+import axios from 'axios'
+import flash from 'next-flash'
 
 export default function Home({ modul }) {
   const countdownData = (date) => {
@@ -95,23 +97,45 @@ export default function Home({ modul }) {
 
 export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx);
-  const req = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`)
-  const res = await req.json()
+  const reqModul = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`)
+  const modul = await reqModul.json()
+  
+  const reqSeo = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+  const seo = await reqSeo.json()
 
   if(!cookies.token) {
     return {
-      props: {
-        modul: res.data,
-      },
       redirect: {
         destination: '/login'
+      }
+    }
+  }
+  
+  const user = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  console.log(user.data)
+
+  if(!user.data.username || !user.data.email || !user.data.First_Name || !user.data.Last_Name) {
+    return {
+      redirect: {
+        destination: '/account'
       }
     }
   }
 
   return {
     props: {
-      modul: res.data,
+      seo: seo.data.attributes,
+      modul: modul.data,
     },
   }
 }

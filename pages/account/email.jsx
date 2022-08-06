@@ -13,6 +13,10 @@ const Email = ({ user, token, flashData }) => {
   const [field, setField] = useState({
     email: user.email,
   })
+  const [progress, setProgress] = useState(false)
+  const [error, setError] = useState({
+    email: ''
+  })
 
   const setValue = (e) => {
     const target = e.target
@@ -26,35 +30,97 @@ const Email = ({ user, token, flashData }) => {
   }
 
   const doUpdate = async (e) => {
-    e.preventDefault()
-    const req = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+    if(validateSubmit(e)) {
+      e.prevenDefault();
+    }else {
+      setProgress(true)
+      const req = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(field),
         },
-        body: JSON.stringify(field),
-      },
-    )
-    const res = await req.json()
-
-    if (res.error) {
-      router.reload(window.location.pathname)
-      flash.set(['error', res.error.message])
-    } else {
-      router.reload(window.location.pathname)
-      flash.set(['update', 'You’ve updated your email.'])
+      )
+      const res = await req.json()
+      setProgress(false)
+  
+      if (res.error) {
+        router.reload(window.location.pathname)
+        flash.set({
+          type: 'error',
+          message: res.error.message,
+        })
+      } else {
+        router.reload(window.location.pathname)
+        flash.set({
+          type: 'update',
+          message: 'You’ve updated your email.',
+        })
+      }
     }
   }
 
   const ShowFlash = () => {
     useEffect(() => {
       flash.set(null)
-    },[])
-    return <>{flashData[1]}</>
+    }, [])
+    return <>{flashData.message}</>
   }
+
+  const validateSubmit = (e) => {
+    const emailTarget = e.target[0]
+    const email = emailTarget.name
+    const emailValue = emailTarget.value
+
+    const stateObj = { email: '' }
+
+    if (email) {
+      if (!emailValue) {
+        stateObj.email = 'Please enter Email.'
+      }
+    }
+
+    setError(stateObj)
+    if (stateObj.email) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const validateInput = (e) => {
+    let { name, value } = e.target
+    setError((prev) => {
+      const stateObj = { ...prev, [name]: '' }
+
+      switch (name) {
+        case 'email':
+          if (!value) {
+            stateObj[name] = 'Please enter Email.'
+          }
+          break
+
+        default:
+          break
+      }
+
+      return stateObj
+    })
+  }
+
+  useEffect(() => {
+    if (!user.username || !user.email || !user.First_Name || !user.Last_Name) {
+      flash.set({
+        type: 'warning',
+        message:
+          'Please complete your personal data such as username, email, and full name!',
+      })
+    }
+  }, [])
 
   return (
     <Layout>
@@ -86,14 +152,20 @@ const Email = ({ user, token, flashData }) => {
           </div>
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
             {flashData ? (
-              flashData[0] === 'update' ? (
+              flashData.type === 'update' ? (
                 <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
                   <ShowFlash />
                 </div>
-              ) : (
+              ) : flashData.type === 'error' ? (
                 <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
                   <ShowFlash />
                 </div>
+              ) : (
+                flashData.type === 'warning' && (
+                  <div className="bg-yellow-400 text-white rounded mb-4 px-4 py-3">
+                    <ShowFlash />
+                  </div>
+                )
               )
             ) : (
               <></>
@@ -111,12 +183,19 @@ const Email = ({ user, token, flashData }) => {
                     type="email"
                     name="email"
                     onChange={setValue}
+                    onBlur={validateInput}
                     className="w-full h-11 border p-2 mt-2"
                     value={field.email}
                   />
+                  {error.email && (
+                    <span className="block text-red-500">
+                      {error.email}
+                    </span>
+                  )}
                 </div>
                 <button
                   type="submit"
+                  disabled={progress}
                   className="bg-yellow-400 w-full mt-6 text-white font-medium py-2 px-3"
                 >
                   Change my email address

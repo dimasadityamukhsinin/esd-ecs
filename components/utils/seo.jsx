@@ -24,12 +24,12 @@ const SEO = ({
     typeof inputSEO.seo_image !== 'undefined' &&
     typeof inputSEO.seo_image.asset !== 'undefined' &&
     inputSEO.seo_image
-      ? urlFor(inputSEO.seo_image).url() // Check and Get Input
+      ? inputSEO.seo_image // Check and Get Input
       : typeof defaultSEO !== 'undefined' &&
         typeof defaultSEO.seo_image !== 'undefined' &&
         typeof defaultSEO.seo_image.asset !== 'undefined' &&
         defaultSEO.seo_image
-      ? urlFor(defaultSEO.seo_image).url() // Check and Get Default
+      ? defaultSEO.seo_image.url() // Check and Get Default
       : ''; // Insert Blank
 
   const image_alt =
@@ -70,10 +70,14 @@ const SEO = ({
           url: canonicalLink,
           title: pagetitle,
           description: description,
+          type: 'website',
           images: [
             {
               url: image,
               alt: image_alt,
+              width: 800,
+              height: 600,
+              type: 'image/jpeg',
             },
           ],
           site_name: 'Locavore',

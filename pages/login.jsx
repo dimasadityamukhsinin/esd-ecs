@@ -8,11 +8,17 @@ import flash from 'next-flash'
 import Router from 'next/router'
 import { useRouter } from 'next/router'
 import axios from 'axios'
+import Image from 'next/image'
 
 const Login = ({ seo, flashData }) => {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
   const route = useRouter()
+
+  const [error, setError] = useState({
+    identifier: '',
+    password: '',
+  })
 
   const setValue = (e) => {
     const target = e.target
@@ -23,33 +29,93 @@ const Login = ({ seo, flashData }) => {
       ...field,
       [name]: value,
     })
+    validateInput(e)
+  }
+
+  const validateSubmit = (e) => {
+    const identifierTarget = e.target[0]
+    const identifier = identifierTarget.name
+    const identifierValue = identifierTarget.value
+
+    const passwordTarget = e.target[1]
+    const password = passwordTarget.name
+    const passwordValue = passwordTarget.value
+
+    const stateObj = { identifier: '', password: '' }
+
+    if (identifier) {
+      if (!identifierValue) {
+        stateObj.identifier = 'Please enter Username.'
+      }
+    }
+
+    if (password) {
+      if (!passwordValue) {
+        stateObj.password = 'Please enter Password.'
+      }
+    }
+    setError(stateObj)
+    if (stateObj.identifier || stateObj.password) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const validateInput = (e) => {
+    let { name, value } = e.target
+    setError((prev) => {
+      const stateObj = { ...prev, [name]: '' }
+
+      switch (name) {
+        case 'identifier':
+          if (!value) {
+            stateObj[name] = 'Please enter Username.'
+          }
+          break
+
+        case 'password':
+          if (!value) {
+            stateObj[name] = 'Please enter Password.'
+          }
+          break
+
+        default:
+          break
+      }
+
+      return stateObj
+    })
   }
 
   const doLogin = async (e) => {
-    setProgress(true)
-    e.preventDefault();
+    e.preventDefault()
 
-    const req = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    if (!validateSubmit(e)) {
+      setProgress(true)
+
+      const req = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(field),
         },
-        body: JSON.stringify(field),
-      },
-    )
-    const res = await req.json()
+      )
+      const res = await req.json()
 
-    if (res.jwt) {
-      nookies.set(null, 'token', res.jwt)
-      Router.replace('/')
-    } else {
-      route.reload(window.location.pathname)
-      flash.set('Wrong username or password!')
+      if (res.jwt) {
+        nookies.set(null, 'token', res.jwt)
+        Router.replace('/')
+      } else {
+        route.reload(window.location.pathname)
+        flash.set('Wrong username or password!')
+      }
+
+      setProgress(false)
     }
-
-    setProgress(false)
   }
 
   const ShowFlash = () => {
@@ -61,15 +127,22 @@ const Login = ({ seo, flashData }) => {
 
   return (
     <Layout>
-      <Header />
       <SEO
         title={'Login'}
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
-        <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
-          <h1 className="font-bold text-center text-2xl mb-5">ESD in ECS</h1>
+        <div className="mx-auto md:w-full md:max-w-md">
+          {/* <h1 className="font-bold text-center text-2xl mb-5"></h1> */}
+          <div className="relative w-full h-32 aspect-square mb-6">
+            <Image
+              src={seo.Logo.data.attributes.url}
+              alt={seo.Website_Title}
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
           {flashData && (
             <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
               <ShowFlash />
@@ -87,8 +160,16 @@ const Login = ({ seo, flashData }) => {
                 type="text"
                 name="identifier"
                 onChange={setValue}
-                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.identifier && 'mb-5'
+                }`}
               />
+              {error.identifier && (
+                <span className="block text-red-500 mb-5">
+                  {error.identifier}
+                </span>
+              )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
                 Password
               </label>
@@ -96,8 +177,16 @@ const Login = ({ seo, flashData }) => {
                 type="password"
                 name="password"
                 onChange={setValue}
-                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.password && 'mb-5'
+                }`}
               />
+              {error.password && (
+                <span className="block text-red-500 mb-5">
+                  {error.password}
+                </span>
+              )}
               <button
                 disabled={progress}
                 type="submit"
@@ -156,9 +245,9 @@ Login.getInitialProps = async (ctx) => {
 
   if (cookies.token) {
     ctx.res.writeHead(302, {
-        Location: '/'
-    });
-    ctx.res.end();
+      Location: '/',
+    })
+    ctx.res.end()
   }
 
   return {
