@@ -8,8 +8,11 @@ import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
 import axios from 'axios'
 import flash from 'next-flash'
+import { useRouter } from 'next/router'
 
-export default function Home({ modul }) {
+export default function Home({ user, modul }) {
+  const router = useRouter()
+
   const countdownData = (date) => {
     let today = new Date().toISOString().slice(0, 10)
 
@@ -20,6 +23,20 @@ export default function Home({ modul }) {
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24)
     return `${diffInDays} days left`
   }
+
+  useEffect(() => {
+    if (!user.username || !user.email || !user.First_Name || !user.Last_Name) {
+      flash.set({
+        type: 'warning',
+        message:
+          'Please complete your personal data such as username, email, and full name!',
+      })
+      // Make sure we're in the browser
+      if (typeof window !== 'undefined') {
+        router.push('/account')
+      }
+    }
+  }, [])
 
   return (
     <Layout>
@@ -75,7 +92,9 @@ export default function Home({ modul }) {
                   <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
                 </div>
                 <div className="w-full flex flex-col p-3 space-y-3">
-                  <span className='font-medium text-gray-500'>Modul {id+1}</span>
+                  <span className="font-medium text-gray-500">
+                    Modul {id + 1}
+                  </span>
                   <span className="font-medium text-lg text-left">
                     {attributes.Title}
                   </span>
@@ -96,23 +115,25 @@ export default function Home({ modul }) {
 }
 
 export async function getServerSideProps(ctx) {
-  const cookies = nookies.get(ctx);
-  const reqModul = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`)
+  const cookies = nookies.get(ctx)
+  const reqModul = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
+  )
   const modul = await reqModul.json()
-  
+
   const reqSeo = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
   )
   const seo = await reqSeo.json()
 
-  if(!cookies.token) {
+  if (!cookies.token) {
     return {
       redirect: {
-        destination: '/login'
-      }
+        destination: '/login',
+      },
     }
   }
-  
+
   const user = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
     {
@@ -122,18 +143,9 @@ export async function getServerSideProps(ctx) {
     },
   )
 
-  console.log(user.data)
-
-  if(!user.data.username || !user.data.email || !user.data.First_Name || !user.data.Last_Name) {
-    return {
-      redirect: {
-        destination: '/account'
-      }
-    }
-  }
-
   return {
     props: {
+      user: user.data,
       seo: seo.data.attributes,
       modul: modul.data,
     },
