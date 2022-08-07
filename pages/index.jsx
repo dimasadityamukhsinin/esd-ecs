@@ -21,7 +21,7 @@ export default function Home({ user, modul }) {
 
     const diffInMs = new Date(startDate) - new Date(endDate)
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24)
-    return `${diffInDays} days left`
+    return diffInDays
   }
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function Home({ user, modul }) {
       <div className="w-full my-8 text-center font-medium">
         <h2>Your Learning</h2>
       </div>
-      <div className="border-t bg-gray-50 w-full">
+      <div className="border-t bg-gray-50 w-full min-h-[60vh]">
         <Container className="mt-4 md:mt-6 xl:mt-8">
           <div className="flex space-x-8 mt-12 ml-[0.7rem]">
             <FancyLink
@@ -72,41 +72,46 @@ export default function Home({ user, modul }) {
             </FancyLink>
           </div>
           <div className="flex flex-wrap modul mt-6">
-            {modul.map(({ attributes }, id) => (
-              <FancyLink
-                key={id}
-                destination="/contoh1"
-                className="relative bg-white border w-96"
-              >
-                <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                  {countdownData(attributes.Assignment_Deadline)}
-                </span>
-                <div className="relative flex justify-center w-full h-52">
-                  <Image
-                    src={attributes.Thumbnail.data.attributes.url}
-                    alt={attributes.title}
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                  <div className="absolute z-10 w-full h-full bg-black opacity-40" />
-                  <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
-                </div>
-                <div className="w-full flex flex-col p-3 space-y-3">
-                  <span className="font-medium text-gray-500">
-                    Modul {id + 1}
-                  </span>
-                  <span className="font-medium text-lg text-left">
-                    {attributes.Title}
-                  </span>
-                  <p className="text-gray-500 font-medium text-sm text-left">
-                    {attributes.Short_Description}
-                  </p>
-                  <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                    Go to modul
-                  </div>
-                </div>
-              </FancyLink>
-            ))}
+            {modul.map(
+              ({ attributes }, id) =>
+                !(countdownData(attributes.Assignment_Deadline) < 0) && (
+                  <FancyLink
+                    key={id}
+                    destination={`modul/${attributes.Slug}`}
+                    className="relative bg-white border w-96"
+                  >
+                    <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
+                      {`${countdownData(
+                        attributes.Assignment_Deadline,
+                      )} days left`}
+                    </span>
+                    <div className="relative flex justify-center w-full h-52">
+                      <Image
+                        src={attributes.Thumbnail.data.attributes.url}
+                        alt={attributes.title}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                      <div className="absolute z-10 w-full h-full bg-black opacity-40" />
+                      <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
+                    </div>
+                    <div className="w-full flex flex-col p-3 space-y-3">
+                      <span className="font-medium text-gray-500">
+                        Modul {id + 1}
+                      </span>
+                      <span className="font-medium text-lg text-left">
+                        {attributes.Title}
+                      </span>
+                      <p className="text-gray-500 font-medium text-sm text-left">
+                        {attributes.Short_Description}
+                      </p>
+                      <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
+                        Go to modul
+                      </div>
+                    </div>
+                  </FancyLink>
+                ),
+            )}
           </div>
         </Container>
       </div>

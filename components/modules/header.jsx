@@ -19,7 +19,7 @@ export default function Header({ className }) {
 
             <FancyLink
               className="ml-8 text-yellow-500 font-medium text-xl"
-              destination="/assigment"
+              destination="/"
             >
               Your Learning
             </FancyLink>

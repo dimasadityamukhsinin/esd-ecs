@@ -13,39 +13,241 @@ import { GrNext, GrPrevious } from 'react-icons/gr'
 import swal from 'sweetalert'
 
 export default function ModulSlug({ modul }) {
-  const itemsFromBackend = [
-    { id: uuidv4(), content: 'Turn On' },
-    { id: uuidv4(), content: 'Change' },
-    { id: uuidv4(), content: 'Disable' },
-    { id: uuidv4(), content: 'Consider' },
-    { id: uuidv4(), content: 'Choose' },
-    { id: uuidv4(), content: 'Reduce' },
-    { id: uuidv4(), content: 'Switch off' },
-    { id: uuidv4(), content: 'Reduce' },
-    { id: uuidv4(), content: 'Turn off' },
-    { id: uuidv4(), content: 'Make' },
-  ]
+  let dragsFromBackend = []
+  let dropsFromBackend = []
+
+  modul.Editor.forEach((data, id) => {
+    if (data.__component === 'editor.drag-and-drop') {
+      dragsFromBackend.push({
+        id: id,
+        items: [],
+      })
+      data.Drag.forEach((item) => {
+        if (dragsFromBackend.find((getId) => getId.id === id)) {
+          dragsFromBackend
+            .find((getId) => getId.id === id)
+            .items.push({ id: uuidv4(), content: item.Content })
+        }
+      })
+    }
+  })
+
+  modul.Editor.forEach((data, id) => {
+    if (data.__component === 'editor.drag-and-drop') {
+      dropsFromBackend.push({
+        id: id,
+        items: [],
+      })
+      data.Drop.forEach((item) => {
+        if (dropsFromBackend.find((getId) => getId.id === id)) {
+          dropsFromBackend
+            .find((getId) => getId.id === id)
+            .items.push({
+              id: uuidv4(),
+              Key: item.Key,
+              Answer: item.Answer,
+              Question_Column_1: item.Question_Column_1,
+              Question_Column_2: item.Question_Column_2,
+              Question_Column_3: item.Question_Column_3,
+            })
+        }
+      })
+    }
+  })
+
+  // console.log(dropsFromBackend)
 
   const columnsFromBackend = {
-    [uuidv4()]: {
+    drag: {
+      id: uuidv4(),
       name: 'Drag',
-      items: itemsFromBackend,
+      content: dragsFromBackend,
     },
-    [uuidv4()]: {
+    drop: {
+      id: uuidv4(),
       name: 'Drop',
-      items: [],
+      content: [],
     },
   }
 
-  const onDragEnd = (result, columns, setColumns) => {
+  const [checkDrop, setCheckDrop] = useState([])
+
+  const onDragEnd = (result, columns, setColumns, idComponent) => {
+    let dropContent = document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+      result.destination.index
+    ].children[0].innerHTML
+
+    let dragContent = columns.drag.content.find(
+      (data) => data.id === idComponent,
+    ).items[result.source.index].content
+
     if (result.destination) {
-      document.getElementsByClassName('drops')[0].children[
-        result.destination.index
-      ].innerHTML = 'Turn on your sleep setting.'
+      if (result.destination.droppableId !== result.source.droppableId) {
+        if (
+          !modul.Editor[idComponent].Drop[result.destination.index]
+            .Question_Column_1
+        ) {
+          if (
+            dropContent
+              .split(' ')
+              .find((data) => (data === '..........' ? true : false))
+          ) {
+            document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+              result.destination.index
+            ].children[0].innerHTML = `${dragContent} ${
+              modul.Editor[idComponent].Drop[result.destination.index]
+                .Question_Column_2
+            } ${
+              modul.Editor[idComponent].Drop[result.destination.index]
+                .Question_Column_3
+            }`
+          }
+        } else if (
+          !modul.Editor[idComponent].Drop[result.destination.index]
+            .Question_Column_2
+        ) {
+          if (
+            dropContent
+              .split(' ')
+              .find((data) => (data === '..........' ? true : false))
+          ) {
+            document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+              result.destination.index
+            ].children[0].innerHTML = `${
+              modul.Editor[idComponent].Drop[result.destination.index]
+                .Question_Column_1
+            } ${dragContent} ${
+              modul.Editor[idComponent].Drop[result.destination.index]
+                .Question_Column_3
+            }`
+          }
+        } else if (
+          !modul.Editor[idComponent].Drop[result.destination.index]
+            .Question_Column_3
+        ) {
+          if (
+            dropContent
+              .split(' ')
+              .find((data) => (data === '..........' ? true : false))
+          ) {
+            document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+              result.destination.index
+            ].children[0].innerHTML = `${
+              modul.Editor[idComponent].Drop[result.destination.index]
+                .Question_Column_1
+            } ${
+              modul.Editor[idComponent].Drop[result.destination.index]
+                .Question_Column_2
+            } ${dragContent}`
+          }
+        }
+        setCheckDrop((prev) => {
+          let data = [
+            ...prev,
+            {
+              id: idComponent,
+              index: result.destination.index,
+            },
+          ]
+          return data
+        })
+      }
     }
 
     if (!result.destination) return
-    const { source, destination, combine } = result
+    const { source, destination, combine, draggableId } = result
+
+    if (
+      !modul.Editor[idComponent].Drop[result.destination.index]
+        .Question_Column_1
+    ) {
+      if (
+        dropContent
+          .split(' ')
+          .find((data) => (data === '..........' ? true : false))
+      ) {
+        if (source.droppableId !== destination.droppableId) {
+          const sourceColumn = columns.drag
+          const destColumn = columns.drop
+          const sourceItems = [...sourceColumn.content]
+          sourceItems
+            .find((data) => data.id === idComponent)
+            .items.splice(source.index, 1)
+          setColumns({
+            drag: {
+              id: sourceColumn.id,
+              name: 'Drag',
+              content: sourceItems,
+            },
+            drop: {
+              id: destColumn.id,
+              name: 'Drop',
+              content: [],
+            },
+          })
+        }
+      }
+    } else if (
+      !modul.Editor[idComponent].Drop[result.destination.index]
+        .Question_Column_2
+    ) {
+      if (
+        dropContent
+          .split(' ')
+          .find((data) => (data === '..........' ? true : false))
+      ) {
+        if (source.droppableId !== destination.droppableId) {
+          const sourceColumn = columns.drag
+          const destColumn = columns.drop
+          const sourceItems = [...sourceColumn.content]
+          sourceItems
+            .find((data) => data.id === idComponent)
+            .items.splice(source.index, 1)
+          setColumns({
+            drag: {
+              id: sourceColumn.id,
+              name: 'Drag',
+              content: sourceItems,
+            },
+            drop: {
+              id: destColumn.id,
+              name: 'Drop',
+              content: [],
+            },
+          })
+        }
+      }
+    } else if (
+      !modul.Editor[idComponent].Drop[result.destination.index]
+        .Question_Column_3
+    ) {
+      if (
+        dropContent
+          .split(' ')
+          .find((data) => (data === '..........' ? true : false))
+      ) {
+        if (source.droppableId !== destination.droppableId) {
+          const sourceColumn = columns.drag
+          const destColumn = columns.drop
+          const sourceItems = [...sourceColumn.content]
+          sourceItems
+            .find((data) => data.id === idComponent)
+            .items.splice(source.index, 1)
+          setColumns({
+            drag: {
+              id: sourceColumn.id,
+              name: 'Drag',
+              content: sourceItems,
+            },
+            drop: {
+              id: destColumn.id,
+              name: 'Drop',
+              content: [],
+            },
+          })
+        }
+      }
+    }
 
     // if(combine) {
     //   // super simple: just removing the dragging item
@@ -54,38 +256,6 @@ export default function ModulSlug({ modul }) {
     //   setState({ items });
     //   return;
     // }
-
-    if (source.droppableId !== destination.droppableId) {
-      const sourceColumn = columns[source.droppableId]
-      const destColumn = columns[destination.droppableId]
-      const sourceItems = [...sourceColumn.items]
-      const destItems = [...destColumn.items]
-      const [removed] = sourceItems.splice(source.index, 1)
-      destItems.splice(destination.index, 0, removed)
-      setColumns({
-        ...columns,
-        [source.droppableId]: {
-          ...sourceColumn,
-          items: sourceItems,
-        },
-        [destination.droppableId]: {
-          ...destColumn,
-          items: destItems,
-        },
-      })
-    } else {
-      const column = columns[source.droppableId]
-      const copiedItems = [...column.items]
-      const [removed] = copiedItems.splice(source.index, 1)
-      copiedItems.splice(destination.index, 0, removed)
-      setColumns({
-        ...columns,
-        [source.droppableId]: {
-          ...column,
-          items: copiedItems,
-        },
-      })
-    }
   }
   const [columns, setColumns] = useState(columnsFromBackend)
 
@@ -108,7 +278,7 @@ export default function ModulSlug({ modul }) {
     setColumns(columnsFromBackend)
   }
 
-  const [dragging, setDragging] = useState(null)
+  const removeDrag = () => {}
 
   return (
     <Layout>
@@ -127,37 +297,29 @@ export default function ModulSlug({ modul }) {
         </FancyLink>
       </div>
       <div className="relative flex flex-col w-full">
-        {/* <div className="sticky top-0 left-0 h-full w-80 bg-gray-50 border-r-2 flex flex-col py-4 px-3 overflow-hidden">
-          <div className="flex flex-col space-y-1">
-            <span className="text-lg font-medium">MODUL 1</span>
-            <FancyLink className="font-medium text-left flex justify-between items-center">
-              <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-                Reducing Computer Power Consumption
-              </span>
-            </FancyLink>
-            <div className="flex flex-col justify-start text-left ml-2 space-y-2">
-              <FancyLink destination="/">A. Starting Out</FancyLink>
-              <FancyLink destination="/">B. Point of Language</FancyLink>
-              <FancyLink destination="/">C. Practice</FancyLink>
-              <FancyLink destination="/">D. Assessment</FancyLink>
-              <FancyLink destination="/">E. Expansion</FancyLink>
-            </div>
-          </div>
-        </div> */}
         <Container className="mt-4 md:mt-6 xl:mt-8">
           <div className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8">
-            {modul.attributes.Editor.map((data, idComponent) =>
+            {modul.Editor.map((data, idComponent) =>
               data.__component === 'editor.title' ? (
-                <TitleComponent title={data.Title} content={data.Content} />
+                <TitleComponent
+                  title={data.Title}
+                  content={data.Content}
+                  key={idComponent}
+                />
               ) : data.__component === 'editor.youtube' ? (
-                <YoutubeComponent link={data.Youtube} />
+                <YoutubeComponent link={data.Youtube} key={idComponent} />
               ) : data.__component === 'editor.content' ? (
                 <div
+                  key={idComponent}
+                  data-id={idComponent + 1}
                   className="w-full flex flex-col space-y-3 text-lg editor"
                   dangerouslySetInnerHTML={{ __html: data.Content }}
                 ></div>
               ) : data.__component === 'editor.drag-and-drop' ? (
-                <div className="flex flex-col w-full">
+                <div
+                  className="flex flex-col w-full"
+                  key={idComponent}
+                >
                   <span className="font-medium">Instruction:</span>
                   <span>
                     Match the words in the boxes with the phrases below to make
@@ -167,26 +329,26 @@ export default function ModulSlug({ modul }) {
                     {process.browser && (
                       <DragDropContext
                         onDragEnd={(result) =>
-                          onDragEnd(result, columns, setColumns)
+                          onDragEnd(result, columns, setColumns, idComponent)
                         }
                       >
-                        {Object.entries(columns).map(
-                          ([columnId, column], index) => {
-                            return column.name === 'Drop' ? (
-                              <Droppable
-                                droppableId={columnId}
-                                key={columnId}
-                                isCombineEnabled={true}
-                              >
-                                {(provided, snapshot) => {
-                                  return (
-                                    <ol
-                                      className="list-inside list-decimal drops"
-                                      data-idComponent={idComponent}
-                                      {...provided.droppableProps}
-                                      ref={provided.innerRef}
-                                    >
-                                      {data.Drop.map((item, id) => (
+                        <div className="w-full" key={columns.drag.id}>
+                          <div style={{ margin: 8 }}>
+                            <Droppable
+                              droppableId={columns.drag.id}
+                              key={columns.drag.id}
+                              direction="horizontal"
+                            >
+                              {(provided, snapshot) => {
+                                return (
+                                  <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className="flex flex-wrap drag"
+                                  >
+                                    {columns.drag.content
+                                      .find((getId) => getId.id === idComponent)
+                                      .items.map((item, id) => (
                                         <Draggable
                                           key={`${item.id}`}
                                           draggableId={`${item.id}`}
@@ -194,78 +356,94 @@ export default function ModulSlug({ modul }) {
                                         >
                                           {(provided, snapshot) => {
                                             return (
-                                              <li
+                                              <span
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
                                                 {...provided.dragHandleProps}
-                                                className={`${
-                                                  dragging === `${item.id}`
-                                                    ? 'bg-yellow-500'
-                                                    : ''
-                                                }`}
-                                                data-id={id + 1}
+                                                className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
                                               >
-                                                {item.Question}
-                                              </li>
+                                                {item.content}
+                                              </span>
                                             )
                                           }}
                                         </Draggable>
                                       ))}
-                                      {provided.placeholder}
-                                    </ol>
-                                  )
-                                }}
-                              </Droppable>
-                            ) : (
-                              <div className="w-full" key={columnId}>
-                                <div style={{ margin: 8 }}>
-                                  <Droppable
-                                    droppableId={columnId}
-                                    key={columnId}
+                                    {provided.placeholder}
+                                  </div>
+                                )
+                              }}
+                            </Droppable>
+                          </div>
+                        </div>
+                        <Droppable
+                          droppableId={columns.drop.id}
+                          key={columns.drop.id}
+                          isCombineEnabled={true}
+                        >
+                          {(provided, snapshot) => {
+                            // console.log(data)
+                            return (
+                              <ol
+                                className={`list-inside list-decimal space-y-4 drops-${idComponent}`}
+                                data-idComponent={idComponent}
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                              >
+                                {data.Drop.map((item, id) => (
+                                  <Draggable
+                                    key={`${item.id}`}
+                                    draggableId={`${item.id}`}
+                                    index={id}
                                   >
                                     {(provided, snapshot) => {
                                       return (
-                                        <div
-                                          {...provided.droppableProps}
-                                          ref={provided.innerRef}
-                                          className="flex flex-wrap drag"
-                                        >
-                                          {column.items.map((item, index) => {
-                                            return (
-                                              <Draggable
-                                                key={item.id}
-                                                draggableId={item.id}
-                                                index={index}
+                                        <>
+                                          <li
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            data-id={id + 1}
+                                          >
+                                            <span className="inline-flex max-w-md">
+                                              {item.Question_Column_1
+                                                ? item.Question_Column_1
+                                                : '.......... '}
+                                              {` `}
+                                              {item.Question_Column_2
+                                                ? item.Question_Column_2
+                                                : '.......... '}
+                                              {` `}
+                                              {item.Question_Column_3
+                                                ? item.Question_Column_3
+                                                : '.......... '}
+                                            </span>
+                                            {checkDrop
+                                              .filter(
+                                                (data) =>
+                                                  data.id ===
+                                                  idComponent,
+                                              )
+                                              .find(
+                                                (item) => item.index === id,
+                                              ) && (
+                                              <FancyLink
+                                                onClick={removeDrag}
+                                                className="ml-6 rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-white"
                                               >
-                                                {(provided, snapshot) => {
-                                                  // console.log(snapshot)
-                                                  setDragging(
-                                                    snapshot.combineWith,
-                                                  )
-                                                  return (
-                                                    <span
-                                                      ref={provided.innerRef}
-                                                      {...provided.draggableProps}
-                                                      {...provided.dragHandleProps}
-                                                      className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
-                                                    >
-                                                      {item.content}
-                                                    </span>
-                                                  )
-                                                }}
-                                              </Draggable>
-                                            )
-                                          })}
-                                          {provided.placeholder}
-                                        </div>
+                                                Remove
+                                              </FancyLink>
+                                            )}
+                                          </li>
+                                        </>
                                       )
                                     }}
-                                  </Droppable>
-                                </div>
-                              </div>
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </ol>
                             )
-                          },
-                        )}
+                          }}
+                        </Droppable>
                       </DragDropContext>
                     )}
                   </div>
@@ -282,90 +460,6 @@ export default function ModulSlug({ modul }) {
                 <></>
               ),
             )}
-            {/* <YoutubeComponent link="https://youtu.be/QRkPhXI6tFo" />
-            <TitleComponent title="B" content="Point of Language" />
-            <div className="w-full flex flex-col space-y-3 text-lg">
-              <p>
-                An imperative sentence is basically, a sentence that gives a
-                command or gives a request to do something. You can use
-                imperative sentences
-              </p>
-              <p>
-                to give a command or instruction, ask for something, or give
-                advice. They tell people what to do.
-              </p>
-              <p className="font-bold">
-                How do we know that it is an imperative sentence?
-              </p>
-              <p>
-                The first sign that a sentence is in order is how it is
-                punctuated. Most of these sentences end with a period, and
-                sometimes with an exclamation mark. Just be careful, because, as
-                you'll see below, a period or exclamation mark isn't the only
-                way to end a sentence. Just look at the punctuation to see if
-                you might be looking at an imperative sentence.
-              </p>
-              <p>
-                Next, look at what these sentences say about the verbs. Most of
-                the time, the first word in an imperative sentence is a verb
-                that gives an order. The subject is another hint. Most of the
-                time, the subject of a sentence that gives a direct order is not
-                stated. Instead, it is assumed.
-              </p>
-              <p>
-                The main purpose of an imperative sentence is to instruct,
-                request or demand, invite, or give advice. Here are some
-                examples of imperative sentences and their function.
-              </p>
-              <ul className="list-inside list-disc">
-                <li>Turn on the power button. (instruction)</li>
-                <li>
-                  Help me to fix my power-saving mode. (request or demand)
-                </li>
-                <li>Come with me to the computer exhibition. (invitation)</li>
-              </ul>
-            </div>
-            <TitleComponent title="C" content="Practice" />
-            <div className="w-full flex flex-col space-y-3">
-              <p>
-                Obviously, the amount of power a computer uses depends on the
-                model and how it is used. For example, a laptop uses only a
-                third as much energy as a desktop:
-              </p>
-              <p>
-                On average, 200 Watt-hours are used by a full desktop (Wh). This
-                is the average amount of power used by the computer (171 W), the
-                internet modem (10 W), the printer (5 W), and the loudspeakers
-                per hour (20 W). If a computer is on for eight hours a day, it
-                will use 600 kWh of electricity in a year. That's the same as
-                putting out about 175 kg of CO2 per year.
-              </p>
-              <p>
-                A laptop uses a lot less power. Depending on the model, it uses
-                between 50 and 100 Wh when it is on. If it is used for eight
-                hours a day, it uses anywhere from 150 to 300 kWh per year.
-                That's the same as putting out between 44 and 88 kg of CO2 per
-                year.
-              </p>
-              <p>
-                On standby, both a desktop and a laptop use about a third as
-                much power as when they are being used. Putting the monitor into
-                standby mode cuts its power use by 15%. If the monitor is
-                completely turned off, it doesn't use any power.
-              </p>
-              <p>
-                Even though the internet is a virtual place, using it still
-                takes energy and causes CO2 to be released into the air.
-                Consider it!
-              </p>
-              <p>Here are some tips to reduce computer power consumption!</p>
-              <p>
-                <span className="font-bold">Instruction:</span>
-                <br /> Match the words in the boxes with the phrases below to
-                make them into imperative sentences.
-              </p>
-            </div> */}
-            {/* Drag and Drop Component */}
           </div>
           <div className="w-full my-10 max-w-3xl flex flex-col items-center mx-auto">
             <div className="border-b w-full pb-2">
@@ -438,27 +532,28 @@ export default function ModulSlug({ modul }) {
   )
 }
 
-// export async function getStaticPaths() {
-//   const res = await client.fetch(`
-//       *[_type == "issue" && comingSoon == false]
-//     `)
+export async function getStaticPaths() {
+  const req = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
+  )
+  const res = await req.json()
 
-//   const paths = res.map((data) => ({
-//     params: { editorial_slug: data.slug.current.toString() },
-//   }))
+  const paths = res.data.map((data) => ({
+    params: { slug: data.attributes.Slug },
+  }))
 
-//   return { paths, fallback: false }
-// }
+  return { paths, fallback: false }
+}
 
-// export async function getStaticProps() {
-//   const req = await fetch(
-//     `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=reducing-computer-power-consumption&populate=deep`,
-//   )
-//   const res = await req.json()
+export async function getStaticProps({ params }) {
+  const req = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${params.slug}&populate=deep`,
+  )
+  const res = await req.json()
 
-//   return {
-//     props: {
-//       modul: res.data[0],
-//     },
-//   }
-// }
+  return {
+    props: {
+      modul: res.data[0].attributes,
+    },
+  }
+}

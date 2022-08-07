@@ -15,7 +15,7 @@ const Email = ({ user, token, flashData }) => {
   })
   const [progress, setProgress] = useState(false)
   const [error, setError] = useState({
-    email: ''
+    email: '',
   })
 
   const setValue = (e) => {
@@ -30,9 +30,9 @@ const Email = ({ user, token, flashData }) => {
   }
 
   const doUpdate = async (e) => {
-    if(validateSubmit(e)) {
-      e.prevenDefault();
-    }else {
+    if (validateSubmit(e)) {
+      e.prevenDefault()
+    } else {
       setProgress(true)
       const req = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
@@ -47,7 +47,7 @@ const Email = ({ user, token, flashData }) => {
       )
       const res = await req.json()
       setProgress(false)
-  
+
       if (res.error) {
         router.reload(window.location.pathname)
         flash.set({
@@ -56,19 +56,35 @@ const Email = ({ user, token, flashData }) => {
         })
       } else {
         router.reload(window.location.pathname)
-        flash.set({
-          type: 'update',
-          message: 'You’ve updated your email.',
-        })
+
+        if (
+          !user.username ||
+          !user.email ||
+          !user.First_Name ||
+          !user.Last_Name
+        ) {
+          flash.set({
+            type: 'warning',
+            message:
+              'Please complete your personal data such as username, email, and full name!',
+          })
+        } else {
+          flash.set({
+            type: 'update',
+            message: 'You’ve updated your email.',
+          })
+        }
       }
     }
   }
 
   const ShowFlash = () => {
-    useEffect(() => {
+    let message = flashData.message;
+    // Make sure we're in the browser
+    if (typeof window !== 'undefined') {
       flash.set(null)
-    }, [])
-    return <>{flashData.message}</>
+    }
+    return <>{message}</>
   }
 
   const validateSubmit = (e) => {
@@ -188,9 +204,7 @@ const Email = ({ user, token, flashData }) => {
                     value={field.email}
                   />
                   {error.email && (
-                    <span className="block text-red-500">
-                      {error.email}
-                    </span>
+                    <span className="block text-red-500">{error.email}</span>
                   )}
                 </div>
                 <button

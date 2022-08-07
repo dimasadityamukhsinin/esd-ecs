@@ -62,10 +62,12 @@ const Account = ({ user, token, flashData }) => {
   }
 
   const ShowFlash = () => {
-    useEffect(() => {
+    let message = flashData.message
+    // Make sure we're in the browser
+    if (typeof window !== 'undefined') {
       flash.set(null)
-    }, [])
-    return <>{flashData.message}</>
+    }
+    return <>{message}</>
   }
 
   const validateSubmit = (e) => {
@@ -265,11 +267,10 @@ Account.getInitialProps = async (ctx) => {
   const cookies = nookies.get(ctx)
 
   if (!cookies.token) {
-    return {
-      redirect: {
-        destination: '/login',
-      },
-    }
+    ctx.res.writeHead(302, {
+      Location: '/login',
+    })
+    ctx.res.end()
   }
 
   const user = await axios.get(
