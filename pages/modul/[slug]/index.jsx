@@ -438,27 +438,27 @@ export default function ModulSlug({ modul }) {
   )
 }
 
-export async function getStaticPaths() {
-  const res = await client.fetch(`
-      *[_type == "issue" && comingSoon == false]
-    `)
+// export async function getStaticPaths() {
+//   const res = await client.fetch(`
+//       *[_type == "issue" && comingSoon == false]
+//     `)
 
-  const paths = res.map((data) => ({
-    params: { editorial_slug: data.slug.current.toString() },
-  }))
+//   const paths = res.map((data) => ({
+//     params: { editorial_slug: data.slug.current.toString() },
+//   }))
 
-  return { paths, fallback: false }
-}
+//   return { paths, fallback: false }
+// }
 
-export async function getStaticProps() {
-  const req = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=reducing-computer-power-consumption&populate=deep`,
-  )
-  const res = await req.json()
+// export async function getStaticProps() {
+//   const req = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=reducing-computer-power-consumption&populate=deep`,
+//   )
+//   const res = await req.json()
 
-  return {
-    props: {
-      modul: res.data[0],
-    },
-  }
-}
+//   return {
+//     props: {
+//       modul: res.data[0],
+//     },
+//   }
+// }
