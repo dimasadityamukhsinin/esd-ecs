@@ -6,13 +6,4 @@
     table {
         @apply table-auto w-full;
     }
-
-    .drops {
-        @apply pointer-events-none;
-        
-        p {
-            @apply inline;
-            
-        }
-    }
 }

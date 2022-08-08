@@ -55,8 +55,6 @@ export default function ModulSlug({ modul }) {
     }
   })
 
-  // console.log(dropsFromBackend)
-
   const columnsFromBackend = {
     drag: {
       id: uuidv4(),
@@ -73,88 +71,85 @@ export default function ModulSlug({ modul }) {
   const [checkDrop, setCheckDrop] = useState([])
 
   const onDragEnd = (result, columns, setColumns, idComponent) => {
-    let dropContent = document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-      result.destination.index
-    ].children[0].innerHTML
+    if (!result.destination) return
+    let dropContent = document.getElementsByClassName(`drops-${idComponent}`)[0]
+      .children[result.destination.index].children[0].innerHTML
 
     let dragContent = columns.drag.content.find(
       (data) => data.id === idComponent,
     ).items[result.source.index].content
 
-    if (result.destination) {
-      if (result.destination.droppableId !== result.source.droppableId) {
+    if (result.destination.droppableId !== result.source.droppableId) {
+      if (
+        !modul.Editor[idComponent].Drop[result.destination.index]
+          .Question_Column_1
+      ) {
         if (
-          !modul.Editor[idComponent].Drop[result.destination.index]
-            .Question_Column_1
+          dropContent
+            .split(' ')
+            .find((data) => (data === '..........' ? true : false))
         ) {
-          if (
-            dropContent
-              .split(' ')
-              .find((data) => (data === '..........' ? true : false))
-          ) {
-            document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-              result.destination.index
-            ].children[0].innerHTML = `${dragContent} ${
-              modul.Editor[idComponent].Drop[result.destination.index]
-                .Question_Column_2
-            } ${
-              modul.Editor[idComponent].Drop[result.destination.index]
-                .Question_Column_3
-            }`
-          }
-        } else if (
-          !modul.Editor[idComponent].Drop[result.destination.index]
-            .Question_Column_2
-        ) {
-          if (
-            dropContent
-              .split(' ')
-              .find((data) => (data === '..........' ? true : false))
-          ) {
-            document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-              result.destination.index
-            ].children[0].innerHTML = `${
-              modul.Editor[idComponent].Drop[result.destination.index]
-                .Question_Column_1
-            } ${dragContent} ${
-              modul.Editor[idComponent].Drop[result.destination.index]
-                .Question_Column_3
-            }`
-          }
-        } else if (
-          !modul.Editor[idComponent].Drop[result.destination.index]
-            .Question_Column_3
-        ) {
-          if (
-            dropContent
-              .split(' ')
-              .find((data) => (data === '..........' ? true : false))
-          ) {
-            document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-              result.destination.index
-            ].children[0].innerHTML = `${
-              modul.Editor[idComponent].Drop[result.destination.index]
-                .Question_Column_1
-            } ${
-              modul.Editor[idComponent].Drop[result.destination.index]
-                .Question_Column_2
-            } ${dragContent}`
-          }
+          document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+            result.destination.index
+          ].children[0].innerHTML = `${dragContent} ${
+            modul.Editor[idComponent].Drop[result.destination.index]
+              .Question_Column_2
+          } ${
+            modul.Editor[idComponent].Drop[result.destination.index]
+              .Question_Column_3
+          }`
         }
-        setCheckDrop((prev) => {
-          let data = [
-            ...prev,
-            {
-              id: idComponent,
-              index: result.destination.index,
-            },
-          ]
-          return data
-        })
+      } else if (
+        !modul.Editor[idComponent].Drop[result.destination.index]
+          .Question_Column_2
+      ) {
+        if (
+          dropContent
+            .split(' ')
+            .find((data) => (data === '..........' ? true : false))
+        ) {
+          document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+            result.destination.index
+          ].children[0].innerHTML = `${
+            modul.Editor[idComponent].Drop[result.destination.index]
+              .Question_Column_1
+          } ${dragContent} ${
+            modul.Editor[idComponent].Drop[result.destination.index]
+              .Question_Column_3
+          }`
+        }
+      } else if (
+        !modul.Editor[idComponent].Drop[result.destination.index]
+          .Question_Column_3
+      ) {
+        if (
+          dropContent
+            .split(' ')
+            .find((data) => (data === '..........' ? true : false))
+        ) {
+          document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+            result.destination.index
+          ].children[0].innerHTML = `${
+            modul.Editor[idComponent].Drop[result.destination.index]
+              .Question_Column_1
+          } ${
+            modul.Editor[idComponent].Drop[result.destination.index]
+              .Question_Column_2
+          } ${dragContent}`
+        }
       }
+      setCheckDrop((prev) => {
+        let data = [
+          ...prev,
+          {
+            id: idComponent,
+            index: result.destination.index,
+          },
+        ]
+        return data
+      })
     }
 
-    if (!result.destination) return
     const { source, destination, combine, draggableId } = result
 
     if (
@@ -170,21 +165,92 @@ export default function ModulSlug({ modul }) {
           const sourceColumn = columns.drag
           const destColumn = columns.drop
           const sourceItems = [...sourceColumn.content]
+          const destItems = [...destColumn.content]
           sourceItems
             .find((data) => data.id === idComponent)
             .items.splice(source.index, 1)
-          setColumns({
-            drag: {
-              id: sourceColumn.id,
-              name: 'Drag',
-              content: sourceItems,
-            },
-            drop: {
-              id: destColumn.id,
-              name: 'Drop',
-              content: [],
-            },
-          })
+
+          if (destItems.length === 0) {
+            setColumns({
+              drag: {
+                id: sourceColumn.id,
+                name: 'Drag',
+                content: sourceItems,
+              },
+              drop: {
+                id: destColumn.id,
+                name: 'Drop',
+                content: [
+                  {
+                    id: idComponent,
+                    items: [
+                      {
+                        index: result.destination.index,
+                        content: dragContent,
+                      },
+                    ],
+                  },
+                ],
+              },
+            })
+          } else {
+            if (destItems.find((data) => data.id === idComponent)) {
+              destItems
+                .find((data) => data.id === idComponent)
+                .items.push({
+                  index: result.destination.index,
+                  content: dragContent,
+                })
+              setColumns({
+                drag: {
+                  id: sourceColumn.id,
+                  name: 'Drag',
+                  content: sourceItems,
+                },
+                drop: {
+                  id: destColumn.id,
+                  name: 'Drop',
+                  content: destItems,
+                },
+              })
+            } else {
+              setColumns({
+                drag: {
+                  id: sourceColumn.id,
+                  name: 'Drag',
+                  content: sourceItems,
+                },
+                drop: {
+                  id: destColumn.id,
+                  name: 'Drop',
+                  content: [
+                    ...destItems,
+                    {
+                      id: idComponent,
+                      items: [
+                        {
+                          index: result.destination.index,
+                          content: dragContent,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              })
+            }
+          }
+
+          // setColumns({
+          //   ...columns,
+          //   [source.droppableId]: {
+          //     ...sourceColumn,
+          //     items: sourceItems,
+          //   },
+          //   [destination.droppableId]: {
+          //     ...destColumn,
+          //     items: destItems,
+          //   },
+          // })
         }
       }
     } else if (
@@ -215,6 +281,76 @@ export default function ModulSlug({ modul }) {
               content: [],
             },
           })
+
+          if (destItems.length === 0) {
+            setColumns({
+              drag: {
+                id: sourceColumn.id,
+                name: 'Drag',
+                content: sourceItems,
+              },
+              drop: {
+                id: destColumn.id,
+                name: 'Drop',
+                content: [
+                  {
+                    id: idComponent,
+                    items: [
+                      {
+                        index: result.destination.index,
+                        content: dragContent,
+                      },
+                    ],
+                  },
+                ],
+              },
+            })
+          } else {
+            if (destItems.find((data) => data.id === idComponent)) {
+              destItems
+                .find((data) => data.id === idComponent)
+                .items.push({
+                  index: result.destination.index,
+                  content: dragContent,
+                })
+              setColumns({
+                drag: {
+                  id: sourceColumn.id,
+                  name: 'Drag',
+                  content: sourceItems,
+                },
+                drop: {
+                  id: destColumn.id,
+                  name: 'Drop',
+                  content: destItems,
+                },
+              })
+            } else {
+              setColumns({
+                drag: {
+                  id: sourceColumn.id,
+                  name: 'Drag',
+                  content: sourceItems,
+                },
+                drop: {
+                  id: destColumn.id,
+                  name: 'Drop',
+                  content: [
+                    ...destItems,
+                    {
+                      id: idComponent,
+                      items: [
+                        {
+                          index: result.destination.index,
+                          content: dragContent,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              })
+            }
+          }
         }
       }
     } else if (
@@ -245,6 +381,75 @@ export default function ModulSlug({ modul }) {
               content: [],
             },
           })
+
+          if (destItems.length === 0) {
+            setColumns({
+              drag: {
+                id: sourceColumn.id,
+                name: 'Drag',
+                content: sourceItems,
+              },
+              drop: {
+                id: destColumn.id,
+                name: 'Drop',
+                content: [
+                  {
+                    id: idComponent,
+                    items: [
+                      {
+                        index: result.destination.index,
+                        content: dragContent,
+                      },
+                    ],
+                  },
+                ],
+              },
+            })
+          } else {
+            if (destItems.find((data) => data.id === idComponent)) {
+              destItems
+                .find((data) => data.id === idComponent)
+                .items.push({
+                  index: result.destination.index,
+                })
+              setColumns({
+                drag: {
+                  id: sourceColumn.id,
+                  name: 'Drag',
+                  content: sourceItems,
+                },
+                drop: {
+                  id: destColumn.id,
+                  name: 'Drop',
+                  content: destItems,
+                },
+              })
+            } else {
+              setColumns({
+                drag: {
+                  id: sourceColumn.id,
+                  name: 'Drag',
+                  content: sourceItems,
+                },
+                drop: {
+                  id: destColumn.id,
+                  name: 'Drop',
+                  content: [
+                    ...destItems,
+                    {
+                      id: idComponent,
+                      items: [
+                        {
+                          index: result.destination.index,
+                          content: dragContent,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              })
+            }
+          }
         }
       }
     }
@@ -278,7 +483,53 @@ export default function ModulSlug({ modul }) {
     setColumns(columnsFromBackend)
   }
 
-  const removeDrag = () => {}
+  const removeDrag = (idComponent, index, item) => {
+    const getDragComponent = columns.drag.content.find(
+      (getId) => getId.id === idComponent,
+    )
+    const getDropComponent = columns.drop.content.find(
+      (getId) => getId.id === idComponent,
+    ).items
+    getDragComponent.items.push({
+      id: uuidv4(),
+      content: getDropComponent.find((item) => item.index === index).content,
+    })
+
+    const getDropIndex = getDropComponent.findIndex(
+      (data) => data.index === index,
+    )
+    getDropComponent.splice(getDropIndex, 1)
+
+    setColumns({
+      drag: {
+        id: columns.drag.id,
+        name: 'Drag',
+        content: [...columns.drag.content, getDragComponent],
+      },
+      drop: {
+        id: columns.drop.id,
+        name: 'Drop',
+        content: [
+          ...columns.drop.content,
+          {
+            id: idComponent,
+            items: [getDropComponent],
+          },
+        ],
+      },
+    })
+
+    const getCheckDropIndex = checkDrop.findIndex((data) => data.index === index && data.id === idComponent)
+    checkDrop.splice(getCheckDropIndex, 1)
+
+    document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+      index
+    ].children[0].innerHTML = `${
+      item.Question_Column_1 ? item.Question_Column_1 : '..........'
+    } ${item.Question_Column_2 ? item.Question_Column_2 : '..........'} ${
+      item.Question_Column_3 ? item.Question_Column_3 : '..........'
+    }`
+  }
 
   return (
     <Layout>
@@ -316,10 +567,7 @@ export default function ModulSlug({ modul }) {
                   dangerouslySetInnerHTML={{ __html: data.Content }}
                 ></div>
               ) : data.__component === 'editor.drag-and-drop' ? (
-                <div
-                  className="flex flex-col w-full"
-                  key={idComponent}
-                >
+                <div className="flex flex-col w-full" key={idComponent}>
                   <span className="font-medium">Instruction:</span>
                   <span>
                     Match the words in the boxes with the phrases below to make
@@ -381,10 +629,9 @@ export default function ModulSlug({ modul }) {
                           isCombineEnabled={true}
                         >
                           {(provided, snapshot) => {
-                            // console.log(data)
                             return (
                               <ol
-                                className={`list-inside list-decimal space-y-4 drops-${idComponent}`}
+                                className={`list-inside list-decimal space-y-4 pointer-events-none drops-${idComponent}`}
                                 data-idComponent={idComponent}
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
@@ -420,14 +667,19 @@ export default function ModulSlug({ modul }) {
                                             {checkDrop
                                               .filter(
                                                 (data) =>
-                                                  data.id ===
-                                                  idComponent,
+                                                  data.id === idComponent,
                                               )
                                               .find(
                                                 (item) => item.index === id,
                                               ) && (
                                               <FancyLink
-                                                onClick={removeDrag}
+                                                onClick={() =>
+                                                  removeDrag(
+                                                    idComponent,
+                                                    id,
+                                                    item,
+                                                  )
+                                                }
                                                 className="ml-6 rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-white"
                                               >
                                                 Remove
@@ -450,7 +702,7 @@ export default function ModulSlug({ modul }) {
                   <div className="flex justify-end w-full mt-3">
                     <FancyLink
                       onClick={() => resetDnd()}
-                      className="font-medium text-white bg-yellow-400 py-1 px-4 rounded-md"
+                      className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
                     >
                       Reset
                     </FancyLink>
