@@ -1,13 +1,16 @@
 .modul {
   & > a {
-    width: calc((100% / 3) - 1.5rem);
+    @apply w-full md:w-[calc((100%/2)-1.5rem)] lg:w-[calc((100%/3)-1.5rem)];
+    // @apply w-[calc(100%+2rem)];
+    // width: calc((100% / 3) - 1.5rem);
     margin: 0.75rem;
   }
 }
 
 .drag {
     span {
-        width: calc((100% / 5) - 1.5rem);
+        @apply w-[calc((100%/2)-1.5rem)] md:w-[calc((100%/3)-1.5rem)] lg:w-[calc((100%/5)-1.5rem)];
+        // width: calc((100% / 5) - 1.5rem);
         margin: 0.75rem;
     }
 }

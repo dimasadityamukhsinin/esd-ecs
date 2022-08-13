@@ -24,20 +24,6 @@ export default function Home({ user, modul }) {
     return diffInDays
   }
 
-  useEffect(() => {
-    if (!user.username || !user.email || !user.First_Name || !user.Last_Name) {
-      flash.set({
-        type: 'warning',
-        message:
-          'Please complete your personal data such as username, email, and full name!',
-      })
-      // Make sure we're in the browser
-      if (typeof window !== 'undefined') {
-        router.push('/account')
-      }
-    }
-  }, [])
-
   return (
     <Layout>
       <Header />
@@ -51,7 +37,7 @@ export default function Home({ user, modul }) {
       </div>
       <div className="border-t bg-gray-50 w-full min-h-[60vh]">
         <Container className="mt-4 md:mt-6 xl:mt-8">
-          <div className="flex space-x-8 mt-12 ml-[0.7rem]">
+          <div className="flex space-x-8 mt-12 md:ml-[0.7rem] overflow-auto">
             <FancyLink
               destination="/"
               className="border-b border-yellow-500 pb-2 text-yellow-500 text-xl font-medium"

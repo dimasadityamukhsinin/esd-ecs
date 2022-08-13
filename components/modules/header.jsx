@@ -9,67 +9,91 @@ export default function Header({ className }) {
     status: false,
   })
   return (
-    <header className={`py-4 border-b w-full z-10 ${className}`}>
-      <Container>
-        <div className="flex justify-between items-center">
-          <div className="w-full flex items-center">
-            <FancyLink destination="/" className="font-medium text-xl">
-              ESD in ECS
-            </FancyLink>
-
-            <FancyLink
-              className="ml-8 text-yellow-500 font-medium text-xl"
-              destination="/"
-            >
-              Your Learning
-            </FancyLink>
-          </div>
-
-          <nav className="flex items-center space-x-5">
-            <FancyLink destination="/" className="w-full h-full">
-              <IoNotificationsOutline size={23} />
-            </FancyLink>
-
-            <div className="relative">
-              <FancyLink
-                onClick={() =>
-                  setReveal({
-                    option: 'profile',
-                    status: !reveal.status,
-                  })
-                }
-                className="bg-yellow-400 py-2 px-3 font-medium text-white"
-              >
-                DA
+    <>
+      <header className={`py-4 border-b w-full z-10 ${className}`}>
+        <Container className="flex flex-col">
+          <div className="flex justify-between items-center">
+            <div className="w-full flex items-center">
+              <FancyLink destination="/" className="font-medium text-xl">
+                ESD in ECS
               </FancyLink>
-              <div
-                className={`absolute w-40 right-0 top-12 flex flex-col items-center space-y-3 p-6 text-sm bg-white border shadow-[0_1px_5px_1px_rgb(0_0_0_/_5%)] ${
-                  reveal.status ? 'block' : 'hidden'
-                }`}
+
+              <FancyLink
+                className="ml-8 text-yellow-500 font-medium text-xl hidden md:block"
+                destination="/"
               >
-                <FancyLink
-                  destination="/"
-                  className="font-medium text-yellow-500"
-                >
-                  Your Learning
-                </FancyLink>
-                <FancyLink
-                  destination="/account"
-                  className="font-medium text-yellow-500"
-                >
-                  Account
-                </FancyLink>
-                <FancyLink
-                  destination="/logout"
-                  className="font-medium text-yellow-500"
-                >
-                  Sign out
-                </FancyLink>
-              </div>
+                Your Learning
+              </FancyLink>
+              <FancyLink
+                className="ml-5 text-yellow-500 font-medium text-xl hidden md:block"
+                destination="/about"
+              >
+                About
+              </FancyLink>
             </div>
-          </nav>
-        </div>
-      </Container>
-    </header>
+
+            <nav className="flex items-center space-x-5">
+              <FancyLink destination="/" className="w-full h-full">
+                <IoNotificationsOutline size={23} />
+              </FancyLink>
+
+              <div className="relative">
+                <FancyLink
+                  onClick={() =>
+                    setReveal({
+                      option: 'profile',
+                      status: !reveal.status,
+                    })
+                  }
+                  className="bg-yellow-400 py-2 px-3 font-medium text-white"
+                >
+                  DA
+                </FancyLink>
+                <div
+                  className={`absolute w-40 right-0 top-12 flex flex-col items-center space-y-3 p-6 text-sm bg-white border shadow-[0_1px_5px_1px_rgb(0_0_0_/_5%)] ${
+                    reveal.status ? 'block' : 'hidden'
+                  }`}
+                >
+                  <FancyLink
+                    destination="/"
+                    className="font-medium text-yellow-500"
+                  >
+                    Your Learning
+                  </FancyLink>
+                  <FancyLink
+                    destination="/account"
+                    className="font-medium text-yellow-500"
+                  >
+                    Account
+                  </FancyLink>
+                  <FancyLink
+                    destination="/logout"
+                    className="font-medium text-yellow-500"
+                  >
+                    Sign out
+                  </FancyLink>
+                </div>
+              </div>
+            </nav>
+          </div>
+        </Container>
+      </header>
+      <div className="block md:hidden py-4 border-b w-full z-10">
+        <Container className="flex items-start">
+          <FancyLink
+            className="text-yellow-500 font-medium text-xl"
+            destination="/"
+          >
+            Your Learning
+          </FancyLink>
+          <FancyLink
+            className="ml-8 text-yellow-500 font-medium text-xl"
+            destination="/about"
+          >
+            About
+          </FancyLink>
+        </Container>
+      </div>
+    </>
   )
 }

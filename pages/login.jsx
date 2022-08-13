@@ -7,7 +7,6 @@ import SEO from '@/components/utils/seo'
 import flash from 'next-flash'
 import Router from 'next/router'
 import { useRouter } from 'next/router'
-import axios from 'axios'
 import Image from 'next/image'
 
 const Login = ({ seo, flashData }) => {
@@ -134,7 +133,6 @@ const Login = ({ seo, flashData }) => {
       />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="mx-auto md:w-full md:max-w-md">
-          {/* <h1 className="font-bold text-center text-2xl mb-5"></h1> */}
           <div className="relative w-full h-32 aspect-square mb-6">
             <Image
               src={seo.Logo.data.attributes.url}
@@ -149,7 +147,7 @@ const Login = ({ seo, flashData }) => {
             </div>
           )}
           <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-            <form method="post" onSubmit={doLogin} className="px-5 py-7">
+            <form method="post" onSubmit={doLogin} className="relative px-5 py-7">
               {progress && (
                 <div className="absolute inset-0 z-10 bg-white/50" />
               )}
@@ -209,14 +207,6 @@ const Login = ({ seo, flashData }) => {
                 </svg>
               </button>
             </form>
-            <div className="p-5">
-              <button
-                type="button"
-                className="transition duration-200 border border-gray-200 text-gray-500 w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-normal text-center inline-block"
-              >
-                Login with Google
-              </button>
-            </div>
             <div className="py-5">
               <div className="grid grid-cols-2 gap-1">
                 <div className="text-center sm:text-left whitespace-nowrap">

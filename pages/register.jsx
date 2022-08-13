@@ -1,13 +1,25 @@
 import Layout from '@/components/modules/layout'
-import Header from '@/components/modules/header'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
+import flash from 'next-flash'
+import Image from 'next/image'
+import FancyLink from '@/components/utils/fancyLink'
+import { useRouter } from 'next/router'
 
-export default function Register() {
+const Register = ({ seo, flashData }) => {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
-  const [success, setSuccess] = useState(false)
+  const route = useRouter()
+
+  const [error, setError] = useState({
+    First_Name: '',
+    Last_Name: '',
+    Nim: '',
+    username: '',
+    email: '',
+    password: '',
+  })
 
   const setValue = (e) => {
     const target = e.target
@@ -18,36 +30,202 @@ export default function Register() {
       ...field,
       [name]: value,
     })
+    validateInput(e)
+  }
+
+  const validateSubmit = (e) => {
+    const firstNameTarget = e.target[0]
+    const firstName = firstNameTarget.name
+    const firstNameValue = firstNameTarget.value
+
+    const lastNameTarget = e.target[1]
+    const lastName = lastNameTarget.name
+    const lastNameValue = lastNameTarget.value
+
+    const nimTarget = e.target[2]
+    const nim = nimTarget.name
+    const nimValue = nimTarget.value
+
+    const usernameTarget = e.target[3]
+    const username = usernameTarget.name
+    const usernameValue = usernameTarget.value
+
+    const emailTarget = e.target[4]
+    const email = emailTarget.name
+    const emailValue = emailTarget.value
+
+    const passwordTarget = e.target[5]
+    const password = passwordTarget.name
+    const passwordValue = passwordTarget.value
+
+    const stateObj = {
+      First_Name: '',
+      Last_Name: '',
+      Nim: '',
+      username: '',
+      email: '',
+      password: '',
+    }
+
+    if (firstName) {
+      if (!firstNameValue) {
+        stateObj.First_Name = 'Please enter First Name.'
+      }
+    }
+
+    if (lastName) {
+      if (!lastNameValue) {
+        stateObj.Last_Name = 'Please enter Last Name.'
+      }
+    }
+
+    if (nim) {
+      if (!nimValue) {
+        stateObj.Nim = 'Please enter Nim.'
+      }
+    }
+
+    if (username) {
+      if (!usernameValue) {
+        stateObj.username = 'Please enter Username.'
+      }
+    }
+
+    if (email) {
+      if (!emailValue) {
+        stateObj.email = 'Please enter Email.'
+      }
+    }
+
+    if (password) {
+      if (!passwordValue) {
+        stateObj.password = 'Please enter Password.'
+      } else {
+        const regexPassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+        if (!regexPassword.test(passwordValue)) {
+          stateObj.password =
+            'Your password must be at least 8 characters, and include at least one uppercase letter, and a number.'
+        }
+      }
+    }
+
+    setError(stateObj)
+    if (
+      stateObj.First_Name ||
+      stateObj.Last_Name ||
+      stateObj.Nim ||
+      stateObj.username ||
+      stateObj.email ||
+      stateObj.password
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const validateInput = (e) => {
+    let { name, value } = e.target
+    setError((prev) => {
+      const stateObj = { ...prev, [name]: '' }
+
+      switch (name) {
+        case 'First_Name':
+          if (!value) {
+            stateObj[name] = 'Please enter First Name.'
+          }
+          break
+
+        case 'Last_Name':
+          if (!value) {
+            stateObj[name] = 'Please enter Last Name.'
+          }
+          break
+
+        case 'Nim':
+          if (!value) {
+            stateObj[name] = 'Please enter Nim.'
+          }
+          break
+
+        case 'username':
+          if (!value) {
+            stateObj[name] = 'Please enter Username.'
+          }
+          break
+
+        case 'email':
+          if (!value) {
+            stateObj[name] = 'Please enter Email.'
+          }
+          break
+
+        case 'password':
+          if (!value) {
+            stateObj[name] = 'Please enter Password.'
+          }
+          break
+
+        default:
+          break
+      }
+
+      return stateObj
+    })
   }
 
   const doRegister = async (e) => {
-    e.preventDefault()
+    if (validateSubmit(e)) {
+      e.preventDefault()
+    } else {
+      setProgress(true)
 
-    setProgress(true)
-
-    const req = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const req = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(field),
         },
-        body: JSON.stringify(field),
-      },
-    )
-    const res = await req.json()
+      )
+      const res = await req.json()
+      console.log(field)
+      console.log(res)
 
-    if (res.jwt) {
-      setField({})
-      e.target.reset()
-      setSuccess(true)
+      if (res.jwt) {
+        setField({})
+        e.target.reset()
+        setSuccess(true)
+        route.reload(window.location.pathname)
+        flash.set({
+          type: 'success',
+          message: 'Congratulations! Your account has been registered.',
+        })
+      } else {
+        route.reload(window.location.pathname)
+        flash.set({
+          type: 'error',
+          message: 'Username, Email or Nim already in use!',
+        })
+      }
+
+      setProgress(false)
     }
-
-    setProgress(false)
   }
+
+  const ShowFlash = () => {
+    const message = flashData.message
+    // Make sure we're in the browser
+    // if (typeof window !== 'undefined') {
+    //   flash.set(null)
+    // }
+    return <>{message}</>
+  }
+
   return (
     <Layout>
-      <Header />
       <SEO
         title={'Register'}
         defaultSEO={typeof seo !== 'undefined' && seo.seo}
@@ -55,16 +233,109 @@ export default function Register() {
       />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
-          <h1 className="font-bold text-center text-2xl mb-5">ESD in ECS</h1>
-          {success && (
-            <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
-              Congratulations! Your account has been registered.
-            </div>
+          <div className="relative w-full h-32 aspect-square mb-6">
+            <Image
+              src={seo.Logo.data.attributes.url}
+              alt={seo.Website_Title}
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          {console.log(flashData)}
+          {flashData ? (
+            flashData.type === 'success' ? (
+              <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
+                <ShowFlash />
+              </div>
+            ) : (
+              flashData?.type === 'error' && (
+                <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+                  <ShowFlash />
+                </div>
+              )
+            )
+          ) : (
+            <></>
           )}
+          <div className="w-full">
+            <FancyLink
+              destination="/login"
+              className="space-x-2 font-semibold text-md text-gray-600 mb-3 ml-1 flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                className="w-6 h-6 inline-block rotate-180"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+              <span>Login</span>
+            </FancyLink>
+          </div>
           <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-            <form onSubmit={doRegister} className="px-5 py-7">
+            <form
+              method="post"
+              onSubmit={doRegister}
+              className="relative px-5 py-7"
+            >
               {progress && (
                 <div className="absolute inset-0 z-10 bg-white/50" />
+              )}
+              <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                First Name
+              </label>
+              <input
+                type="text"
+                name="First_Name"
+                onChange={setValue}
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.First_Name && 'mb-5'
+                }`}
+              />
+              {error.First_Name && (
+                <span className="block text-red-500 mb-5">
+                  {error.First_Name}
+                </span>
+              )}
+              <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                Last Name
+              </label>
+              <input
+                type="text"
+                name="Last_Name"
+                onChange={setValue}
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.Last_Name && 'mb-5'
+                }`}
+              />
+              {error.Last_Name && (
+                <span className="block text-red-500 mb-5">
+                  {error.Last_Name}
+                </span>
+              )}
+              <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                Nim
+              </label>
+              <input
+                type="number"
+                name="Nim"
+                onChange={setValue}
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.Nim && 'mb-5'
+                }`}
+              />
+              {error.Nim && (
+                <span className="block text-red-500 mb-5">{error.Nim}</span>
               )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
                 Username
@@ -73,8 +344,16 @@ export default function Register() {
                 type="text"
                 name="username"
                 onChange={setValue}
-                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.username && 'mb-5'
+                }`}
               />
+              {error.username && (
+                <span className="block text-red-500 mb-5">
+                  {error.username}
+                </span>
+              )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
                 Email
               </label>
@@ -82,8 +361,14 @@ export default function Register() {
                 type="email"
                 name="email"
                 onChange={setValue}
-                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.email && 'mb-5'
+                }`}
               />
+              {error.email && (
+                <span className="block text-red-500 mb-5">{error.email}</span>
+              )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
                 Password
               </label>
@@ -91,8 +376,16 @@ export default function Register() {
                 type="password"
                 name="password"
                 onChange={setValue}
-                className="border rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+                onBlur={validateInput}
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.password && 'mb-5'
+                }`}
               />
+              {error.password && (
+                <span className="block text-red-500 mb-5">
+                  {error.password}
+                </span>
+              )}
               <button
                 disabled={progress}
                 type="submit"
@@ -122,18 +415,24 @@ export default function Register() {
   )
 }
 
-export async function getServerSideProps(ctx) {
-  const cookies = nookies.set(ctx);
+Register.getInitialProps = async (ctx) => {
+  const cookies = nookies.get(ctx)
+  const req = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+  const seo = await req.json()
 
-  if(cookies.token) {
-    return {
-      redirect: {
-        destination: '/'
-      }
-    }
+  if (cookies.token) {
+    ctx.res.writeHead(302, {
+      Location: '/',
+    })
+    ctx.res.end()
   }
 
   return {
-    props: {}
+    seo: seo.data.attributes,
+    flashData: flash.get(ctx),
   }
 }
+
+export default Register
