@@ -18,7 +18,8 @@ import SEO from '@/components/utils/seo'
 import nookies from 'nookies'
 import axios from 'axios'
 
-export default function ModulSlug({ user, modul, seo }) {
+export default function ModulSlug({ user, userList, modul, seo, comments }) {
+  const [field, setField] = useState({})
   let dragsFromBackend = []
   let dropsFromBackend = []
 
@@ -547,9 +548,22 @@ export default function ModulSlug({ user, modul, seo }) {
     }`
   }
 
+  const setValue = (e) => {
+    const target = e.target
+    const name = target.name
+    const value = target.value
+
+    setField({
+      ...field,
+      [name]: value,
+    })
+    // validateInput(e)
+  }
+
   return (
     <Layout>
       <Header user={user} />
+      {console.log(comments)}
       <SEO
         title={modul.Title}
         defaultSEO={typeof seo !== 'undefined' && seo}
@@ -752,44 +766,59 @@ export default function ModulSlug({ user, modul, seo }) {
                 Comments
               </span>
             </div>
-            <div className="w-full h-40 flex mt-10 font-medium">
-              <span className="h-[fit-content] p-2 mr-5 text-white bg-yellow-400">
-                DA
+            <div className="w-full min-h-[10rem] flex mt-10 font-medium">
+              <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400">
+                {user.Full_Name.split('')[0]}
               </span>
               <div className="w-full flex flex-col">
-                <span className="mb-2">Dimas Aditya</span>
-                <textarea className="w-full h-full"></textarea>
+                <span className="mb-2">{user.Full_Name}</span>
+                <form className='w-full h-full'>
+                  <textarea
+                    onChange={setValue}
+                    className="w-full h-full font-normal"
+                  ></textarea>
+                </form>
+                <button
+                  type="submit"
+                  className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                >
+                  Post
+                </button>
               </div>
             </div>
             <div className="flex flex-col w-full space-y-6">
-              <div className="w-full border-b pb-6 flex mt-10">
-                <span className="h-[fit-content] p-2 mr-5 text-white bg-yellow-400 font-medium">
-                  DA
-                </span>
-                <div className="w-full flex flex-col">
-                  <div className="flex justify-between">
-                    <span className="mb-2 font-medium">Dimas Aditya</span>
-                    <span className="text-gray-500">23 JULI</span>
-                  </div>
-                  <div className="w-full h-full">
-                    <p>Ok</p>
+              {comments.map((data) => (
+                <div className="w-full border-b pb-6 flex mt-10">
+                  <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                    {
+                      userList
+                        .find((item) => item.id === data.attributes.idUser)
+                        .Full_Name.split('')[0]
+                    }
+                  </span>
+                  <div className="w-full flex flex-col">
+                    <div className="flex justify-between">
+                      <span className="mb-2 font-medium">
+                        {
+                          userList.find(
+                            (item) => item.id === data.attributes.idUser,
+                          ).Full_Name
+                        }
+                      </span>
+                      <span className="text-gray-500">
+                        {`${new Date(
+                          data.attributes.publishedAt,
+                        ).getFullYear()}-${
+                          new Date(data.attributes.publishedAt).getMonth() + 1
+                        }-${new Date(data.attributes.publishedAt).getDate()}`}
+                      </span>
+                    </div>
+                    <div className="w-full h-full">
+                      <p>{data.attributes.Content}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="w-full border-b pb-6 flex mt-10">
-                <span className="h-[fit-content] p-2 mr-5 text-white bg-yellow-400 font-medium">
-                  DA
-                </span>
-                <div className="w-full flex flex-col">
-                  <div className="flex justify-between">
-                    <span className="mb-2 font-medium">Dimas Aditya</span>
-                    <span className="text-gray-500">23 JULI</span>
-                  </div>
-                  <div className="w-full h-full">
-                    <p>Ok</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
           <div className="w-full h-16 fixed bottom-0 left-0 right-0 border-t-2 bg-gray-50">
@@ -842,17 +871,33 @@ export async function getServerSideProps(ctx) {
   )
   const res = await req.json()
 
-  if(res.data[0].attributes.major.data?.attributes.Name) {
-    if(!res.data[0].attributes.major.data?.attributes.Name === user.data.major.Name) {
+  if (res.data[0].attributes.major.data?.attributes.Name) {
+    if (
+      !res.data[0].attributes.major.data?.attributes.Name ===
+      user.data.major.Name
+    ) {
       return {
         notFound: true,
       }
     }
-  }else {
+  } else {
     return {
       notFound: true,
     }
   }
+
+  const userList = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  const comments = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[modul][slug][$eq]=${ctx.params.slug}&populate=deep`,
+  )
 
   const reqSeo = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
@@ -862,8 +907,10 @@ export async function getServerSideProps(ctx) {
   return {
     props: {
       user: user.data,
+      userList: userList.data,
       seo: seo.data.attributes,
       modul: res.data[0].attributes,
+      comments: comments.data.data,
     },
   }
 }
