@@ -3,7 +3,7 @@ import Container from '@/components/modules/container'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import { useState } from 'react'
 
-export default function Header({ className }) {
+export default function Header({ className, user }) {
   const [reveal, setReveal] = useState({
     option: '',
     status: false,
@@ -45,9 +45,9 @@ export default function Header({ className }) {
                       status: !reveal.status,
                     })
                   }
-                  className="bg-yellow-400 py-2 px-3 font-medium text-white"
+                  className="bg-yellow-400 py-2 px-3 w-10 font-medium text-white"
                 >
-                  DA
+                  {user.Full_Name.split('')[0]}
                 </FancyLink>
                 <div
                   className={`absolute w-40 right-0 top-12 flex flex-col items-center space-y-3 p-6 text-sm bg-white border shadow-[0_1px_5px_1px_rgb(0_0_0_/_5%)] ${

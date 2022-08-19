@@ -7,15 +7,15 @@ import Image from 'next/image'
 import FancyLink from '@/components/utils/fancyLink'
 import { useRouter } from 'next/router'
 
-const Register = ({ seo, flashData }) => {
+const Register = ({ seo, flashData, major }) => {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
   const route = useRouter()
 
   const [error, setError] = useState({
-    First_Name: '',
-    Last_Name: '',
+    Full_Name: '',
     Nim: '',
+    major: '',
     username: '',
     email: '',
     password: '',
@@ -34,17 +34,17 @@ const Register = ({ seo, flashData }) => {
   }
 
   const validateSubmit = (e) => {
-    const firstNameTarget = e.target[0]
-    const firstName = firstNameTarget.name
-    const firstNameValue = firstNameTarget.value
+    const fullNameTarget = e.target[0]
+    const fullName = fullNameTarget.name
+    const fullNameValue = fullNameTarget.value
 
-    const lastNameTarget = e.target[1]
-    const lastName = lastNameTarget.name
-    const lastNameValue = lastNameTarget.value
-
-    const nimTarget = e.target[2]
+    const nimTarget = e.target[1]
     const nim = nimTarget.name
     const nimValue = nimTarget.value
+
+    const majorTarget = e.target[2]
+    const major = majorTarget.name
+    const majorValue = majorTarget.value
 
     const usernameTarget = e.target[3]
     const username = usernameTarget.name
@@ -59,29 +59,29 @@ const Register = ({ seo, flashData }) => {
     const passwordValue = passwordTarget.value
 
     const stateObj = {
-      First_Name: '',
-      Last_Name: '',
+      Full_Name: '',
       Nim: '',
+      major: '',
       username: '',
       email: '',
       password: '',
     }
 
-    if (firstName) {
-      if (!firstNameValue) {
-        stateObj.First_Name = 'Please enter First Name.'
-      }
-    }
-
-    if (lastName) {
-      if (!lastNameValue) {
-        stateObj.Last_Name = 'Please enter Last Name.'
+    if (fullName) {
+      if (!fullNameValue) {
+        stateObj.Full_Name = 'Please enter Full Name.'
       }
     }
 
     if (nim) {
       if (!nimValue) {
         stateObj.Nim = 'Please enter Nim.'
+      }
+    }
+
+    if (major) {
+      if (!majorValue) {
+        stateObj.major = 'Please enter Jurusan.'
       }
     }
 
@@ -111,9 +111,9 @@ const Register = ({ seo, flashData }) => {
 
     setError(stateObj)
     if (
-      stateObj.First_Name ||
-      stateObj.Last_Name ||
+      stateObj.Full_Name ||
       stateObj.Nim ||
+      stateObj.major ||
       stateObj.username ||
       stateObj.email ||
       stateObj.password
@@ -130,21 +130,21 @@ const Register = ({ seo, flashData }) => {
       const stateObj = { ...prev, [name]: '' }
 
       switch (name) {
-        case 'First_Name':
+        case 'Full_Name':
           if (!value) {
-            stateObj[name] = 'Please enter First Name.'
-          }
-          break
-
-        case 'Last_Name':
-          if (!value) {
-            stateObj[name] = 'Please enter Last Name.'
+            stateObj[name] = 'Please enter Full Name.'
           }
           break
 
         case 'Nim':
           if (!value) {
             stateObj[name] = 'Please enter Nim.'
+          }
+          break
+
+        case 'major':
+          if (!value) {
+            stateObj[name] = 'Please enter Jurusan.'
           }
           break
 
@@ -228,8 +228,8 @@ const Register = ({ seo, flashData }) => {
     <Layout>
       <SEO
         title={'Register'}
-        defaultSEO={typeof seo !== 'undefined' && seo.seo}
-        webTitle={typeof seo !== 'undefined' && seo.webTitle}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
         <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
@@ -241,7 +241,9 @@ const Register = ({ seo, flashData }) => {
               objectFit="contain"
             />
           </div>
-          {console.log(flashData)}
+          {
+            console.log(flashData)
+          }
           {flashData ? (
             flashData.type === 'success' ? (
               <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
@@ -289,37 +291,20 @@ const Register = ({ seo, flashData }) => {
                 <div className="absolute inset-0 z-10 bg-white/50" />
               )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                First Name
+                Full Name
               </label>
               <input
                 type="text"
-                name="First_Name"
+                name="Full_Name"
                 onChange={setValue}
                 onBlur={validateInput}
                 className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
-                  !error.First_Name && 'mb-5'
+                  !error.Full_Name && 'mb-5'
                 }`}
               />
-              {error.First_Name && (
+              {error.Full_Name && (
                 <span className="block text-red-500 mb-5">
-                  {error.First_Name}
-                </span>
-              )}
-              <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                Last Name
-              </label>
-              <input
-                type="text"
-                name="Last_Name"
-                onChange={setValue}
-                onBlur={validateInput}
-                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
-                  !error.Last_Name && 'mb-5'
-                }`}
-              />
-              {error.Last_Name && (
-                <span className="block text-red-500 mb-5">
-                  {error.Last_Name}
+                  {error.Full_Name}
                 </span>
               )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
@@ -336,6 +321,25 @@ const Register = ({ seo, flashData }) => {
               />
               {error.Nim && (
                 <span className="block text-red-500 mb-5">{error.Nim}</span>
+              )}
+              <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                Jurusan
+              </label>
+              <select
+                id="lang"
+                onChange={setValue}
+                onBlur={validateInput}
+                name="major"
+                className={`border rounded-lg px-3 py-2 mt-1 text-sm w-full ${
+                  !error.major && 'mb-5'
+                }`}
+              >
+                {major.map((data) => (
+                  <option value={data.id}>{data.attributes.Name}</option>
+                ))}
+              </select>
+              {error.major && (
+                <span className="block text-red-500 mb-5">{error.major}</span>
               )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
                 Username
@@ -417,10 +421,13 @@ const Register = ({ seo, flashData }) => {
 
 Register.getInitialProps = async (ctx) => {
   const cookies = nookies.get(ctx)
-  const req = await fetch(
+  const reqSeo = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
   )
-  const seo = await req.json()
+  const seo = await reqSeo.json()
+
+  const reqMajor = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/majors`)
+  const major = await reqMajor.json()
 
   if (cookies.token) {
     ctx.res.writeHead(302, {
@@ -430,6 +437,7 @@ Register.getInitialProps = async (ctx) => {
   }
 
   return {
+    major: major.data,
     seo: seo.data.attributes,
     flashData: flash.get(ctx),
   }

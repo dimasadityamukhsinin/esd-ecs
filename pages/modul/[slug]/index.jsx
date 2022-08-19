@@ -11,10 +11,40 @@ import { BsCheck2, BsCheck2Square } from 'react-icons/bs'
 import { BiConversation } from 'react-icons/bi'
 import { GrNext, GrPrevious } from 'react-icons/gr'
 import swal from 'sweetalert'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { useDrag, useDrop, DndProvider } from 'react-dnd'
+import DragDrop from '@/components/dnd/DragDrop'
+import SEO from '@/components/utils/seo'
+import nookies from 'nookies'
+import axios from 'axios'
 
-export default function ModulSlug({ modul }) {
+export default function ModulSlug({ user, modul, seo }) {
   let dragsFromBackend = []
   let dropsFromBackend = []
+
+  modul.Editor = modul.Editor.map((data, id) => {
+    if (data.__component === 'editor.drag-and-drop') {
+      return {
+        ...data,
+        Drop: data.Drop.map((item) => {
+          return {
+            ...item,
+            Name: item.Name,
+            Content: data.Drop.filter((i) => i.Name === item.Name).map(
+              (k) => k.Content,
+            ),
+          }
+        }).reduce((unique, o) => {
+          if (!unique.some((obj) => obj.Name === o.Name)) {
+            unique.push(o)
+          }
+          return unique
+        }, []),
+      }
+    } else {
+      return data
+    }
+  })
 
   modul.Editor.forEach((data, id) => {
     if (data.__component === 'editor.drag-and-drop') {
@@ -23,34 +53,14 @@ export default function ModulSlug({ modul }) {
         items: [],
       })
       data.Drag.forEach((item) => {
-        if (dragsFromBackend.find((getId) => getId.id === id)) {
-          dragsFromBackend
-            .find((getId) => getId.id === id)
-            .items.push({ id: uuidv4(), content: item.Content })
-        }
-      })
-    }
-  })
-
-  modul.Editor.forEach((data, id) => {
-    if (data.__component === 'editor.drag-and-drop') {
-      dropsFromBackend.push({
-        id: id,
-        items: [],
-      })
-      data.Drop.forEach((item) => {
-        if (dropsFromBackend.find((getId) => getId.id === id)) {
-          dropsFromBackend
-            .find((getId) => getId.id === id)
-            .items.push({
-              id: uuidv4(),
-              Key: item.Key,
-              Answer: item.Answer,
-              Question_Column_1: item.Question_Column_1,
-              Question_Column_2: item.Question_Column_2,
-              Question_Column_3: item.Question_Column_3,
-            })
-        }
+        dragsFromBackend
+          .find((getId) => getId.id === id)
+          .items.push({
+            id: uuidv4(),
+            content: item.Content,
+            number: item.Number,
+            to: item.To,
+          })
       })
     }
   })
@@ -81,378 +91,382 @@ export default function ModulSlug({ modul }) {
 
     if (result.destination.droppableId !== result.source.droppableId) {
       if (
-        !modul.Editor[idComponent].Drop[result.destination.index]
-          .Question_Column_1
+        dropContent
+          .split(' ')
+          .find((data) => (data === '..........' ? true : false))
       ) {
-        if (
-          dropContent
-            .split(' ')
-            .find((data) => (data === '..........' ? true : false))
-        ) {
-          document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-            result.destination.index
-          ].children[0].innerHTML = `${dragContent} ${
-            modul.Editor[idComponent].Drop[result.destination.index]
-              .Question_Column_2
-          } ${
-            modul.Editor[idComponent].Drop[result.destination.index]
-              .Question_Column_3
-          }`
-        }
-      } else if (
-        !modul.Editor[idComponent].Drop[result.destination.index]
-          .Question_Column_2
-      ) {
-        if (
-          dropContent
-            .split(' ')
-            .find((data) => (data === '..........' ? true : false))
-        ) {
-          document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-            result.destination.index
-          ].children[0].innerHTML = `${
-            modul.Editor[idComponent].Drop[result.destination.index]
-              .Question_Column_1
-          } ${dragContent} ${
-            modul.Editor[idComponent].Drop[result.destination.index]
-              .Question_Column_3
-          }`
-        }
-      } else if (
-        !modul.Editor[idComponent].Drop[result.destination.index]
-          .Question_Column_3
-      ) {
-        if (
-          dropContent
-            .split(' ')
-            .find((data) => (data === '..........' ? true : false))
-        ) {
-          document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-            result.destination.index
-          ].children[0].innerHTML = `${
-            modul.Editor[idComponent].Drop[result.destination.index]
-              .Question_Column_1
-          } ${
-            modul.Editor[idComponent].Drop[result.destination.index]
-              .Question_Column_2
-          } ${dragContent}`
-        }
+        document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+          result.destination.index
+        ].children[0].innerHTML = modul.Editor[idComponent].Drop[
+          result.destination.index
+        ].Content[0]
+          .map((data) => (data ? data : dragContent))
+          .join(' ')
       }
-      setCheckDrop((prev) => {
-        let data = [
-          ...prev,
-          {
-            id: idComponent,
-            index: result.destination.index,
-          },
-        ]
-        return data
-      })
     }
+
+    // if (result.destination.droppableId !== result.source.droppableId) {
+    //   if (
+    //     !modul.Editor[idComponent].Drop[result.destination.index]
+    //       .Question_Column_1
+    //   ) {
+    //     if (
+    //       dropContent
+    //         .split(' ')
+    //         .find((data) => (data === '..........' ? true : false))
+    //     ) {
+    //       document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+    //         result.destination.index
+    //       ].children[0].innerHTML = `${dragContent} ${
+    //         modul.Editor[idComponent].Drop[result.destination.index]
+    //           .Question_Column_2
+    //       } ${
+    //         modul.Editor[idComponent].Drop[result.destination.index]
+    //           .Question_Column_3
+    //       }`
+    //     }
+    //   } else if (
+    //     !modul.Editor[idComponent].Drop[result.destination.index]
+    //       .Question_Column_2
+    //   ) {
+    //     if (
+    //       dropContent
+    //         .split(' ')
+    //         .find((data) => (data === '..........' ? true : false))
+    //     ) {
+    //       document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+    //         result.destination.index
+    //       ].children[0].innerHTML = `${
+    //         modul.Editor[idComponent].Drop[result.destination.index]
+    //           .Question_Column_1
+    //       } ${dragContent} ${
+    //         modul.Editor[idComponent].Drop[result.destination.index]
+    //           .Question_Column_3
+    //       }`
+    //     }
+    //   } else if (
+    //     !modul.Editor[idComponent].Drop[result.destination.index]
+    //       .Question_Column_3
+    //   ) {
+    //     if (
+    //       dropContent
+    //         .split(' ')
+    //         .find((data) => (data === '..........' ? true : false))
+    //     ) {
+    //       document.getElementsByClassName(`drops-${idComponent}`)[0].children[
+    //         result.destination.index
+    //       ].children[0].innerHTML = `${
+    //         modul.Editor[idComponent].Drop[result.destination.index]
+    //           .Question_Column_1
+    //       } ${
+    //         modul.Editor[idComponent].Drop[result.destination.index]
+    //           .Question_Column_2
+    //       } ${dragContent}`
+    //     }
+    //   }
+    //   setCheckDrop((prev) => {
+    //     let data = [
+    //       ...prev,
+    //       {
+    //         id: idComponent,
+    //         index: result.destination.index,
+    //       },
+    //     ]
+    //     return data
+    //   })
+    // }
 
     const { source, destination, combine, draggableId } = result
 
-    if (
-      !modul.Editor[idComponent].Drop[result.destination.index]
-        .Question_Column_1
-    ) {
-      if (
-        dropContent
-          .split(' ')
-          .find((data) => (data === '..........' ? true : false))
-      ) {
-        if (source.droppableId !== destination.droppableId) {
-          const sourceColumn = columns.drag
-          const destColumn = columns.drop
-          const sourceItems = [...sourceColumn.content]
-          const destItems = [...destColumn.content]
-          sourceItems
-            .find((data) => data.id === idComponent)
-            .items.splice(source.index, 1)
+    // if (
+    //   !modul.Editor[idComponent].Drop[result.destination.index]
+    //     .Question_Column_1
+    // ) {
+    //   if (
+    //     dropContent
+    //       .split(' ')
+    //       .find((data) => (data === '..........' ? true : false))
+    //   ) {
+    //     if (source.droppableId !== destination.droppableId) {
+    //       const sourceColumn = columns.drag
+    //       const destColumn = columns.drop
+    //       const sourceItems = [...sourceColumn.content]
+    //       const destItems = [...destColumn.content]
+    //       sourceItems
+    //         .find((data) => data.id === idComponent)
+    //         .items.splice(source.index, 1)
 
-          if (destItems.length === 0) {
-            setColumns({
-              drag: {
-                id: sourceColumn.id,
-                name: 'Drag',
-                content: sourceItems,
-              },
-              drop: {
-                id: destColumn.id,
-                name: 'Drop',
-                content: [
-                  {
-                    id: idComponent,
-                    items: [
-                      {
-                        index: result.destination.index,
-                        content: dragContent,
-                      },
-                    ],
-                  },
-                ],
-              },
-            })
-          } else {
-            if (destItems.find((data) => data.id === idComponent)) {
-              destItems
-                .find((data) => data.id === idComponent)
-                .items.push({
-                  index: result.destination.index,
-                  content: dragContent,
-                })
-              setColumns({
-                drag: {
-                  id: sourceColumn.id,
-                  name: 'Drag',
-                  content: sourceItems,
-                },
-                drop: {
-                  id: destColumn.id,
-                  name: 'Drop',
-                  content: destItems,
-                },
-              })
-            } else {
-              setColumns({
-                drag: {
-                  id: sourceColumn.id,
-                  name: 'Drag',
-                  content: sourceItems,
-                },
-                drop: {
-                  id: destColumn.id,
-                  name: 'Drop',
-                  content: [
-                    ...destItems,
-                    {
-                      id: idComponent,
-                      items: [
-                        {
-                          index: result.destination.index,
-                          content: dragContent,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              })
-            }
-          }
+    //       if (destItems.length === 0) {
+    //         setColumns({
+    //           drag: {
+    //             id: sourceColumn.id,
+    //             name: 'Drag',
+    //             content: sourceItems,
+    //           },
+    //           drop: {
+    //             id: destColumn.id,
+    //             name: 'Drop',
+    //             content: [
+    //               {
+    //                 id: idComponent,
+    //                 items: [
+    //                   {
+    //                     index: result.destination.index,
+    //                     content: dragContent,
+    //                   },
+    //                 ],
+    //               },
+    //             ],
+    //           },
+    //         })
+    //       } else {
+    //         if (destItems.find((data) => data.id === idComponent)) {
+    //           destItems
+    //             .find((data) => data.id === idComponent)
+    //             .items.push({
+    //               index: result.destination.index,
+    //               content: dragContent,
+    //             })
+    //           setColumns({
+    //             drag: {
+    //               id: sourceColumn.id,
+    //               name: 'Drag',
+    //               content: sourceItems,
+    //             },
+    //             drop: {
+    //               id: destColumn.id,
+    //               name: 'Drop',
+    //               content: destItems,
+    //             },
+    //           })
+    //         } else {
+    //           setColumns({
+    //             drag: {
+    //               id: sourceColumn.id,
+    //               name: 'Drag',
+    //               content: sourceItems,
+    //             },
+    //             drop: {
+    //               id: destColumn.id,
+    //               name: 'Drop',
+    //               content: [
+    //                 ...destItems,
+    //                 {
+    //                   id: idComponent,
+    //                   items: [
+    //                     {
+    //                       index: result.destination.index,
+    //                       content: dragContent,
+    //                     },
+    //                   ],
+    //                 },
+    //               ],
+    //             },
+    //           })
+    //         }
+    //       }
+    //     }
+    //   }
+    // } else if (
+    //   !modul.Editor[idComponent].Drop[result.destination.index]
+    //     .Question_Column_2
+    // ) {
+    //   if (
+    //     dropContent
+    //       .split(' ')
+    //       .find((data) => (data === '..........' ? true : false))
+    //   ) {
+    //     if (source.droppableId !== destination.droppableId) {
+    //       const sourceColumn = columns.drag
+    //       const destColumn = columns.drop
+    //       const sourceItems = [...sourceColumn.content]
+    //       sourceItems
+    //         .find((data) => data.id === idComponent)
+    //         .items.splice(source.index, 1)
+    //       setColumns({
+    //         drag: {
+    //           id: sourceColumn.id,
+    //           name: 'Drag',
+    //           content: sourceItems,
+    //         },
+    //         drop: {
+    //           id: destColumn.id,
+    //           name: 'Drop',
+    //           content: [],
+    //         },
+    //       })
 
-          // setColumns({
-          //   ...columns,
-          //   [source.droppableId]: {
-          //     ...sourceColumn,
-          //     items: sourceItems,
-          //   },
-          //   [destination.droppableId]: {
-          //     ...destColumn,
-          //     items: destItems,
-          //   },
-          // })
-        }
-      }
-    } else if (
-      !modul.Editor[idComponent].Drop[result.destination.index]
-        .Question_Column_2
-    ) {
-      if (
-        dropContent
-          .split(' ')
-          .find((data) => (data === '..........' ? true : false))
-      ) {
-        if (source.droppableId !== destination.droppableId) {
-          const sourceColumn = columns.drag
-          const destColumn = columns.drop
-          const sourceItems = [...sourceColumn.content]
-          sourceItems
-            .find((data) => data.id === idComponent)
-            .items.splice(source.index, 1)
-          setColumns({
-            drag: {
-              id: sourceColumn.id,
-              name: 'Drag',
-              content: sourceItems,
-            },
-            drop: {
-              id: destColumn.id,
-              name: 'Drop',
-              content: [],
-            },
-          })
+    //       if (destItems.length === 0) {
+    //         setColumns({
+    //           drag: {
+    //             id: sourceColumn.id,
+    //             name: 'Drag',
+    //             content: sourceItems,
+    //           },
+    //           drop: {
+    //             id: destColumn.id,
+    //             name: 'Drop',
+    //             content: [
+    //               {
+    //                 id: idComponent,
+    //                 items: [
+    //                   {
+    //                     index: result.destination.index,
+    //                     content: dragContent,
+    //                   },
+    //                 ],
+    //               },
+    //             ],
+    //           },
+    //         })
+    //       } else {
+    //         if (destItems.find((data) => data.id === idComponent)) {
+    //           destItems
+    //             .find((data) => data.id === idComponent)
+    //             .items.push({
+    //               index: result.destination.index,
+    //               content: dragContent,
+    //             })
+    //           setColumns({
+    //             drag: {
+    //               id: sourceColumn.id,
+    //               name: 'Drag',
+    //               content: sourceItems,
+    //             },
+    //             drop: {
+    //               id: destColumn.id,
+    //               name: 'Drop',
+    //               content: destItems,
+    //             },
+    //           })
+    //         } else {
+    //           setColumns({
+    //             drag: {
+    //               id: sourceColumn.id,
+    //               name: 'Drag',
+    //               content: sourceItems,
+    //             },
+    //             drop: {
+    //               id: destColumn.id,
+    //               name: 'Drop',
+    //               content: [
+    //                 ...destItems,
+    //                 {
+    //                   id: idComponent,
+    //                   items: [
+    //                     {
+    //                       index: result.destination.index,
+    //                       content: dragContent,
+    //                     },
+    //                   ],
+    //                 },
+    //               ],
+    //             },
+    //           })
+    //         }
+    //       }
+    //     }
+    //   }
+    // } else if (
+    //   !modul.Editor[idComponent].Drop[result.destination.index]
+    //     .Question_Column_3
+    // ) {
+    //   if (
+    //     dropContent
+    //       .split(' ')
+    //       .find((data) => (data === '..........' ? true : false))
+    //   ) {
+    //     if (source.droppableId !== destination.droppableId) {
+    //       const sourceColumn = columns.drag
+    //       const destColumn = columns.drop
+    //       const sourceItems = [...sourceColumn.content]
+    //       sourceItems
+    //         .find((data) => data.id === idComponent)
+    //         .items.splice(source.index, 1)
+    //       setColumns({
+    //         drag: {
+    //           id: sourceColumn.id,
+    //           name: 'Drag',
+    //           content: sourceItems,
+    //         },
+    //         drop: {
+    //           id: destColumn.id,
+    //           name: 'Drop',
+    //           content: [],
+    //         },
+    //       })
 
-          if (destItems.length === 0) {
-            setColumns({
-              drag: {
-                id: sourceColumn.id,
-                name: 'Drag',
-                content: sourceItems,
-              },
-              drop: {
-                id: destColumn.id,
-                name: 'Drop',
-                content: [
-                  {
-                    id: idComponent,
-                    items: [
-                      {
-                        index: result.destination.index,
-                        content: dragContent,
-                      },
-                    ],
-                  },
-                ],
-              },
-            })
-          } else {
-            if (destItems.find((data) => data.id === idComponent)) {
-              destItems
-                .find((data) => data.id === idComponent)
-                .items.push({
-                  index: result.destination.index,
-                  content: dragContent,
-                })
-              setColumns({
-                drag: {
-                  id: sourceColumn.id,
-                  name: 'Drag',
-                  content: sourceItems,
-                },
-                drop: {
-                  id: destColumn.id,
-                  name: 'Drop',
-                  content: destItems,
-                },
-              })
-            } else {
-              setColumns({
-                drag: {
-                  id: sourceColumn.id,
-                  name: 'Drag',
-                  content: sourceItems,
-                },
-                drop: {
-                  id: destColumn.id,
-                  name: 'Drop',
-                  content: [
-                    ...destItems,
-                    {
-                      id: idComponent,
-                      items: [
-                        {
-                          index: result.destination.index,
-                          content: dragContent,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              })
-            }
-          }
-        }
-      }
-    } else if (
-      !modul.Editor[idComponent].Drop[result.destination.index]
-        .Question_Column_3
-    ) {
-      if (
-        dropContent
-          .split(' ')
-          .find((data) => (data === '..........' ? true : false))
-      ) {
-        if (source.droppableId !== destination.droppableId) {
-          const sourceColumn = columns.drag
-          const destColumn = columns.drop
-          const sourceItems = [...sourceColumn.content]
-          sourceItems
-            .find((data) => data.id === idComponent)
-            .items.splice(source.index, 1)
-          setColumns({
-            drag: {
-              id: sourceColumn.id,
-              name: 'Drag',
-              content: sourceItems,
-            },
-            drop: {
-              id: destColumn.id,
-              name: 'Drop',
-              content: [],
-            },
-          })
-
-          if (destItems.length === 0) {
-            setColumns({
-              drag: {
-                id: sourceColumn.id,
-                name: 'Drag',
-                content: sourceItems,
-              },
-              drop: {
-                id: destColumn.id,
-                name: 'Drop',
-                content: [
-                  {
-                    id: idComponent,
-                    items: [
-                      {
-                        index: result.destination.index,
-                        content: dragContent,
-                      },
-                    ],
-                  },
-                ],
-              },
-            })
-          } else {
-            if (destItems.find((data) => data.id === idComponent)) {
-              destItems
-                .find((data) => data.id === idComponent)
-                .items.push({
-                  index: result.destination.index,
-                })
-              setColumns({
-                drag: {
-                  id: sourceColumn.id,
-                  name: 'Drag',
-                  content: sourceItems,
-                },
-                drop: {
-                  id: destColumn.id,
-                  name: 'Drop',
-                  content: destItems,
-                },
-              })
-            } else {
-              setColumns({
-                drag: {
-                  id: sourceColumn.id,
-                  name: 'Drag',
-                  content: sourceItems,
-                },
-                drop: {
-                  id: destColumn.id,
-                  name: 'Drop',
-                  content: [
-                    ...destItems,
-                    {
-                      id: idComponent,
-                      items: [
-                        {
-                          index: result.destination.index,
-                          content: dragContent,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              })
-            }
-          }
-        }
-      }
-    }
+    //       if (destItems.length === 0) {
+    //         setColumns({
+    //           drag: {
+    //             id: sourceColumn.id,
+    //             name: 'Drag',
+    //             content: sourceItems,
+    //           },
+    //           drop: {
+    //             id: destColumn.id,
+    //             name: 'Drop',
+    //             content: [
+    //               {
+    //                 id: idComponent,
+    //                 items: [
+    //                   {
+    //                     index: result.destination.index,
+    //                     content: dragContent,
+    //                   },
+    //                 ],
+    //               },
+    //             ],
+    //           },
+    //         })
+    //       } else {
+    //         if (destItems.find((data) => data.id === idComponent)) {
+    //           destItems
+    //             .find((data) => data.id === idComponent)
+    //             .items.push({
+    //               index: result.destination.index,
+    //             })
+    //           setColumns({
+    //             drag: {
+    //               id: sourceColumn.id,
+    //               name: 'Drag',
+    //               content: sourceItems,
+    //             },
+    //             drop: {
+    //               id: destColumn.id,
+    //               name: 'Drop',
+    //               content: destItems,
+    //             },
+    //           })
+    //         } else {
+    //           setColumns({
+    //             drag: {
+    //               id: sourceColumn.id,
+    //               name: 'Drag',
+    //               content: sourceItems,
+    //             },
+    //             drop: {
+    //               id: destColumn.id,
+    //               name: 'Drop',
+    //               content: [
+    //                 ...destItems,
+    //                 {
+    //                   id: idComponent,
+    //                   items: [
+    //                     {
+    //                       index: result.destination.index,
+    //                       content: dragContent,
+    //                     },
+    //                   ],
+    //                 },
+    //               ],
+    //             },
+    //           })
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
 
     // if(combine) {
     //   // super simple: just removing the dragging item
@@ -519,7 +533,9 @@ export default function ModulSlug({ modul }) {
       },
     })
 
-    const getCheckDropIndex = checkDrop.findIndex((data) => data.index === index && data.id === idComponent)
+    const getCheckDropIndex = checkDrop.findIndex(
+      (data) => data.index === index && data.id === idComponent,
+    )
     checkDrop.splice(getCheckDropIndex, 1)
 
     document.getElementsByClassName(`drops-${idComponent}`)[0].children[
@@ -533,7 +549,12 @@ export default function ModulSlug({ modul }) {
 
   return (
     <Layout>
-      <Header />
+      <Header user={user} />
+      <SEO
+        title={modul.Title}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <div className="setflex-center-row border-b py-6 space-x-8">
         <FancyLink destination="/" className="font-medium flex items-center">
           <BsCheck2Square size={20} className="mr-2" />
@@ -550,7 +571,7 @@ export default function ModulSlug({ modul }) {
       <div className="relative flex flex-col w-full">
         <Container className="mt-4 md:mt-6 xl:mt-8">
           <div className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8">
-            {modul.Editor.map((data, idComponent) =>
+            {modul.Editor?.map((data, idComponent) =>
               data.__component === 'editor.title' ? (
                 <TitleComponent
                   title={data.Title}
@@ -563,7 +584,7 @@ export default function ModulSlug({ modul }) {
                 <div
                   key={idComponent}
                   data-id={idComponent + 1}
-                  className="w-full flex flex-col space-y-3 text-lg editor"
+                  className="w-full flex flex-col space-y-3 editor"
                   dangerouslySetInnerHTML={{ __html: data.Content }}
                 ></div>
               ) : data.__component === 'editor.drag-and-drop' ? (
@@ -573,7 +594,28 @@ export default function ModulSlug({ modul }) {
                     Match the words in the boxes with the phrases below to make
                     them into imperative sentences.
                   </span>
-                  <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400">
+                  <DragDrop data={data} idComponent={idComponent} />
+                  {/* <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400">
+                    <div className="flex flex-wrap drag">
+                      {data.Drag.map((item, idDrag) => {
+                        const [, drag] = useDrag(() => ({
+                          type: 'drag-drop',
+                          item: {
+                            content: item.Content,
+                          },
+                        }))
+                        return (
+                          <span
+                            ref={drag}
+                            key={idDrag}
+                            className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
+                          >
+                            {item.Content}
+                          </span>
+                        )
+                      })}
+                    </div>
+
                     {process.browser && (
                       <DragDropContext
                         onDragEnd={(result) =>
@@ -632,7 +674,6 @@ export default function ModulSlug({ modul }) {
                             return (
                               <ol
                                 className={`list-inside list-decimal space-y-4 pointer-events-none drops-${idComponent}`}
-                                data-idComponent={idComponent}
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                               >
@@ -652,17 +693,9 @@ export default function ModulSlug({ modul }) {
                                             data-id={id + 1}
                                           >
                                             <span className="inline-flex max-w-md">
-                                              {item.Question_Column_1
-                                                ? item.Question_Column_1
-                                                : '.......... '}
-                                              {` `}
-                                              {item.Question_Column_2
-                                                ? item.Question_Column_2
-                                                : '.......... '}
-                                              {` `}
-                                              {item.Question_Column_3
-                                                ? item.Question_Column_3
-                                                : '.......... '}
+                                              {item.Content[0].map((i) =>
+                                                i ? i : '.......... ',
+                                              )}
                                             </span>
                                             {checkDrop
                                               .filter(
@@ -698,7 +731,7 @@ export default function ModulSlug({ modul }) {
                         </Droppable>
                       </DragDropContext>
                     )}
-                  </div>
+                  </div> */}
                   <div className="flex justify-end w-full mt-3">
                     <FancyLink
                       onClick={() => resetDnd()}
@@ -713,7 +746,7 @@ export default function ModulSlug({ modul }) {
               ),
             )}
           </div>
-          <div className="w-full my-10 max-w-3xl flex flex-col items-center mx-auto">
+          <div className="w-full my-10 max-w-4xl flex flex-col items-center mx-auto">
             <div className="border-b w-full pb-2">
               <span className="font-medium border-b border-black pb-2.5">
                 Comments
@@ -725,7 +758,7 @@ export default function ModulSlug({ modul }) {
               </span>
               <div className="w-full flex flex-col">
                 <span className="mb-2">Dimas Aditya</span>
-                <div className="w-full h-full border border-black"></div>
+                <textarea className="w-full h-full"></textarea>
               </div>
             </div>
             <div className="flex flex-col w-full space-y-6">
@@ -784,27 +817,52 @@ export default function ModulSlug({ modul }) {
   )
 }
 
-export async function getStaticPaths() {
+export async function getServerSideProps(ctx) {
+  const cookies = nookies.get(ctx)
+
+  if (!cookies.token) {
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
+  }
+
+  const user = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
   const req = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate=deep`,
   )
   const res = await req.json()
 
-  const paths = res.data.map((data) => ({
-    params: { slug: data.attributes.Slug },
-  }))
+  if(res.data[0].attributes.major.data?.attributes.Name) {
+    if(!res.data[0].attributes.major.data?.attributes.Name === user.data.major.Name) {
+      return {
+        notFound: true,
+      }
+    }
+  }else {
+    return {
+      notFound: true,
+    }
+  }
 
-  return { paths, fallback: false }
-}
-
-export async function getStaticProps({ params }) {
-  const req = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${params.slug}&populate=deep`,
+  const reqSeo = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
   )
-  const res = await req.json()
+  const seo = await reqSeo.json()
 
   return {
     props: {
+      user: user.data,
+      seo: seo.data.attributes,
       modul: res.data[0].attributes,
     },
   }

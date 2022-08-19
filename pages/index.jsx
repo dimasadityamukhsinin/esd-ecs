@@ -10,7 +10,7 @@ import axios from 'axios'
 import flash from 'next-flash'
 import { useRouter } from 'next/router'
 
-export default function Home({ user, modul }) {
+export default function Home({ user, modul, seo }) {
   const router = useRouter()
 
   const countdownData = (date) => {
@@ -26,11 +26,11 @@ export default function Home({ user, modul }) {
 
   return (
     <Layout>
-      <Header />
+      <Header user={user}/>
       <SEO
         title={'Your Learning'}
-        defaultSEO={typeof seo !== 'undefined' && seo.seo}
-        webTitle={typeof seo !== 'undefined' && seo.webTitle}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
       <div className="w-full my-8 text-center font-medium">
         <h2>Your Learning</h2>
@@ -63,8 +63,8 @@ export default function Home({ user, modul }) {
                 !(countdownData(attributes.Assignment_Deadline) < 0) && (
                   <FancyLink
                     key={id}
-                    destination={`modul/${attributes.Slug}`}
-                    className="relative bg-white border w-96"
+                    destination={`/modul/${attributes.Slug}`}
+                    className="relative bg-white border"
                   >
                     <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
                       {`${countdownData(
@@ -81,16 +81,18 @@ export default function Home({ user, modul }) {
                       <div className="absolute z-10 w-full h-full bg-black opacity-40" />
                       <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
                     </div>
-                    <div className="w-full flex flex-col p-3 space-y-3">
-                      <span className="font-medium text-gray-500">
-                        Modul {id + 1}
-                      </span>
-                      <span className="font-medium text-lg text-left">
-                        {attributes.Title}
-                      </span>
-                      <p className="text-gray-500 font-medium text-sm text-left">
-                        {attributes.Short_Description}
-                      </p>
+                    <div className="w-full flex flex-col justify-between p-3 space-y-3">
+                      <div className="flex flex-col  space-y-3">
+                        <span className="font-medium text-gray-500">
+                          Modul {id + 1}
+                        </span>
+                        <span className="font-medium text-lg text-left">
+                          {attributes.Title}
+                        </span>
+                        <p className="text-gray-500 font-medium text-sm text-left">
+                          {attributes.Short_Description}
+                        </p>
+                      </div>
                       <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
                         Go to modul
                       </div>
@@ -107,15 +109,6 @@ export default function Home({ user, modul }) {
 
 export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
-  const reqModul = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
-  )
-  const modul = await reqModul.json()
-
-  const reqSeo = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
-  )
-  const seo = await reqSeo.json()
 
   if (!cookies.token) {
     return {
@@ -125,6 +118,11 @@ export async function getServerSideProps(ctx) {
     }
   }
 
+  const reqSeo = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+  const seo = await reqSeo.json()
+
   const user = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
     {
@@ -133,6 +131,11 @@ export async function getServerSideProps(ctx) {
       },
     },
   )
+
+  const reqModul = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major.Name}&populate=deep`,
+  )
+  const modul = await reqModul.json()
 
   return {
     props: {
