@@ -567,7 +567,6 @@ export default function ModulSlug({
       ...field,
       [name]: value,
     })
-    // validateInput(e)
   }
 
   const doComment = async (e) => {
@@ -624,7 +623,7 @@ export default function ModulSlug({
           Assignment
         </FancyLink>
         <FancyLink
-          destination="/conversations"
+          destination={`/modul/${modul.Slug}/conversations`}
           className="font-medium flex items-center"
         >
           <BiConversation size={20} className="mr-2" />
@@ -824,8 +823,11 @@ export default function ModulSlug({
                 <form
                   method="post"
                   onSubmit={doComment}
-                  className="w-full h-full"
+                  className="relative w-full h-full"
                 >
+                  {progress && (
+                    <div className="absolute inset-0 z-10 bg-white/50" />
+                  )}
                   <textarea
                     onChange={setValue}
                     name="Content"
