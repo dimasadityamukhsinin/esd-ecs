@@ -3,7 +3,7 @@ import Container from '@/components/modules/container'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import { useState } from 'react'
 
-export default function Header({ className, user }) {
+export default function Header({ className, user, notif }) {
   const [reveal, setReveal] = useState({
     option: '',
     status: false,
@@ -33,8 +33,14 @@ export default function Header({ className, user }) {
             </div>
 
             <nav className="flex items-center space-x-5">
-              <FancyLink destination="/" className="w-full h-full">
+              <FancyLink
+                destination="/notifications"
+                className="relative w-full h-full"
+              >
                 <IoNotificationsOutline size={23} />
+                {notif && (
+                  <div className="absolute top-0 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                )}
               </FancyLink>
 
               <div className="relative">
