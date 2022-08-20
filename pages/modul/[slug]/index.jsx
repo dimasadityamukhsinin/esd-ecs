@@ -18,8 +18,18 @@ import SEO from '@/components/utils/seo'
 import nookies from 'nookies'
 import axios from 'axios'
 
-export default function ModulSlug({ user, userList, modul, seo, comments }) {
+export default function ModulSlug({
+  user,
+  userList,
+  modul,
+  seo,
+  comments,
+  modulId,
+  token,
+}) {
   const [field, setField] = useState({})
+  const [progress, setProgress] = useState(false)
+  const [dataComments, setComments] = useState(comments)
   let dragsFromBackend = []
   let dropsFromBackend = []
 
@@ -560,10 +570,49 @@ export default function ModulSlug({ user, userList, modul, seo, comments }) {
     // validateInput(e)
   }
 
+  const doComment = async (e) => {
+    e.preventDefault()
+    setProgress(true)
+
+    const req = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        data: {
+          ...field,
+          users_permissions_user: user.id,
+          idUser: user.id,
+          idModul: modulId,
+          Modul_Name: modul.Title,
+          User: user.Full_Name,
+        },
+      }),
+    })
+    const res = await req.json()
+
+    const newComment = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+
+    setComments(newComment.data.data)
+
+    setField({})
+    e.target.reset()
+
+    setProgress(false)
+  }
+
   return (
     <Layout>
       <Header user={user} />
-      {console.log(comments)}
       <SEO
         title={modul.Title}
         defaultSEO={typeof seo !== 'undefined' && seo}
@@ -772,27 +821,35 @@ export default function ModulSlug({ user, userList, modul, seo, comments }) {
               </span>
               <div className="w-full flex flex-col">
                 <span className="mb-2">{user.Full_Name}</span>
-                <form className='w-full h-full'>
+                <form
+                  method="post"
+                  onSubmit={doComment}
+                  className="w-full h-full"
+                >
                   <textarea
                     onChange={setValue}
-                    className="w-full h-full font-normal"
+                    name="Content"
+                    className="w-full font-normal"
                   ></textarea>
+                  <button
+                    type="submit"
+                    className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                  >
+                    Post
+                  </button>
                 </form>
-                <button
-                  type="submit"
-                  className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
-                >
-                  Post
-                </button>
               </div>
             </div>
             <div className="flex flex-col w-full space-y-6">
-              {comments.map((data) => (
+              {dataComments.map((data) => (
                 <div className="w-full border-b pb-6 flex mt-10">
                   <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
                     {
                       userList
-                        .find((item) => item.id === data.attributes.idUser)
+                        .find(
+                          (item) =>
+                            item.id.toString() === data.attributes.idUser,
+                        )
                         .Full_Name.split('')[0]
                     }
                   </span>
@@ -801,7 +858,8 @@ export default function ModulSlug({ user, userList, modul, seo, comments }) {
                       <span className="mb-2 font-medium">
                         {
                           userList.find(
-                            (item) => item.id === data.attributes.idUser,
+                            (item) =>
+                              item.id.toString() === data.attributes.idUser,
                           ).Full_Name
                         }
                       </span>
@@ -896,7 +954,12 @@ export async function getServerSideProps(ctx) {
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[modul][slug][$eq]=${ctx.params.slug}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
   )
 
   const reqSeo = await fetch(
@@ -911,6 +974,8 @@ export async function getServerSideProps(ctx) {
       seo: seo.data.attributes,
       modul: res.data[0].attributes,
       comments: comments.data.data,
+      modulId: res.data[0].id,
+      token: cookies.token,
     },
   }
 }
