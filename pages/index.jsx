@@ -25,7 +25,7 @@ export default function Home({ user, modul, seo, checkNotif }) {
 
   return (
     <Layout>
-      <Header user={user} notif={checkNotif} />
+      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
       <SEO
         title={'Your Learning'}
         defaultSEO={typeof seo !== 'undefined' && seo}

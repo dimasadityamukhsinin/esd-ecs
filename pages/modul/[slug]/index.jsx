@@ -618,7 +618,7 @@ export default function ModulSlug({
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} />
+      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
       <div className="setflex-center-row border-b py-6 space-x-8">
         <FancyLink destination="/" className="font-medium flex items-center">
           <BsCheck2Square size={20} className="mr-2" />
@@ -653,149 +653,161 @@ export default function ModulSlug({
                 ></div>
               ) : data.__component === 'editor.drag-and-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
-                  <span className="font-medium">Instruction:</span>
-                  <span>
-                    Match the words in the boxes with the phrases below to make
-                    them into imperative sentences.
-                  </span>
                   <DragDrop data={data} idComponent={idComponent} />
-                  {/* <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400">
-                    <div className="flex flex-wrap drag">
-                      {data.Drag.map((item, idDrag) => {
-                        const [, drag] = useDrag(() => ({
-                          type: 'drag-drop',
-                          item: {
-                            content: item.Content,
-                          },
-                        }))
-                        return (
-                          <span
-                            ref={drag}
-                            key={idDrag}
-                            className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
-                          >
-                            {item.Content}
-                          </span>
-                        )
-                      })}
-                    </div>
-
-                    {process.browser && (
-                      <DragDropContext
-                        onDragEnd={(result) =>
-                          onDragEnd(result, columns, setColumns, idComponent)
-                        }
-                      >
-                        <div className="w-full" key={columns.drag.id}>
-                          <div style={{ margin: 8 }}>
-                            <Droppable
-                              droppableId={columns.drag.id}
-                              key={columns.drag.id}
-                              direction="horizontal"
-                            >
-                              {(provided, snapshot) => {
-                                return (
-                                  <div
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                    className="flex flex-wrap drag"
-                                  >
-                                    {columns.drag.content
-                                      .find((getId) => getId.id === idComponent)
-                                      .items.map((item, id) => (
-                                        <Draggable
-                                          key={`${item.id}`}
-                                          draggableId={`${item.id}`}
-                                          index={id}
-                                        >
-                                          {(provided, snapshot) => {
-                                            return (
-                                              <span
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
-                                              >
-                                                {item.content}
-                                              </span>
-                                            )
-                                          }}
-                                        </Draggable>
-                                      ))}
-                                    {provided.placeholder}
-                                  </div>
-                                )
-                              }}
-                            </Droppable>
-                          </div>
-                        </div>
-                        <Droppable
-                          droppableId={columns.drop.id}
-                          key={columns.drop.id}
-                          isCombineEnabled={true}
-                        >
-                          {(provided, snapshot) => {
-                            return (
-                              <ol
-                                className={`list-inside list-decimal space-y-4 pointer-events-none drops-${idComponent}`}
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                              >
-                                {data.Drop.map((item, id) => (
-                                  <Draggable
-                                    key={`${item.id}`}
-                                    draggableId={`${item.id}`}
-                                    index={id}
-                                  >
-                                    {(provided, snapshot) => {
-                                      return (
-                                        <>
-                                          <li
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            data-id={id + 1}
-                                          >
-                                            <span className="inline-flex max-w-md">
-                                              {item.Content[0].map((i) =>
-                                                i ? i : '.......... ',
-                                              )}
-                                            </span>
-                                            {checkDrop
-                                              .filter(
-                                                (data) =>
-                                                  data.id === idComponent,
-                                              )
-                                              .find(
-                                                (item) => item.index === id,
-                                              ) && (
-                                              <FancyLink
-                                                onClick={() =>
-                                                  removeDrag(
-                                                    idComponent,
-                                                    id,
-                                                    item,
-                                                  )
-                                                }
-                                                className="ml-6 rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-white"
-                                              >
-                                                Remove
-                                              </FancyLink>
-                                            )}
-                                          </li>
-                                        </>
-                                      )
-                                    }}
-                                  </Draggable>
-                                ))}
-                                {provided.placeholder}
-                              </ol>
-                            )
-                          }}
-                        </Droppable>
-                      </DragDropContext>
+                  <div className="flex justify-end w-full mt-3">
+                    <FancyLink
+                      onClick={() => resetDnd()}
+                      className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
+                    >
+                      Reset
+                    </FancyLink>
+                  </div>
+                </div>
+              ) : data.type === 'fill-left-answer' ? (
+                <div
+                  className="grid grid-cols-[2fr,1fr,2fr] grid-flow-col w-full border border-black"
+                  key={idComponent}
+                >
+                  <div className="w-full border-r border-black h-full flex flex-col">
+                    {data.question_and_answer.map((_, idLeft) =>
+                      idLeft !== 0 ? (
+                        <input
+                          key={idLeft}
+                          placeholder="..............."
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
+                        />
+                      ) : (
+                        <input
+                          key={idLeft}
+                          placeholder="..............."
+                          className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
+                        />
+                      ),
                     )}
-                  </div> */}
+                  </div>
+                  <div className="w-full flex justify-center items-center h-full">
+                    <span>{data.Verb}</span>
+                  </div>
+                  <div className="w-full border-l border-black h-full flex flex-col">
+                    {data.question_and_answer.map((item, idLeft) =>
+                      idLeft !== 0 ? (
+                        <div
+                          key={idLeft}
+                          className="w-full pl-3 py-1 border-t border-black"
+                        >
+                          {item.Question}
+                        </div>
+                      ) : (
+                        <div key={idLeft} className="w-full pl-3 py-1">
+                          {item.Question}
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+              ) : data.type === 'fill-right-answer' ? (
+                <div
+                  className="grid grid-cols-[2fr,1fr,2fr] grid-flow-col w-full border border-black"
+                  key={idComponent}
+                >
+                  <div className="w-full border-r border-black h-full flex flex-col">
+                    {data.question_and_answer.map((item, idRight) =>
+                      idRight !== 0 ? (
+                        <div
+                          key={idRight}
+                          className="w-full pl-3 py-1 border-t border-black"
+                        >
+                          {item.Question}
+                        </div>
+                      ) : (
+                        <div key={idRight} className="w-full pl-3 py-1">
+                          {item.Question}
+                        </div>
+                      ),
+                    )}
+                  </div>
+                  <div className="w-full flex justify-center items-center h-full">
+                    <span>{data.Verb}</span>
+                  </div>
+                  <div className="w-full border-l border-black h-full flex flex-col">
+                    {data.question_and_answer.map((_, idRight) =>
+                      idRight !== 0 ? (
+                        <input
+                          key={idRight}
+                          placeholder="..............."
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
+                        />
+                      ) : (
+                        <input
+                          key={idRight}
+                          placeholder="..............."
+                          className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
+                        />
+                      ),
+                    )}
+                  </div>
+                </div>
+              ) : data.type === 'arrange' ? (
+                <div
+                  className="w-full grid grid-cols-3 gap-6"
+                  key={idComponent}
+                >
+                  {data.Arrange.map((item, idArrange) => (
+                    <div
+                      key={idArrange}
+                      className="w-full grid grid-cols-4 grid-flow-col"
+                    >
+                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-yellow-400 col-span-3 flex justify-center items-center">
+                        <span>{item.Content}</span>
+                      </div>
+                      <input
+                        type="number"
+                        className="outline-none text-center border rounded-r-md bg-yellow-400 text-white border-yellow-400"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : data.type === 'stack-with-drag' ? (
+                <div
+                  className="w-full flex flex-col space-y-4"
+                  key={idComponent}
+                >
+                  {data.Drag.map((item, idStack) => (
+                    <div className="w-full grid grid-cols-12" key={idStack}>
+                      <div className="outline-none rounded-l-md border border-yellow-400 flex justify-center items-center">
+                        <span>{idStack + 1}</span>
+                      </div>
+                      <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
+                        <span>{item.Content}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : data.__component === 'editor.audio' ? (
+                <div className="w-full" key={idComponent}>
+                  <audio
+                    controls
+                    src={data.Audio.data.attributes.url}
+                    className="outline-none"
+                  >
+                    Your browser does not support the
+                    <code>audio</code> element.
+                  </audio>
+                </div>
+              ) : data.type === 'stack-with-drag-drop' ? (
+                <div className="flex flex-col w-full" key={idComponent}>
+                  <div className="w-full flex flex-col space-y-4">
+                    {data.Drop.map((item, idStack) => (
+                      <div className="w-full grid grid-cols-12" key={idStack}>
+                        <div className="outline-none rounded-l-md border border-yellow-400 flex justify-center items-center">
+                          <span>{idStack + 1}</span>
+                        </div>
+                        <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
+                          <span>{item.Content}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                   <div className="flex justify-end w-full mt-3">
                     <FancyLink
                       onClick={() => resetDnd()}

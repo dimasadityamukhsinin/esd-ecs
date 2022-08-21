@@ -2,8 +2,9 @@ import FancyLink from '@/components/utils/fancyLink'
 import Container from '@/components/modules/container'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import { useState } from 'react'
+import Image from 'next/image'
 
-export default function Header({ className, user, notif }) {
+export default function Header({ className, user, notif, logo, title }) {
   const [reveal, setReveal] = useState({
     option: '',
     status: false,
@@ -15,7 +16,14 @@ export default function Header({ className, user, notif }) {
           <div className="flex justify-between items-center">
             <div className="w-full flex items-center">
               <FancyLink destination="/" className="font-medium text-xl">
-                ESD in ECS
+                <div className="relative w-12 h-12 aspect-square">
+                  <Image
+                    src={logo}
+                    alt={title}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
               </FancyLink>
 
               <FancyLink

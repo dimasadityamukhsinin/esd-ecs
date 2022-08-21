@@ -20,3 +20,9 @@ body {
   @apply font-sans tracking-wide font-normal antialiased text-black bg-white;
   overscroll-behavior: none;
 }
+
+table {
+  td {
+    @apply py-1 #{!important};
+  }
+}

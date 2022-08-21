@@ -14,7 +14,7 @@ const About = ({ seo, about, user, token, checkNotif }) => {
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} />
+      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
       <Container className="mt-4 md:mt-6 xl:mt-8">
         <div className="w-full max-w-lg mx-auto flex flex-col pt-8 pb-8">
           <h2 className="text-lg m-0 font-medium">About {seo.Website_Title}</h2>

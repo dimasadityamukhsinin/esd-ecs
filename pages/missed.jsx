@@ -30,7 +30,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} />
+      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
       <div className="w-full my-8 text-center font-medium">
         <h2>Your Learning</h2>
       </div>
