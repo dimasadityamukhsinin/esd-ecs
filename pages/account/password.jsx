@@ -43,20 +43,20 @@ const Password = ({ token, user, flashData, checkNotif }) => {
               <form className="mt-6">
                 <div className="flex flex-col">
                   <div className="h-full w-full flex flex-col">
-                    <label className="font-medium">
-                      Enter a new password (min. 10 characters)
-                    </label>
+                    <label className="font-medium">Current password</label>
                     <input
                       type="text"
+                      name="currentPassword"
                       className="w-full h-11 border p-2 mt-2"
                     />
                   </div>
                   <div className="h-full w-full mt-6 flex flex-col">
                     <label className="font-medium">
-                      Confirm your new password
+                      Enter a new password (min. 8 characters)
                     </label>
                     <input
                       type="text"
+                      name="newPassword"
                       className="w-full h-11 border p-2 mt-2"
                     />
                   </div>
