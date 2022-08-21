@@ -7,10 +7,9 @@ import Image from 'next/image'
 import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
 import axios from 'axios'
-import flash from 'next-flash'
 import { useRouter } from 'next/router'
 
-export default function Missed({ user, modul }) {
+export default function Missed({ modul, seo, user, token, checkNotif }) {
   const router = useRouter()
 
   const countdownData = (date) => {
@@ -26,12 +25,12 @@ export default function Missed({ user, modul }) {
 
   return (
     <Layout>
-      <Header />
       <SEO
-        title={'Your Learning'}
-        defaultSEO={typeof seo !== 'undefined' && seo.seo}
-        webTitle={typeof seo !== 'undefined' && seo.webTitle}
+        title={'Missed'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
+      <Header user={user} notif={checkNotif} />
       <div className="w-full my-8 text-center font-medium">
         <h2>Your Learning</h2>
       </div>
@@ -60,7 +59,7 @@ export default function Missed({ user, modul }) {
           <div className="flex flex-wrap modul mt-6">
             {modul.map(
               ({ attributes }, id) =>
-                (countdownData(attributes.Assignment_Deadline) < 0) && (
+                countdownData(attributes.Assignment_Deadline) < 0 && (
                   <FancyLink
                     key={id}
                     className="relative bg-white border w-96 opacity-60 pointer-events-none"
@@ -104,15 +103,6 @@ export default function Missed({ user, modul }) {
 
 export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
-  const reqModul = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
-  )
-  const modul = await reqModul.json()
-
-  const reqSeo = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
-  )
-  const seo = await reqSeo.json()
 
   if (!cookies.token) {
     return {
@@ -121,6 +111,15 @@ export async function getServerSideProps(ctx) {
       },
     }
   }
+
+  const reqModul = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
+  )
+  const modul = await reqModul.json()
+
+  const seo = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
 
   const user = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
@@ -131,11 +130,48 @@ export async function getServerSideProps(ctx) {
     },
   )
 
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
   return {
     props: {
-      user: user.data,
-      seo: seo.data.attributes,
       modul: modul.data,
+      seo: seo.data.data.attributes,
+      token: cookies.token,
+      user: user.data,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }
 }

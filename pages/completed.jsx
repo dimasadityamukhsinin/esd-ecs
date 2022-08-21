@@ -4,11 +4,19 @@ import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import FancyLink from '@/components/utils/fancyLink'
 import Image from 'next/image'
+import SEO from '@/components/utils/seo'
+import nookies from 'nookies'
+import axios from 'axios'
 
-export default function Completed() {
+export default function Completed({ seo, user, token, checkNotif }) {
   return (
     <Layout>
-      <Header />
+      <SEO
+        title={'Completed'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
+      <Header user={user} notif={checkNotif} />
       <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
         <h2>Your Learning</h2>
       </div>
@@ -36,7 +44,7 @@ export default function Completed() {
         <div className="flex flex-wrap test mt-6">
           <FancyLink className="relative bg-white border w-96">
             <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                80 / 100
+              80 / 100
             </span>
             <div className="relative flex justify-center w-full h-40">
               <Image src="/tes.jpg" layout="fill" objectFit="cover" />
@@ -62,4 +70,73 @@ export default function Completed() {
       </Container>
     </Layout>
   )
+}
+
+export async function getServerSideProps(ctx) {
+  const cookies = nookies.get(ctx)
+
+  if (!cookies.token) {
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
+  }
+
+  const seo = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+
+  const user = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
+  return {
+    props: {
+      seo: seo.data.data.attributes,
+      token: cookies.token,
+      user: user.data,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
+    },
+  }
 }
