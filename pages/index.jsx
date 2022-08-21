@@ -10,7 +10,7 @@ import axios from 'axios'
 import flash from 'next-flash'
 import { useRouter } from 'next/router'
 
-export default function Home({ user, modul, seo }) {
+export default function Home({ user, modul, seo, checkNotif }) {
   const router = useRouter()
 
   const countdownData = (date) => {
@@ -26,7 +26,7 @@ export default function Home({ user, modul, seo }) {
 
   return (
     <Layout>
-      <Header user={user}/>
+      <Header user={user} notif={checkNotif} />
       <SEO
         title={'Your Learning'}
         defaultSEO={typeof seo !== 'undefined' && seo}
@@ -137,11 +137,47 @@ export async function getServerSideProps(ctx) {
   )
   const modul = await reqModul.json()
 
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
   return {
     props: {
       user: user.data,
       seo: seo.data.attributes,
       modul: modul.data,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }
 }

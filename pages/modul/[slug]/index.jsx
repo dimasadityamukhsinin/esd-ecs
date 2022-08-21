@@ -26,6 +26,7 @@ export default function ModulSlug({
   comments,
   modulId,
   token,
+  checkNotif,
 }) {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
@@ -611,7 +612,7 @@ export default function ModulSlug({
 
   return (
     <Layout>
-      <Header user={user} />
+      <Header user={user} notif={checkNotif} />
       <SEO
         title={modul.Title}
         defaultSEO={typeof seo !== 'undefined' && seo}
@@ -969,6 +970,41 @@ export async function getServerSideProps(ctx) {
   )
   const seo = await reqSeo.json()
 
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
   return {
     props: {
       user: user.data,
@@ -978,6 +1014,7 @@ export async function getServerSideProps(ctx) {
       comments: comments.data.data,
       modulId: res.data[0].id,
       token: cookies.token,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }
 }

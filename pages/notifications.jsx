@@ -60,7 +60,7 @@ export default function Notifications({
             {notif.map((data, id) => (
               <div
                 key={id}
-                className="w-full min-h-[100px] flex flex-col justify-between border-b pb-4"
+                className="w-full min-h-[50px] flex flex-col justify-between border-b pb-4"
               >
                 <div className="w-full flex justify-between">
                   <AiOutlineQuestionCircle size={25} />

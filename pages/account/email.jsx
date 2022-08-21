@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import flash from 'next-flash'
 import { useRouter } from 'next/router'
 
-const Email = ({ user, token, flashData }) => {
+const Email = ({ user, token, flashData, checkNotif }) => {
   const router = useRouter()
   const [field, setField] = useState({
     email: user.email,
@@ -56,30 +56,16 @@ const Email = ({ user, token, flashData }) => {
         })
       } else {
         router.reload(window.location.pathname)
-
-        if (
-          !user.username ||
-          !user.email ||
-          !user.First_Name ||
-          !user.Last_Name
-        ) {
-          flash.set({
-            type: 'warning',
-            message:
-              'Please complete your personal data such as username, email, and full name!',
-          })
-        } else {
-          flash.set({
-            type: 'update',
-            message: 'You’ve updated your email.',
-          })
-        }
+        flash.set({
+          type: 'update',
+          message: 'You’ve updated your email.',
+        })
       }
     }
   }
 
   const ShowFlash = () => {
-    let message = flashData.message;
+    let message = flashData.message
     // Make sure we're in the browser
     if (typeof window !== 'undefined') {
       flash.set(null)
@@ -129,7 +115,7 @@ const Email = ({ user, token, flashData }) => {
   }
 
   useEffect(() => {
-    if (!user.username || !user.email || !user.First_Name || !user.Last_Name) {
+    if (!user.username || !user.email || !user.Full_Name) {
       flash.set({
         type: 'warning',
         message:
@@ -140,7 +126,7 @@ const Email = ({ user, token, flashData }) => {
 
   return (
     <Layout>
-      <Header />
+      <Header user={user} notif={checkNotif} />
       <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
         <h2>Your Account</h2>
       </div>
@@ -243,10 +229,46 @@ Email.getInitialProps = async (ctx) => {
     },
   )
 
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
   return {
     token: cookies.token,
     user: user.data,
     flashData: flash.get(ctx),
+    checkNotif: checkNotif.data.length === all.length ? false : true,
   }
 }
 

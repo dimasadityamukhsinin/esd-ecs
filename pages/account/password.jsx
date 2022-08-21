@@ -2,11 +2,14 @@ import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import Layout from '@/components/modules/layout'
 import FancyLink from '@/components/utils/fancyLink'
+import nookies from 'nookies'
+import axios from 'axios'
+import flash from 'next-flash'
 
-export default function Password() {
+const Password = ({ token, user, flashData, checkNotif }) => {
   return (
     <Layout>
-      <Header />
+      <Header user={user} notif={checkNotif} />
       <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
         <h2>Your Account</h2>
       </div>
@@ -69,3 +72,68 @@ export default function Password() {
     </Layout>
   )
 }
+
+Password.getInitialProps = async (ctx) => {
+  const cookies = nookies.get(ctx)
+
+  if (!cookies.token) {
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
+  }
+
+  const user = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
+  return {
+    token: cookies.token,
+    user: user.data,
+    flashData: flash.get(ctx),
+    checkNotif: checkNotif.data.length === all.length ? false : true,
+  }
+}
+
+export default Password

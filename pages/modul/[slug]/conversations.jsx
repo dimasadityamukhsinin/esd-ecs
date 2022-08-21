@@ -16,6 +16,7 @@ export default function Conversations({
   comments,
   modulId,
   token,
+  checkNotif
 }) {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
@@ -74,7 +75,7 @@ export default function Conversations({
 
   return (
     <Layout>
-      <Header user={user} />
+      <Header user={user} notif={checkNotif} />
       <div className="setflex-center-row border-b py-6 space-x-8">
         <FancyLink destination="/" className="font-medium flex items-center">
           <BsCheck2Square size={20} className="mr-2" />
@@ -235,6 +236,41 @@ export async function getServerSideProps(ctx) {
   )
   const seo = await reqSeo.json()
 
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
   return {
     props: {
       user: user.data,
@@ -244,6 +280,7 @@ export async function getServerSideProps(ctx) {
       comments: comments.data.data,
       modulId: res.data[0].id,
       token: cookies.token,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }
 }

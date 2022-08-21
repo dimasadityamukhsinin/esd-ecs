@@ -8,18 +8,16 @@ import { useEffect, useState } from 'react'
 import flash from 'next-flash'
 import { useRouter } from 'next/router'
 
-const Account = ({ user, token, flashData }) => {
+const Account = ({ user, token, flashData, checkNotif }) => {
   const router = useRouter()
   const [field, setField] = useState({
     username: user.username,
-    First_Name: user.First_Name,
-    Last_Name: user.Last_Name,
+    Full_Name: user.Full_Name,
   })
   const [progress, setProgress] = useState(false)
   const [error, setError] = useState({
     username: '',
-    First_Name: '',
-    Last_Name: '',
+    Full_Name: '',
   })
 
   const setValue = (e) => {
@@ -75,15 +73,11 @@ const Account = ({ user, token, flashData }) => {
     const username = usernameTarget.name
     const usernameValue = usernameTarget.value
 
-    const firstNameTarget = e.target[1]
-    const firstName = firstNameTarget.name
-    const firstNameValue = firstNameTarget.value
+    const fullNameTarget = e.target[1]
+    const fullName = fullNameTarget.name
+    const fullNameValue = fullNameTarget.value
 
-    const lastNameTarget = e.target[2]
-    const lastName = lastNameTarget.name
-    const lastNameValue = lastNameTarget.value
-
-    const stateObj = { username: '', First_Name: '', Last_Name: '' }
+    const stateObj = { username: '', Full_Name: '' }
 
     if (username) {
       if (!usernameValue) {
@@ -91,20 +85,14 @@ const Account = ({ user, token, flashData }) => {
       }
     }
 
-    if (firstName) {
-      if (!firstNameValue) {
-        stateObj.First_Name = 'Please enter First Name.'
-      }
-    }
-
-    if (lastName) {
-      if (!lastNameValue) {
-        stateObj.Last_Name = 'Please enter Last Name.'
+    if (fullName) {
+      if (!fullNameValue) {
+        stateObj.Full_Name = 'Please enter Full Name.'
       }
     }
 
     setError(stateObj)
-    if (stateObj.username || stateObj.First_Name || stateObj.Last_Name) {
+    if (stateObj.username || stateObj.Full_Name) {
       return true
     } else {
       return false
@@ -123,15 +111,9 @@ const Account = ({ user, token, flashData }) => {
           }
           break
 
-        case 'First_Name':
+        case 'Full_Name':
           if (!value) {
-            stateObj[name] = 'Please enter First Name.'
-          }
-          break
-
-        case 'Last_Name':
-          if (!value) {
-            stateObj[name] = 'Please enter Last Name.'
+            stateObj[name] = 'Please enter Full Name.'
           }
           break
 
@@ -144,18 +126,18 @@ const Account = ({ user, token, flashData }) => {
   }
 
   useEffect(() => {
-    if (!user.username || !user.email || !user.First_Name || !user.Last_Name) {
+    if (!user.username || !user.email || !user.Full_Name) {
       flash.set({
         type: 'warning',
         message:
-          'Please complete your personal data such as username, email, and full name!',
+          'Please complete your personal data such as Username, Email, and Full Name!',
       })
     }
   }, [])
 
   return (
     <Layout>
-      <Header />
+      <Header user={user} notif={checkNotif} />
       <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
         <h2>Your Account</h2>
       </div>
@@ -216,33 +198,18 @@ const Account = ({ user, token, flashData }) => {
                     )}
                   </div>
                   <div className="h-full w-full flex flex-col mb-5">
-                    <label className="font-medium">First Name *</label>
+                    <label className="font-medium">Full Name *</label>
                     <input
                       type="text"
-                      name="First_Name"
+                      name="Full_Name"
                       onChange={setValue}
                       onBlur={validateInput}
                       className="w-full h-11 border p-2 mt-2"
-                      value={field.First_Name}
+                      value={field.Full_Name}
                     />
-                    {error.First_Name && (
+                    {error.Full_Name && (
                       <span className="block text-red-500">
-                        {error.First_Name}
-                      </span>
-                    )}
-                  </div>
-                  <div className="h-full w-full flex flex-col">
-                    <label className="font-medium">Last Name *</label>
-                    <input
-                      type="text"
-                      name="Last_Name"
-                      onChange={setValue}
-                      className="w-full h-11 border p-2 mt-2"
-                      value={field.Last_Name}
-                    />
-                    {error.Last_Name && (
-                      <span className="block text-red-500">
-                        {error.Last_Name}
+                        {error.Full_Name}
                       </span>
                     )}
                   </div>
@@ -282,10 +249,46 @@ Account.getInitialProps = async (ctx) => {
     },
   )
 
+  const reqNotifAll = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifAll = await reqNotifAll.json()
+
+  const reqNotifDetail = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const notifDetail = await reqNotifDetail.json()
+
+  const reqCheckNotif = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+  const checkNotif = await reqCheckNotif.json()
+
+  const all = [
+    ...notifAll.data,
+    ...notifDetail.data.filter((data) => data.attributes.All === false),
+  ]
+
   return {
     token: cookies.token,
     user: user.data,
     flashData: flash.get(ctx),
+    checkNotif: checkNotif.data.length === all.length ? false : true,
   }
 }
 
