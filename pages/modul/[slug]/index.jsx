@@ -22,6 +22,7 @@ export default function ModulSlug({
   user,
   userList,
   modul,
+  modulList,
   seo,
   comments,
   modulId,
@@ -844,8 +845,8 @@ export default function ModulSlug({
               </div>
             </div>
             <div className="flex flex-col w-full space-y-6">
-              {dataComments.map((data) => (
-                <div className="w-full border-b pb-6 flex mt-10">
+              {dataComments.map((data, id) => (
+                <div key={id} className="w-full border-b pb-6 flex mt-10">
                   <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
                     {
                       userList
@@ -883,22 +884,48 @@ export default function ModulSlug({
             </div>
           </div>
           <div className="w-full h-16 fixed bottom-0 left-0 right-0 border-t-2 bg-gray-50">
-            <Container className="h-full flex justify-between py-2.5">
-              <FancyLink className="flex items-center font-medium text-yellow-500 py-1 px-2">
-                <GrPrevious size={18} className="arrow mr-1" />
-                Previous
-              </FancyLink>
-              <FancyLink
-                onClick={() => checkComplete()}
-                className="flex items-center font-medium text-white bg-yellow-400 py-1 px-2"
-              >
-                <BsCheck2 size={28} className="mr-1" />
-                Mark as complete
-              </FancyLink>
-              <FancyLink className="flex items-center font-medium text-yellow-500 py-1 px-2">
-                Next
-                <GrNext size={18} className="arrow ml-1" />
-              </FancyLink>
+            <Container className="h-full grid grid-cols-3 grid-flow-col py-2.5">
+              {modulList[modulList.map((e) => e.id).indexOf(modulId) - 1] ? (
+                <div className="w-full h-full flex justify-start">
+                  <FancyLink
+                    destination={`/modul/${
+                      modulList[modulList.map((e) => e.id).indexOf(modulId) - 1]
+                        .attributes.Slug
+                    }`}
+                    className="flex items-center font-medium text-yellow-500 py-1 px-2"
+                  >
+                    <GrPrevious size={18} className="arrow mr-1" />
+                    Previous
+                  </FancyLink>
+                </div>
+              ) : (
+                <div className="w-full h-full" />
+              )}
+              <div className="w-full h-full flex justify-center">
+                <FancyLink
+                  onClick={() => checkComplete()}
+                  className="flex items-center font-medium text-white bg-yellow-400 py-1 px-2"
+                >
+                  <BsCheck2 size={28} className="mr-1" />
+                  Mark as complete
+                </FancyLink>
+              </div>
+              {modulList[modulList.map((e) => e.id).indexOf(modulId) + 1] ? (
+                <div className="w-full h-full flex justify-end">
+                  <FancyLink
+                    destination={`/modul/${
+                      modulList[modulList.map((e) => e.id).indexOf(modulId) + 1]
+                        .attributes.Slug
+                    }`}
+                    className="flex items-center font-medium text-yellow-500 py-1 px-2"
+                  >
+                    Next
+                    <GrNext size={18} className="arrow ml-1" />
+                  </FancyLink>
+                </div>
+              ) : (
+                <div className="w-full h-full" />
+              )}
             </Container>
           </div>
         </Container>
@@ -932,6 +959,21 @@ export async function getServerSideProps(ctx) {
   )
   const res = await req.json()
 
+  const modulList = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major.Name}&populate=deep`,
+  )
+
+  const countdownData = (date) => {
+    let today = new Date().toISOString().slice(0, 10)
+
+    const startDate = date
+    const endDate = today
+
+    const diffInMs = new Date(startDate) - new Date(endDate)
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24)
+    return diffInDays
+  }
+
   if (res.data[0].attributes.major.data?.attributes.Name) {
     if (
       !res.data[0].attributes.major.data?.attributes.Name ===
@@ -939,6 +981,12 @@ export async function getServerSideProps(ctx) {
     ) {
       return {
         notFound: true,
+      }
+    } else {
+      if (countdownData(res.data[0].attributes.Assignment_Deadline) < 0) {
+        return {
+          notFound: true,
+        }
       }
     }
   } else {
@@ -1011,6 +1059,9 @@ export async function getServerSideProps(ctx) {
       userList: userList.data,
       seo: seo.data.attributes,
       modul: res.data[0].attributes,
+      modulList: modulList.data.data.filter(
+        (item) => !(countdownData(item.attributes.Assignment_Deadline) < 0),
+      ),
       comments: comments.data.data,
       modulId: res.data[0].id,
       token: cookies.token,
