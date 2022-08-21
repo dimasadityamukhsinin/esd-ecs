@@ -91,7 +91,7 @@ const DragDrop = ({ data, idComponent }) => {
       // dragDrop.Drag.splice(index, 1)
       setDroppedBoxNames((prev) => [...prev, e])
     },
-    [dragDrop, droppedBoxNames],
+    [droppedBoxNames],
   )
 
   return (
@@ -105,10 +105,13 @@ const DragDrop = ({ data, idComponent }) => {
         <ol
           className={`list-inside list-decimal space-y-4 drops-${idComponent}`}
         >
+          {
+            console.log(dragDrop)
+          }
           {dragDrop.Drop.map((item, id) => (
             <li key={id}>
               <div className="inline max-w-md">
-                {item.Content[0]?.map((i, idAnswer) =>
+                {item.Content.map((i, idAnswer) =>
                   i ? (
                     <span>{i}</span>
                   ) : (

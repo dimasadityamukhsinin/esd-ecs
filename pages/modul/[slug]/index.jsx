@@ -29,35 +29,13 @@ export default function ModulSlug({
   token,
   checkNotif,
 }) {
-  const [field, setField] = useState({})
+  const [answer, setAnswer] = useState([])
+  const [fieldModul, setFieldModul] = useState({})
+  const [fieldComment, setFieldComment] = useState({})
   const [progress, setProgress] = useState(false)
   const [dataComments, setComments] = useState(comments)
   let dragsFromBackend = []
   let dropsFromBackend = []
-
-  modul.Editor = modul.Editor.map((data, id) => {
-    if (data.__component === 'editor.drag-and-drop') {
-      return {
-        ...data,
-        Drop: data.Drop.map((item) => {
-          return {
-            ...item,
-            Name: item.Name,
-            Content: data.Drop.filter((i) => i.Name === item.Name).map(
-              (k) => k.Content,
-            ),
-          }
-        }).reduce((unique, o) => {
-          if (!unique.some((obj) => obj.Name === o.Name)) {
-            unique.push(o)
-          }
-          return unique
-        }, []),
-      }
-    } else {
-      return data
-    }
-  })
 
   modul.Editor.forEach((data, id) => {
     if (data.__component === 'editor.drag-and-drop') {
@@ -560,13 +538,44 @@ export default function ModulSlug({
     }`
   }
 
-  const setValue = (e) => {
+  const setValueModul = (e) => {
     const target = e.target
     const name = target.name
     const value = target.value
 
-    setField({
-      ...field,
+    // setAnswer({
+    //   data: {
+    //     idUser: user.id,
+    //     idModul: modul.id,
+    //     User: user.Full_Name,
+    //     Modul_Name: modul.Title,
+    //     Question: [
+    //       ...answer.Question,
+    //       {
+    //         __component: 'question.fill-left-answer',
+    //         Name: 'question-1',
+    //         type: 'fill-left-answer',
+    //         Content: [
+    //           ...fieldModul,
+    //           {
+    //             Key: value,
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //     Date: new Date.now(),
+    //     Total_Score: 100,
+    //   },
+    // })
+  }
+
+  const setValueComment = (e) => {
+    const target = e.target
+    const name = target.name
+    const value = target.value
+
+    setFieldComment({
+      ...fieldComment,
       [name]: value,
     })
   }
@@ -583,7 +592,7 @@ export default function ModulSlug({
       },
       body: JSON.stringify({
         data: {
-          ...field,
+          ...fieldComment,
           users_permissions_user: user.id,
           idUser: user.id,
           idModul: modulId,
@@ -605,10 +614,65 @@ export default function ModulSlug({
 
     setComments(newComment.data.data)
 
-    setField({})
+    setFieldComment({})
     e.target.reset()
 
     setProgress(false)
+  }
+
+  const doAnswer = (e) => {
+    e.preventDefault()
+    let dataAnswer = []
+    let dataContent = []
+
+    for (let i = 0; i < e.target.length; i++) {
+      dataAnswer.push({
+        name: e.target[i].name,
+        value: e.target[i].value,
+      })
+    }
+
+    modul.Editor.forEach((data) => {
+      const check = dataAnswer.filter(
+        (item) => item.name.split('_')[0] === data.Name,
+      )
+
+      if (data.type === 'fill-left-answer') {
+        let test = []
+        data.question_and_answer.forEach((item, id) => {
+          test.push({
+            Key: check[id].value,
+            Answer: check[id].value.toLowerCase() === item.Answer.toLowerCase(),
+          })
+        })
+        dataContent.push({
+          __component: data.__component,
+          Name: data.Name,
+          type: data.type,
+          Content: test,
+          Total_Score:
+            (data.Point / data.question_and_answer.length) *
+            test.filter((item) => item.Answer === true).length,
+        })
+      } else if (data.type === 'arrange') {
+        let test = []
+        data.Arrange.forEach((item, id) => {
+          test.push({
+            Key: check[id].value,
+            Answer: parseInt(check[id].value) === parseInt(item.Number),
+          })
+        })
+        dataContent.push({
+          __component: data.__component,
+          Name: data.Name,
+          type: data.type,
+          Content: test,
+          Total_Score:
+            (data.Point / data.Arrange.length) *
+            test.filter((item) => item.Answer === true).length,
+        })
+      }
+    })
   }
 
   return (
@@ -618,7 +682,12 @@ export default function ModulSlug({
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
+      <Header
+        user={user}
+        notif={checkNotif}
+        logo={seo.Logo.data.attributes.url}
+        title={seo.Website_Title}
+      />
       <div className="setflex-center-row border-b py-6 space-x-8">
         <FancyLink destination="/" className="font-medium flex items-center">
           <BsCheck2Square size={20} className="mr-2" />
@@ -632,7 +701,7 @@ export default function ModulSlug({
           Conversations
         </FancyLink>
       </div>
-      <div className="relative flex flex-col w-full">
+      <form onSubmit={doAnswer} className="relative flex flex-col w-full">
         <Container className="mt-4 md:mt-6 xl:mt-8">
           <div className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8">
             {modul.Editor?.map((data, idComponent) =>
@@ -668,17 +737,22 @@ export default function ModulSlug({
                   className="grid grid-cols-[2fr,1fr,2fr] grid-flow-col w-full border border-black"
                   key={idComponent}
                 >
+                  {console.log(fieldModul)}
                   <div className="w-full border-r border-black h-full flex flex-col">
                     {data.question_and_answer.map((_, idLeft) =>
                       idLeft !== 0 ? (
                         <input
                           key={idLeft}
+                          onChange={(e) => setValueModul(e, data.type)}
+                          name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
                       ) : (
                         <input
                           key={idLeft}
+                          onChange={(e) => setValueModul(e, data.type)}
+                          name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
@@ -734,12 +808,14 @@ export default function ModulSlug({
                       idRight !== 0 ? (
                         <input
                           key={idRight}
+                          name={`${data.Name}_${idRight + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
                       ) : (
                         <input
                           key={idRight}
+                          name={`${data.Name}_${idRight + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
@@ -762,6 +838,7 @@ export default function ModulSlug({
                       </div>
                       <input
                         type="number"
+                        name={`${data.Name}_${idArrange + 1}`}
                         className="outline-none text-center border rounded-r-md bg-yellow-400 text-white border-yellow-400"
                       />
                     </div>
@@ -843,7 +920,7 @@ export default function ModulSlug({
                     <div className="absolute inset-0 z-10 bg-white/50" />
                   )}
                   <textarea
-                    onChange={setValue}
+                    onChange={setValueComment}
                     name="Content"
                     className="w-full font-normal"
                   ></textarea>
@@ -914,13 +991,13 @@ export default function ModulSlug({
                 <div className="w-full h-full" />
               )}
               <div className="w-full h-full flex justify-center">
-                <FancyLink
-                  onClick={() => checkComplete()}
+                <button
+                  type="submit"
                   className="flex items-center font-medium text-white bg-yellow-400 py-1 px-2"
                 >
                   <BsCheck2 size={28} className="mr-1" />
                   Mark as complete
-                </FancyLink>
+                </button>
               </div>
               {modulList[modulList.map((e) => e.id).indexOf(modulId) + 1] ? (
                 <div className="w-full h-full flex justify-end">
@@ -941,7 +1018,7 @@ export default function ModulSlug({
             </Container>
           </div>
         </Container>
-      </div>
+      </form>
     </Layout>
   )
 }
@@ -1064,6 +1141,32 @@ export async function getServerSideProps(ctx) {
     ...notifAll.data,
     ...notifDetail.data.filter((data) => data.attributes.All === false),
   ]
+
+  res.data[0].attributes.Editor = res.data[0].attributes.Editor.map(
+    (data, id) => {
+      if (data.__component === 'editor.drag-and-drop') {
+        return {
+          ...data,
+          Drop: data.Drop.map((item) => {
+            return {
+              ...item,
+              Name: item.Name,
+              Content: data.Drop.filter((i) => i.Name === item.Name).map(
+                (k) => k.Content,
+              ),
+            }
+          }).reduce((unique, o) => {
+            if (!unique.some((obj) => obj.Name === o.Name)) {
+              unique.push(o)
+            }
+            return unique
+          }, []),
+        }
+      } else {
+        return data
+      }
+    },
+  )
 
   return {
     props: {
