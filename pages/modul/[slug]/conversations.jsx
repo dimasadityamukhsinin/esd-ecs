@@ -7,6 +7,7 @@ import { BiConversation } from 'react-icons/bi'
 import nookies from 'nookies'
 import axios from 'axios'
 import { useState } from 'react'
+import SEO from '@/components/utils/seo'
 
 export default function Conversations({
   user,
@@ -16,7 +17,7 @@ export default function Conversations({
   comments,
   modulId,
   token,
-  checkNotif
+  checkNotif,
 }) {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
@@ -75,6 +76,11 @@ export default function Conversations({
 
   return (
     <Layout>
+      <SEO
+        title="Conversations"
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <Header user={user} notif={checkNotif} />
       <div className="setflex-center-row border-b py-6 space-x-8">
         <FancyLink destination="/" className="font-medium flex items-center">

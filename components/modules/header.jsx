@@ -61,12 +61,6 @@ export default function Header({ className, user, notif }) {
                   }`}
                 >
                   <FancyLink
-                    destination="/"
-                    className="font-medium text-yellow-500"
-                  >
-                    Your Learning
-                  </FancyLink>
-                  <FancyLink
                     destination="/account"
                     className="font-medium text-yellow-500"
                   >

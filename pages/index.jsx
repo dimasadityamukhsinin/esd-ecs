@@ -7,7 +7,6 @@ import Image from 'next/image'
 import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
 import axios from 'axios'
-import flash from 'next-flash'
 import { useRouter } from 'next/router'
 
 export default function Home({ user, modul, seo, checkNotif }) {

@@ -9,51 +9,12 @@ const SEO = ({
   title = 'ESD in ECS',
   pagelink = 'https://esd-in-ecs.com',
 }) => {
-  const description =
-    typeof inputSEO !== 'undefined' &&
-    typeof inputSEO.seo_description !== 'undefined' &&
-    inputSEO.seo_description
-      ? inputSEO.seo_description // Check and Get Input
-      : typeof defaultSEO !== 'undefined' &&
-        typeof defaultSEO.seo_description !== 'undefined' &&
-        defaultSEO.seo_description
-      ? defaultSEO.seo_description // Check and Get Default
-      : ''; // Insert Blank
-  const image =
-    typeof inputSEO !== 'undefined' &&
-    typeof inputSEO.seo_image !== 'undefined' &&
-    typeof inputSEO.seo_image.asset !== 'undefined' &&
-    inputSEO.seo_image
-      ? inputSEO.seo_image // Check and Get Input
-      : typeof defaultSEO !== 'undefined' &&
-        typeof defaultSEO.seo_image !== 'undefined' &&
-        typeof defaultSEO.seo_image.asset !== 'undefined' &&
-        defaultSEO.seo_image
-      ? defaultSEO.seo_image.url() // Check and Get Default
-      : ''; // Insert Blank
+  const description = defaultSEO.SEO_Description; // Insert Blank
+  const image = defaultSEO.SEO_Image.data.attributes.url; // Insert Blank
 
-  const image_alt =
-    typeof inputSEO !== 'undefined' &&
-    typeof inputSEO.seo_image !== 'undefined' &&
-    typeof inputSEO.seo_image.name !== 'undefined' &&
-    inputSEO.seo_image.name
-      ? inputSEO.seo_image.name
-      : typeof defaultSEO !== 'undefined' &&
-        typeof defaultSEO.seo_image !== 'undefined' &&
-        defaultSEO.seo_image.name
-      ? defaultSEO.seo_image.name
-      : '';
+  const image_alt = defaultSEO.Website_Title;
 
-  const meta_keywords =
-    typeof inputSEO !== 'undefined' &&
-    typeof inputSEO.seo_keywords !== 'undefined' &&
-    inputSEO.seo_keywords
-      ? inputSEO.seo_keywords
-      : typeof defaultSEO !== 'undefined' &&
-        typeof defaultSEO.seo_keywords !== 'undefined' &&
-        defaultSEO.seo_keywords
-      ? defaultSEO.seo_keywords
-      : '';
+  const meta_keywords = defaultSEO.SEO_Keywords;
 
   const pagetitle = title && webTitle ? `${title} • ${webTitle}` : `ESD in ECS®`;
   const canonicalLink = `https://esd-in-ecs.com${

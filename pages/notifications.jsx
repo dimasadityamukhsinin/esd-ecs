@@ -7,6 +7,7 @@ import axios from 'axios'
 import nookies from 'nookies'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import SEO from '@/components/utils/seo'
 
 export default function Notifications({
   user,
@@ -14,7 +15,7 @@ export default function Notifications({
   notifAll,
   notifDetail,
   token,
-  checkNotif
+  checkNotif,
 }) {
   const router = useRouter()
   const notif = [
@@ -50,6 +51,11 @@ export default function Notifications({
 
   return (
     <Layout>
+      <SEO
+        title={'Notifications'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <Header user={user} notif={checkNotif} />
       <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
         <h2>Notifications</h2>

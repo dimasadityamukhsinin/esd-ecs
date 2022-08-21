@@ -612,12 +612,12 @@ export default function ModulSlug({
 
   return (
     <Layout>
-      <Header user={user} notif={checkNotif} />
       <SEO
         title={modul.Title}
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
+      <Header user={user} notif={checkNotif} />
       <div className="setflex-center-row border-b py-6 space-x-8">
         <FancyLink destination="/" className="font-medium flex items-center">
           <BsCheck2Square size={20} className="mr-2" />

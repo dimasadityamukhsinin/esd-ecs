@@ -1,21 +1,23 @@
 import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import Layout from '@/components/modules/layout'
-import FancyLink from '@/components/utils/fancyLink'
 import nookies from 'nookies'
 import axios from 'axios'
-import { useEffect, useState } from 'react'
-import flash from 'next-flash'
-import { useRouter } from 'next/router'
 import parse from 'html-react-parser'
+import SEO from '@/components/utils/seo'
 
-const About = ({ about, user, token, flashData, checkNotif }) => {
+const About = ({ seo, about, user, token, checkNotif }) => {
   return (
     <Layout>
+      <SEO
+        title={'About'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <Header user={user} notif={checkNotif} />
       <Container className="mt-4 md:mt-6 xl:mt-8">
         <div className="w-full max-w-lg mx-auto flex flex-col pt-8 pb-8">
-          <h2 className="text-lg m-0 font-medium">About ESD in ESC</h2>
+          <h2 className="text-lg m-0 font-medium">About {seo.Website_Title}</h2>
           <h1 className="text-4xl font-medium">Our Story</h1>
           <div className="w-full flex flex-col mt-8 about font-medium">
             {parse(about.Content)}
@@ -26,15 +28,20 @@ const About = ({ about, user, token, flashData, checkNotif }) => {
   )
 }
 
-About.getInitialProps = async (ctx) => {
+export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
 
   if (!cookies.token) {
-    ctx.res.writeHead(302, {
-      Location: '/login',
-    })
-    ctx.res.end()
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
   }
+
+  const seo = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
 
   const user = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
@@ -83,11 +90,13 @@ About.getInitialProps = async (ctx) => {
   const about = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/about`)
 
   return {
-    about: about.data.data.attributes,
-    token: cookies.token,
-    user: user.data,
-    flashData: flash.get(ctx),
-    checkNotif: checkNotif.data.length === all.length ? false : true,
+    props: {
+      seo: seo.data.data.attributes,
+      about: about.data.data.attributes,
+      token: cookies.token,
+      user: user.data,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
+    },
   }
 }
 

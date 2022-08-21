@@ -7,8 +7,9 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import flash from 'next-flash'
 import { useRouter } from 'next/router'
+import SEO from '@/components/utils/seo'
 
-const Email = ({ user, token, flashData, checkNotif }) => {
+const Email = ({ seo, user, token, flashData, checkNotif }) => {
   const router = useRouter()
   const [field, setField] = useState({
     email: user.email,
@@ -126,6 +127,11 @@ const Email = ({ user, token, flashData, checkNotif }) => {
 
   return (
     <Layout>
+      <SEO
+        title={'Email'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <Header user={user} notif={checkNotif} />
       <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
         <h2>Your Account</h2>
@@ -220,6 +226,11 @@ Email.getInitialProps = async (ctx) => {
     }
   }
 
+  const reqSeo = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+  const seo = await reqSeo.json()
+
   const user = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
     {
@@ -265,6 +276,7 @@ Email.getInitialProps = async (ctx) => {
   ]
 
   return {
+    seo: seo.data.attributes,
     token: cookies.token,
     user: user.data,
     flashData: flash.get(ctx),
