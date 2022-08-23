@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 
-const Answer = ({ idDrop, idAnswer, getDrop }) => {
+const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
   const [lastDropped, setLastDropped] = useState(null)
   const [hasDropped, setHasDropped] = useState(false)
   const [{ isOver, isOverCurrent }, drop] = useDrop(
@@ -29,15 +29,16 @@ const Answer = ({ idDrop, idAnswer, getDrop }) => {
     }),
     [setHasDropped],
   )
-  let border = ''
+  let border = 'rounded-md border-2 border-transparent'
   if (isOverCurrent || isOver) {
-    border = 'rounded-md border-2 px-2 border-yellow-500'
+    border = 'rounded-md border-2 border-yellow-500'
   }
   return (
     <span
       ref={drop}
       //   style={{ backgroundColor: backgroundColor }}
-      className={`text-yellow-500 ${border}`}
+      name={`${question}_${name}_${idName + 1}`}
+      className={`text-yellow-500 ${border} ${hasDropped ? 'pointer-events-none' : ''}`}
     >
       {`${hasDropped ? lastDropped.content : `..........`}`}
     </span>
@@ -55,7 +56,6 @@ const Box = ({ id, children }) => {
   return (
     <span
       ref={drag}
-      data
       id={`dataDrag-${id}`}
       className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
     >
@@ -70,29 +70,13 @@ const DragDrop = ({ data, idComponent }) => {
 
   const getDrop = useCallback(
     (e) => {
-      console.log(e)
-      console.log(dragDrop.Drag)
-      // console.log(dragDrop.Drop.find((item) => item.id === e.idDrop))
-      // const index = dragDrop.Drag.map((item) => item.id).indexOf(e.id)
-      // console.log(index)
-      // let dataFilter = dragDrop.Drag.filter((item) => item.id !== e.id)
-      // console.log({
-      //   ...dragDrop,
-      //   Drag: dataFilter
-      // })
-      // console.log(droppedBoxNames)
-      document.getElementById(`dataDrag-${e.id}`).remove();
-      // setDragDrop(prev => {
-      //   return {
-      //     ...prev,
-      //     Drag: prev.Drag.filter((item) => item.id !== e.id)
-      //   }
-      // });
-      // dragDrop.Drag.splice(index, 1)
+      document.getElementById(`dataDrag-${e.id}`).remove()
       setDroppedBoxNames((prev) => [...prev, e])
     },
     [droppedBoxNames],
   )
+
+  let idName = 0
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -105,29 +89,31 @@ const DragDrop = ({ data, idComponent }) => {
         <ol
           className={`list-inside list-decimal space-y-4 drops-${idComponent}`}
         >
-          {
-            console.log(dragDrop)
-          }
-          {dragDrop.Drop.map((item, id) => (
-            <li key={id}>
-              <div className="inline max-w-md">
-                {item.Content.map((i, idAnswer) =>
-                  i ? (
-                    <span>{i}</span>
-                  ) : (
-                    <>
-                      &nbsp;
-                      <Answer
-                        getDrop={getDrop}
-                        idAnswer={idAnswer}
-                        idDrop={item.id}
-                      />
-                      &nbsp;
-                    </>
-                  ),
-                )}
-              </div>
-              {/* {checkDrop
+          {dragDrop.Drop.map((item, id) => {
+            idName = 0
+            return (
+              <li key={id}>
+                <div className="inline max-w-md">
+                  {item.Content.map((i, idAnswer) =>
+                    i ? (
+                      <span>{i}</span>
+                    ) : (
+                      <>
+                        &nbsp;
+                        <Answer
+                          question={dragDrop.Name}
+                          name={item.Name}
+                          getDrop={getDrop}
+                          idName={idName++}
+                          idAnswer={idAnswer}
+                          idDrop={item.id}
+                        />
+                        &nbsp;
+                      </>
+                    ),
+                  )}
+                </div>
+                {/* {checkDrop
                 .filter((data) => data.id === idComponent)
                 .find((item) => item.index === id) && (
                 <FancyLink
@@ -137,8 +123,9 @@ const DragDrop = ({ data, idComponent }) => {
                   Remove
                 </FancyLink>
               )} */}
-            </li>
-          ))}
+              </li>
+            )
+          })}
         </ol>
       </div>
     </DndProvider>

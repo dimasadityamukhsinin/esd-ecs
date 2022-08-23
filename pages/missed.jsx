@@ -30,7 +30,12 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
+      <Header
+        user={user}
+        notif={checkNotif}
+        logo={seo.Logo.data.attributes.url}
+        title={seo.Website_Title}
+      />
       <div className="w-full my-8 text-center font-medium">
         <h2>Your Learning</h2>
       </div>
@@ -57,8 +62,8 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
             </FancyLink>
           </div>
           <div className="flex flex-wrap modul mt-6">
-            {modul.map(
-              ({ attributes }, id) =>
+            {modul.map(({ attributes, status }, id) =>
+              status !== 'completed' ? (
                 countdownData(attributes.Assignment_Deadline) < 0 && (
                   <FancyLink
                     key={id}
@@ -92,8 +97,37 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
                       </div>
                     </div>
                   </FancyLink>
-                ),
+                )
+              ) : (
+                <></>
+              ),
             )}
+          </div>
+        </Container>
+      </div>
+      <div className="w-full bg-[#3a343a]">
+        <Container className="w-full h-full py-6 flex justify-between">
+          <div className="flex justify-center items-center">
+            <FancyLink
+              className="text-white font-medium text-xl hidden md:block"
+              destination="/"
+            >
+              Your Learning
+            </FancyLink>
+            <FancyLink
+              className="ml-5 text-white font-medium text-xl hidden md:block"
+              destination="/about"
+            >
+              About
+            </FancyLink>
+          </div>
+          <div className="relative w-16 h-16 aspect-square">
+            <Image
+              src={seo.Logo.data.attributes.url}
+              alt={seo.Website_Title}
+              layout="fill"
+              objectFit="contain"
+            />
           </div>
         </Container>
       </div>
@@ -165,9 +199,27 @@ export async function getServerSideProps(ctx) {
     ...notifDetail.data.filter((data) => data.attributes.All === false),
   ]
 
+  const completed = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  let dataModul = []
+
+  completed.data.data.forEach((data) => {
+    dataModul = modul.data.map((item) => ({
+      ...item,
+      status: item.id === parseInt(data.attributes.idModul) ? 'completed' : '',
+    }))
+  })
+
   return {
     props: {
-      modul: modul.data,
+      modul: dataModul,
       seo: seo.data.data.attributes,
       token: cookies.token,
       user: user.data,

@@ -620,24 +620,88 @@ export default function ModulSlug({
     setProgress(false)
   }
 
-  const doAnswer = (e) => {
+  const doAnswer = async (e) => {
     e.preventDefault()
     let dataAnswer = []
     let dataContent = []
 
-    for (let i = 0; i < e.target.length; i++) {
-      dataAnswer.push({
-        name: e.target[i].name,
-        value: e.target[i].value,
-      })
-    }
+    modul.Editor.filter((data) => data.Name).forEach((data) => {
+      if (data.type === 'drag-drop') {
+        let idName = 0
+        data.Drop.forEach((item, id) => {
+          idName = 0
+          item.Content.forEach((e) => {
+            if (!e) {
+              idName++
+              dataAnswer.push({
+                name: `${data.Name}_${item.Name}_${idName}`,
+                value:
+                  document.getElementsByName(
+                    `${data.Name}_${item.Name}_${idName}`,
+                  )[0].innerText !== '..........'
+                    ? document.getElementsByName(
+                        `${data.Name}_${item.Name}_${idName}`,
+                      )[0].innerText
+                    : '',
+                type: 'stack-with-drag-drop',
+              })
+            }
+          })
+        })
+      } else if (data.type === 'stack-with-drag-drop') {
+        let idName = 0
+        data.Drop.forEach((item, id) => {
+          idName = 0
+          item.Content.forEach((e) => {
+            if (!e) {
+              idName++
+              dataAnswer.push({
+                name: `${data.Name}_${item.Name}_${idName}`,
+                value:
+                  document.getElementsByName(
+                    `${data.Name}_${item.Name}_${idName}`,
+                  )[0].innerText !== '..........'
+                    ? document.getElementsByName(
+                        `${data.Name}_${item.Name}_${idName}`,
+                      )[0].innerText
+                    : '',
+                type: 'stack-with-drag-drop',
+              })
+            }
+          })
+        })
+      } else if (
+        data.type === 'fill-left-answer' ||
+        data.type === 'fill-right-answer'
+      ) {
+        data.question_and_answer.forEach((_, id) => {
+          dataAnswer.push({
+            name: `${data.Name}_${id + 1}`,
+            value: document.getElementsByName(`${data.Name}_${id + 1}`)[0]
+              .value,
+          })
+        })
+      }
+    })
+
+    // for (let i = 0; i < e.target.length; i++) {
+    //   dataAnswer.push({
+    //     name: e.target[i].name,
+    //     value: e.target[i].value,
+    //   })
+    // }
+
+    // console.log(dataAnswer)
 
     modul.Editor.forEach((data) => {
       const check = dataAnswer.filter(
         (item) => item.name.split('_')[0] === data.Name,
       )
 
-      if (data.type === 'fill-left-answer') {
+      if (
+        data.type === 'fill-left-answer' ||
+        data.type === 'fill-right-answer'
+      ) {
         let test = []
         data.question_and_answer.forEach((item, id) => {
           test.push({
@@ -671,7 +735,92 @@ export default function ModulSlug({
             (data.Point / data.Arrange.length) *
             test.filter((item) => item.Answer === true).length,
         })
+      } else if (data.type === 'drag-drop') {
+        let test = []
+        data.Drag.forEach((item, id) => {
+          test.push({
+            Name: item.To,
+            Key: check[id].value,
+            Answer: check[id].value === item.Content,
+          })
+        })
+        dataContent.push({
+          __component: 'question.drag-and-drop',
+          Name: data.Name,
+          type: data.type,
+          Content: test,
+          Score:
+            (data.Point / data.Drag.length) *
+            test.filter((item) => item.Answer === true).length,
+        })
+      } else if (data.type === 'stack-with-drag-drop') {
+        // let stack = []
+
+        // data.Drop.forEach((item, id) => {
+        //   stack.push({
+        //     Name: check[id].name.split('_')[1],
+        //     Stack_Number: check.map((item) => item.name.split('_')[1]).indexOf(item.Name),
+        //   })
+        // })
+
+        data.Drag.forEach((_, id) => {
+          test.push({
+            Name: check[id].name.split('_')[1],
+            Key: check[id].value,
+            Answer:
+              check[id].value ===
+              data.Drag.find(
+                (item) =>
+                  item.To === check[id].name.split('_')[1] &&
+                  item.Number === parseInt(check[id].name.split('_')[2]),
+              ).Content,
+          })
+        })
+
+        // console.log(`stack ${check.map((item) => item.name.split('_')[1]).indexOf()}`)
+
+        dataContent.push({
+          __component: data.__component,
+          Name: data.Name,
+          type: data.type,
+          Content: test,
+          Total_Score:
+            (data.Point / data.Drag.length) *
+            test.filter((item) => item.Answer === true).length,
+        })
       }
+    })
+
+    let Total_Score = 0
+
+    dataContent.forEach((item) => {
+      Total_Score = Total_Score + item.Score
+    })
+
+    let date = new Date()
+    let dd = String(date.getDate()).padStart(2, '0')
+    let mm = String(date.getMonth() + 1).padStart(2, '0') //January is 0!
+    let yyyy = date.getFullYear()
+
+    date = yyyy + '-' + mm + '-' + dd
+
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        data: {
+          idModul: modulId,
+          idUser: user.id,
+          User: user.Full_Name,
+          Modul_Name: modul.Title,
+          Question: dataContent,
+          Date: date,
+          Total_Score: Total_Score,
+        },
+      }),
     })
   }
 
@@ -737,7 +886,6 @@ export default function ModulSlug({
                   className="grid grid-cols-[2fr,1fr,2fr] grid-flow-col w-full border border-black"
                   key={idComponent}
                 >
-                  {console.log(fieldModul)}
                   <div className="w-full border-r border-black h-full flex flex-col">
                     {data.question_and_answer.map((_, idLeft) =>
                       idLeft !== 0 ? (
@@ -873,7 +1021,8 @@ export default function ModulSlug({
                 </div>
               ) : data.type === 'stack-with-drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
-                  <div className="w-full flex flex-col space-y-4">
+                  <DragDrop data={data} idComponent={idComponent} />
+                  {/* <div className="w-full flex flex-col space-y-4">
                     {data.Drop.map((item, idStack) => (
                       <div className="w-full grid grid-cols-12" key={idStack}>
                         <div className="outline-none rounded-l-md border border-yellow-400 flex justify-center items-center">
@@ -884,7 +1033,7 @@ export default function ModulSlug({
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                   <div className="flex justify-end w-full mt-3">
                     <FancyLink
                       onClick={() => resetDnd()}
@@ -1144,7 +1293,10 @@ export async function getServerSideProps(ctx) {
 
   res.data[0].attributes.Editor = res.data[0].attributes.Editor.map(
     (data, id) => {
-      if (data.__component === 'editor.drag-and-drop') {
+      if (
+        data.__component === 'editor.drag-and-drop' ||
+        data.type === 'stack-with-drag-drop'
+      ) {
         return {
           ...data,
           Drop: data.Drop.map((item) => {

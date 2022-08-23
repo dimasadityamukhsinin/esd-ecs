@@ -5,6 +5,12 @@
     // width: calc((100% / 3) - 1.5rem);
     margin: 0.75rem;
   }
+  & > div {
+    @apply w-full md:w-[calc((100%/2)-1.5rem)] lg:w-[calc((100%/3)-1.5rem)];
+    // @apply w-[calc(100%+2rem)];
+    // width: calc((100% / 3) - 1.5rem);
+    margin: 0.75rem;
+  }
 }
 
 .drag {

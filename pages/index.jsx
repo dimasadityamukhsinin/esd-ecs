@@ -63,7 +63,8 @@ export default function Home({ user, modul, seo, checkNotif }) {
           </div>
           <div className="flex flex-wrap modul mt-6">
             {modul.map(
-              ({ attributes }, id) =>
+              ({ attributes, status }, id) =>
+                status !== 'completed' &&
                 !(countdownData(attributes.Assignment_Deadline) < 0) && (
                   <FancyLink
                     key={id}
@@ -202,11 +203,29 @@ export async function getServerSideProps(ctx) {
     ...notifDetail.data.filter((data) => data.attributes.All === false),
   ]
 
+  const completed = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  let dataModul = []
+
+  completed.data.data.forEach((data) => {
+    dataModul = modul.data.map((item) => ({
+      ...item,
+      status: item.id !== parseInt(data.attributes.idModul) ? '' : 'completed',
+    }))
+  })
+
   return {
     props: {
       user: user.data,
       seo: seo.data.attributes,
-      modul: modul.data,
+      modul: dataModul,
       checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }
