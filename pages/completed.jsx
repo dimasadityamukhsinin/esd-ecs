@@ -68,7 +68,11 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
                     className="relative bg-white border"
                   >
                     <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                      {`${Total_Score} / 100`}
+                      {`${
+                        Number.isInteger(Total_Score)
+                          ? Total_Score
+                          : parseFloat(Total_Score).toFixed(2)
+                      } / 100`}
                     </span>
                     <div className="relative flex justify-center w-full h-52">
                       <Image
@@ -111,7 +115,11 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
                     </div>
                     <div>
                       <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                        {`${Total_Score} / 100`}
+                        {`${
+                          Number.isInteger(Total_Score)
+                            ? Total_Score
+                            : parseFloat(Total_Score).toFixed(2)
+                        } / 100`}
                       </span>
                       <div className="relative flex justify-center w-full h-52">
                         <Image
@@ -252,14 +260,28 @@ export async function getServerSideProps(ctx) {
     },
   )
 
-  let dataModul = []
-
-  completed.data.data.forEach((data) => {
-    dataModul = modul.data.map((item) => ({
+  modul.data = modul.data.map((item, id) => {
+    return {
       ...item,
-      Total_Score: data.attributes.Total_Score,
-      status: item.id === parseInt(data.attributes.idModul) ? 'completed' : '',
-    }))
+      Total_Score: completed.data.data.find(
+        (data) =>
+          parseInt(data.attributes.idModul) === parseInt(item.id) &&
+          parseInt(data.attributes.idUser) === parseInt(user.data.id),
+      )
+        ? completed.data.data.find(
+            (data) =>
+              parseInt(data.attributes.idModul) === parseInt(item.id) &&
+              parseInt(data.attributes.idUser) === parseInt(user.data.id),
+          ).attributes.Total_Score
+        : 0,
+      status: completed.data.data.find(
+        (data) =>
+          parseInt(data.attributes.idModul) === parseInt(item.id) &&
+          parseInt(data.attributes.idUser) === parseInt(user.data.id),
+      )
+        ? 'completed'
+        : '',
+    }
   })
 
   return {
@@ -267,7 +289,7 @@ export async function getServerSideProps(ctx) {
       seo: seo.data.data.attributes,
       token: cookies.token,
       user: user.data,
-      modul: dataModul,
+      modul: modul.data,
       checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }

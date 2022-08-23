@@ -212,20 +212,18 @@ export async function getServerSideProps(ctx) {
     },
   )
 
-  let dataModul = []
-
-  completed.data.data.forEach((data) => {
-    dataModul = modul.data.map((item) => ({
+  modul.data = modul.data.map((item,id) => {
+    return {
       ...item,
-      status: item.id !== parseInt(data.attributes.idModul) ? '' : 'completed',
-    }))
+      status: completed.data.data.find((data) => parseInt(data.attributes.idModul) === parseInt(item.id) && parseInt(data.attributes.idUser) === parseInt(user.data.id)) ? 'completed' : '',
+    }
   })
 
   return {
     props: {
       user: user.data,
       seo: seo.data.attributes,
-      modul: dataModul,
+      modul: modul.data,
       checkNotif: checkNotif.data.length === all.length ? false : true,
     },
   }
