@@ -17,6 +17,7 @@ import DragDrop from '@/components/dnd/DragDrop'
 import SEO from '@/components/utils/seo'
 import nookies from 'nookies'
 import axios from 'axios'
+import StackDrag from '@/components/dnd/StackDrag'
 
 export default function ModulSlug({
   user,
@@ -1033,16 +1034,7 @@ export default function ModulSlug({
                   className="w-full flex flex-col space-y-4"
                   key={idComponent}
                 >
-                  {data.Drag.map((item, idStack) => (
-                    <div className="w-full grid grid-cols-12" key={idStack}>
-                      <div className="outline-none rounded-l-md border border-yellow-400 flex justify-center items-center">
-                        <span>{idStack + 1}</span>
-                      </div>
-                      <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
-                        <span>{item.Content}</span>
-                      </div>
-                    </div>
-                  ))}
+                  <StackDrag data={data.Drag} idComponent={idComponent} />
                 </div>
               ) : data.__component === 'editor.audio' ? (
                 <div className="w-full" key={idComponent}>
@@ -1160,18 +1152,24 @@ export default function ModulSlug({
           <div className="w-full h-16 fixed bottom-0 left-0 right-0 border-t-2 bg-gray-50">
             <Container className="h-full grid grid-cols-3 grid-flow-col py-2.5">
               {modulList[modulList.map((e) => e.id).indexOf(modulId) - 1] ? (
-                <div className="w-full h-full flex justify-start">
-                  <FancyLink
-                    destination={`/modul/${
-                      modulList[modulList.map((e) => e.id).indexOf(modulId) - 1]
-                        .attributes.Slug
-                    }`}
-                    className="flex items-center font-medium text-yellow-500 py-1 px-2"
-                  >
-                    <GrPrevious size={18} className="arrow mr-1" />
-                    Previous
-                  </FancyLink>
-                </div>
+                modulList[modulList.map((e) => e.id).indexOf(modulId) - 1]
+                  .status !== 'completed' ? (
+                  <div className="w-full h-full flex justify-start">
+                    <FancyLink
+                      destination={`/modul/${
+                        modulList[
+                          modulList.map((e) => e.id).indexOf(modulId) - 1
+                        ].attributes.Slug
+                      }`}
+                      className="flex items-center font-medium text-yellow-500 py-1 px-2"
+                    >
+                      <GrPrevious size={18} className="arrow mr-1" />
+                      Previous
+                    </FancyLink>
+                  </div>
+                ) : (
+                  <div className="w-full h-full" />
+                )
               ) : (
                 <div className="w-full h-full" />
               )}
@@ -1185,18 +1183,24 @@ export default function ModulSlug({
                 </button>
               </div>
               {modulList[modulList.map((e) => e.id).indexOf(modulId) + 1] ? (
-                <div className="w-full h-full flex justify-end">
-                  <FancyLink
-                    destination={`/modul/${
-                      modulList[modulList.map((e) => e.id).indexOf(modulId) + 1]
-                        .attributes.Slug
-                    }`}
-                    className="flex items-center font-medium text-yellow-500 py-1 px-2"
-                  >
-                    Next
-                    <GrNext size={18} className="arrow ml-1" />
-                  </FancyLink>
-                </div>
+                modulList[modulList.map((e) => e.id).indexOf(modulId) + 1]
+                  .status !== 'completed' ? (
+                  <div className="w-full h-full flex justify-end">
+                    <FancyLink
+                      destination={`/modul/${
+                        modulList[
+                          modulList.map((e) => e.id).indexOf(modulId) + 1
+                        ].attributes.Slug
+                      }`}
+                      className="flex items-center font-medium text-yellow-500 py-1 px-2"
+                    >
+                      Next
+                      <GrNext size={18} className="arrow ml-1" />
+                    </FancyLink>
+                  </div>
+                ) : (
+                  <div className="w-full h-full" />
+                )
               ) : (
                 <div className="w-full h-full" />
               )}
@@ -1356,15 +1360,49 @@ export async function getServerSideProps(ctx) {
     },
   )
 
+  const completed = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
+    {
+      headers: {
+        Authorization: `Bearer ${cookies.token}`,
+      },
+    },
+  )
+
+  if (
+    completed.data.data.find(
+      (data) =>
+        parseInt(data.attributes.idModul) === parseInt(res.data[0].id) &&
+        parseInt(data.attributes.idUser) === parseInt(user.data.id),
+    )
+  ) {
+    return {
+      notFound: true,
+    }
+  }
+
+  modulList.data.data = modulList.data.data
+    .filter((item) => !(countdownData(item.attributes.Assignment_Deadline) < 0))
+    .map((item, id) => {
+      return {
+        ...item,
+        status: completed.data.data.find(
+          (data) =>
+            parseInt(data.attributes.idModul) === parseInt(item.id) &&
+            parseInt(data.attributes.idUser) === parseInt(user.data.id),
+        )
+          ? 'completed'
+          : '',
+      }
+    })
+
   return {
     props: {
       user: user.data,
       userList: userList.data,
       seo: seo.data.attributes,
       modul: res.data[0].attributes,
-      modulList: modulList.data.data.filter(
-        (item) => !(countdownData(item.attributes.Assignment_Deadline) < 0),
-      ),
+      modulList: modulList.data.data,
       comments: comments.data.data,
       modulId: res.data[0].id,
       token: cookies.token,
