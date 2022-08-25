@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import FancyLink from '../utils/fancyLink'
-import update from 'immutability-helper'
 
 const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
   const [{ isOver, isOverCurrent }, drop] = useDrop(
@@ -108,6 +107,28 @@ const DragDrop = ({ data, idComponent }) => {
     setRemove(remove.filter((data) => data !== item.id))
   }
 
+  const resetDnd = (data) => {
+    data.Drag.forEach((item) => {
+      document.getElementById(`dataDrag-${item.id}`).classList.remove('hidden')
+    })
+
+    data.Drop.forEach((e) => {
+      let idName = 0
+      e.Content.forEach((item) => {
+        if (!item) {
+          idName = idName + 1
+          document.getElementsByName(
+            `${data.Name}_${e.Name}_${idName}`,
+          )[0].textContent = '..........'
+          document
+          .getElementsByName(`${data.Name}_${e.Name}_${idName}`)[0]
+          .classList.remove('pointer-events-none')
+        }
+      })
+    })
+    setRemove([])
+  }
+
   useEffect(() => {
     if (droppedBoxNames.length > 0) {
       if (remove.length > 0) {
@@ -125,65 +146,75 @@ const DragDrop = ({ data, idComponent }) => {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400">
-        <div className="flex flex-wrap drag">
-          {dragDrop.Drag.map((item, idDrag) => (
-            <Box
-              key={idDrag}
-              index={idDrag}
-              id={item.id}
-              children={item.Content}
-            />
-          ))}
-        </div>
-        <div className="w-full flex flex-col space-y-4">
-          {dragDrop.Drop.map((item, id) => {
-            idName = 0
-            return (
-              <div className="w-full flex flex-col" key={id}>
-                <div className="w-full grid grid-cols-12">
-                  <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-yellow-400 flex justify-center items-center">
-                    <span>{id + 1}</span>
-                  </div>
-                  <div className="w-full h-full p-3 col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
-                    {item.Content.map((i, idAnswer) =>
-                      i ? (
-                        <span key={idAnswer}>{i}</span>
-                      ) : (
-                        <>
-                          &nbsp;
-                          <Answer
-                            key={idAnswer}
-                            question={dragDrop.Name}
-                            name={item.Name}
-                            getDrop={getDrop}
-                            idName={idName++}
-                            idAnswer={idAnswer}
-                            idDrop={item.id}
-                          />
-                          &nbsp;
-                        </>
-                      ),
-                    )}
-                  </div>
-                </div>
-                {remove.length > 0 ? (
-                  remove.find((data) => data === item.id) && (
-                    <div className="w-fit h-full mt-3 flex justify-center items-center">
-                      <FancyLink
-                        onClick={() => removeDrag(dragDrop.Name, item)}
-                        className="font-medium text-white bg-yellow-400 w-full px-4 py-2 rounded-md"
-                      >
-                        Remove
-                      </FancyLink>
+      <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400 h-[60vh] overflow-y-auto scrollbar-hide">
+          <div className="flex flex-wrap drag">
+            {dragDrop.Drag.map((item, idDrag) => (
+              <Box
+                key={idDrag}
+                index={idDrag}
+                id={item.id}
+                children={item.Content}
+              />
+            ))}
+          </div>
+          <div className="w-full flex flex-col space-y-4">
+            {dragDrop.Drop.map((item, id) => {
+              idName = 0
+              return (
+                <div className="w-full flex flex-col" key={id}>
+                  <div className="w-full grid grid-cols-12">
+                    <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-yellow-400 flex justify-center items-center">
+                      <span>{id + 1}</span>
                     </div>
-                  )
-                ) : (
-                  <></>
-                )}
-              </div>
-            )
-          })}
+                    <div className="w-full h-full p-3 col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
+                      {item.Content.map((i, idAnswer) =>
+                        i ? (
+                          <span key={idAnswer}>{i}</span>
+                        ) : (
+                          <>
+                            &nbsp;
+                            <Answer
+                              key={idAnswer}
+                              question={dragDrop.Name}
+                              name={item.Name}
+                              getDrop={getDrop}
+                              idName={idName++}
+                              idAnswer={idAnswer}
+                              idDrop={item.id}
+                            />
+                            &nbsp;
+                          </>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                  {remove.length > 0 ? (
+                    remove.find((data) => data === item.id) && (
+                      <div className="w-fit h-full mt-3 flex justify-center items-center">
+                        <FancyLink
+                          onClick={() => removeDrag(dragDrop.Name, item)}
+                          className="font-medium text-white bg-yellow-400 w-full px-4 py-2 rounded-md"
+                        >
+                          Remove
+                        </FancyLink>
+                      </div>
+                    )
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <div className="flex justify-end w-full mt-3">
+          <FancyLink
+            onClick={() => resetDnd(data)}
+            className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
+          >
+            Reset
+          </FancyLink>
         </div>
       </div>
     </DndProvider>

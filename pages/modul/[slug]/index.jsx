@@ -4,7 +4,7 @@ import YoutubeComponent from '@/components/modules/editorial/youtubeComponent'
 import Header from '@/components/modules/header'
 import Layout from '@/components/modules/layout'
 import FancyLink from '@/components/utils/fancyLink'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
 import { v4 as uuidv4 } from 'uuid'
 import { BsCheck2, BsCheck2Square } from 'react-icons/bs'
@@ -33,6 +33,7 @@ export default function ModulSlug({
   token,
   checkNotif,
 }) {
+  const ref = useRef()
   const [answer, setAnswer] = useState([])
   const [fieldModul, setFieldModul] = useState({})
   const [fieldComment, setFieldComment] = useState({})
@@ -488,58 +489,8 @@ export default function ModulSlug({
     })
   }
 
-  const resetDnd = () => {
-    setColumns(columnsFromBackend)
-  }
-
-  const removeDrag = (idComponent, index, item) => {
-    const getDragComponent = columns.drag.content.find(
-      (getId) => getId.id === idComponent,
-    )
-    const getDropComponent = columns.drop.content.find(
-      (getId) => getId.id === idComponent,
-    ).items
-    getDragComponent.items.push({
-      id: uuidv4(),
-      content: getDropComponent.find((item) => item.index === index).content,
-    })
-
-    const getDropIndex = getDropComponent.findIndex(
-      (data) => data.index === index,
-    )
-    getDropComponent.splice(getDropIndex, 1)
-
-    setColumns({
-      drag: {
-        id: columns.drag.id,
-        name: 'Drag',
-        content: [...columns.drag.content, getDragComponent],
-      },
-      drop: {
-        id: columns.drop.id,
-        name: 'Drop',
-        content: [
-          ...columns.drop.content,
-          {
-            id: idComponent,
-            items: [getDropComponent],
-          },
-        ],
-      },
-    })
-
-    const getCheckDropIndex = checkDrop.findIndex(
-      (data) => data.index === index && data.id === idComponent,
-    )
-    checkDrop.splice(getCheckDropIndex, 1)
-
-    document.getElementsByClassName(`drops-${idComponent}`)[0].children[
-      index
-    ].children[0].innerHTML = `${
-      item.Question_Column_1 ? item.Question_Column_1 : '..........'
-    } ${item.Question_Column_2 ? item.Question_Column_2 : '..........'} ${
-      item.Question_Column_3 ? item.Question_Column_3 : '..........'
-    }`
+  const resetDnd = (data) => {
+    console.log(data)
   }
 
   const setValueModul = (e) => {
@@ -897,7 +848,10 @@ export default function ModulSlug({
       </div>
       <div className="relative flex flex-col w-full pb-12 grow">
         <Container className="mt-4 md:mt-6 xl:mt-8">
-          <div className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8">
+          <div
+            ref={ref}
+            className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8"
+          >
             {modul.Editor?.map((data, idComponent) =>
               data.__component === 'editor.title' ? (
                 <TitleComponent
@@ -917,14 +871,6 @@ export default function ModulSlug({
               ) : data.__component === 'editor.drag-and-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
                   <DragDrop data={data} idComponent={idComponent} />
-                  <div className="flex justify-end w-full mt-3">
-                    <FancyLink
-                      onClick={() => resetDnd()}
-                      className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
-                    >
-                      Reset
-                    </FancyLink>
-                  </div>
                 </div>
               ) : data.type === 'fill-left-answer' ? (
                 <div
@@ -1058,14 +1004,6 @@ export default function ModulSlug({
               ) : data.type === 'stack-with-drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
                   <DragDrop data={data} idComponent={idComponent} />
-                  <div className="flex justify-end w-full mt-3">
-                    <FancyLink
-                      onClick={() => resetDnd()}
-                      className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
-                    >
-                      Reset
-                    </FancyLink>
-                  </div>
                 </div>
               ) : (
                 <></>
