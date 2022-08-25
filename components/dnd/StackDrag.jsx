@@ -1,5 +1,4 @@
-import { DndProvider, useDrag, useDrop } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
+import { useDrag, useDrop } from 'react-dnd'
 import update from 'immutability-helper'
 import { useCallback, useState, useRef } from 'react'
 
@@ -105,11 +104,7 @@ const StackDrag = ({ data, idComponent }) => {
       />
     )
   }, [])
-  return (
-    <DndProvider backend={HTML5Backend}>
-      {cards.map((card, i) => renderCard(card, i))}
-    </DndProvider>
-  )
+  return cards.map((card, i) => renderCard(card, i))
 }
 
 export default StackDrag

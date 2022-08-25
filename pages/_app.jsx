@@ -4,7 +4,9 @@ import { DefaultSeo } from 'next-seo'
 import SEO from '@/helpers/seo.config'
 import { AppWrapper } from '../context/state.js'
 import { AnimatePresence } from 'framer-motion'
-import Head from 'next/head';
+import Head from 'next/head'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
@@ -86,11 +88,11 @@ export default function App({ Component, pageProps }) {
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <AnimatePresence exitBeforeEnter>
+      <DndProvider backend={HTML5Backend}>
         <AppWrapper>
           <Component {...pageProps} key={router.asPath} />
         </AppWrapper>
-      </AnimatePresence>
+      </DndProvider>
     </>
   )
 }

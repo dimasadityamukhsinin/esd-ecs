@@ -11,8 +11,6 @@ import { BsCheck2, BsCheck2Square } from 'react-icons/bs'
 import { BiConversation } from 'react-icons/bi'
 import { GrNext, GrPrevious } from 'react-icons/gr'
 import swal from 'sweetalert'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { useDrag, useDrop, DndProvider } from 'react-dnd'
 import DragDrop from '@/components/dnd/DragDrop'
 import SEO from '@/components/utils/seo'
 import nookies from 'nookies'
@@ -882,7 +880,8 @@ export default function ModulSlug({
                       idLeft !== 0 ? (
                         <input
                           key={idLeft}
-                          onChange={(e) => setValueModul(e, data.type)}
+                          onKeyDown={(e) => e.keyCode === 32 ? false : true}
+                          onChange={(e) => e.target.value = e.target.value.replace(/\s/g, "")}
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
@@ -890,7 +889,8 @@ export default function ModulSlug({
                       ) : (
                         <input
                           key={idLeft}
-                          onChange={(e) => setValueModul(e, data.type)}
+                          onKeyDown={(e) => e.keyCode === 32 ? false : true}
+                          onChange={(e) => e.target.value = e.target.value.replace(/\s/g, "")}
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
@@ -948,6 +948,7 @@ export default function ModulSlug({
                         <input
                           key={idRight}
                           name={`${data.Name}_${idRight + 1}`}
+                          onChange={(e) => e.target.value.replace(/\s/g, "")}
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
@@ -955,6 +956,7 @@ export default function ModulSlug({
                         <input
                           key={idRight}
                           name={`${data.Name}_${idRight + 1}`}
+                          onChange={(e) => e.target.value.replace(/\s/g, "")}
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
