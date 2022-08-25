@@ -18,6 +18,9 @@ import SEO from '@/components/utils/seo'
 import nookies from 'nookies'
 import axios from 'axios'
 import StackDrag from '@/components/dnd/StackDrag'
+import { useEffect } from 'react'
+import { scrollToTop } from '@/components/utils/scrollToTop'
+import Footer from '@/components/modules/footer'
 
 export default function ModulSlug({
   user,
@@ -622,7 +625,6 @@ export default function ModulSlug({
   }
 
   const doAnswer = async (e) => {
-    e.preventDefault()
     let dataAnswer = []
     let dataContent = []
 
@@ -835,31 +837,35 @@ export default function ModulSlug({
     //   },
     // })
 
-    // const req = await fetch(
-    //   `${process.env.NEXT_PUBLIC_API_URL}/api/completeds`,
-    //   {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify({
-    //       data: {
-    //         idModul: modulId,
-    //         idUser: user.id,
-    //         User: user.Full_Name,
-    //         Modul_Name: modul.Title,
-    //         Question: dataContent,
-    //         Date: date,
-    //         Total_Score: Total_Score,
-    //       },
-    //     }),
-    //   },
-    // )
-    // const res = await req.json()
+    const req = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/completeds`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          data: {
+            idModul: modulId,
+            idUser: user.id,
+            User: user.Full_Name,
+            Modul_Name: modul.Title,
+            Question: dataContent,
+            Date: date,
+            Total_Score: Total_Score,
+          },
+        }),
+      },
+    )
+    const res = await req.json()
 
-    // console.log(res)
+    console.log(res)
   }
+
+  useEffect(() => {
+    scrollToTop()
+  }, [])
 
   return (
     <Layout>
@@ -868,26 +874,28 @@ export default function ModulSlug({
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header
-        user={user}
-        notif={checkNotif}
-        logo={seo.Logo.data.attributes.url}
-        title={seo.Website_Title}
-      />
-      <div className="setflex-center-row border-b py-6 space-x-8">
-        <FancyLink destination="/" className="font-medium flex items-center">
-          <BsCheck2Square size={20} className="mr-2" />
-          Assignment
-        </FancyLink>
-        <FancyLink
-          destination={`/modul/${modul.Slug}/conversations`}
-          className="font-medium flex items-center"
-        >
-          <BiConversation size={20} className="mr-2" />
-          Conversations
-        </FancyLink>
+      <div className="w-full flex flex-col">
+        <Header
+          user={user}
+          notif={checkNotif}
+          logo={seo.Logo.data.attributes.url}
+          title={seo.Website_Title}
+        />
+        <div className="setflex-center-row border-b py-6 space-x-8">
+          <FancyLink destination="/" className="font-medium flex items-center">
+            <BsCheck2Square size={20} className="mr-2" />
+            Assignment
+          </FancyLink>
+          <FancyLink
+            destination={`/modul/${modul.Slug}/conversations`}
+            className="font-medium flex items-center"
+          >
+            <BiConversation size={20} className="mr-2" />
+            Conversations
+          </FancyLink>
+        </div>
       </div>
-      <form onSubmit={doAnswer} className="relative flex flex-col w-full">
+      <div className="relative flex flex-col w-full pb-12 grow">
         <Container className="mt-4 md:mt-6 xl:mt-8">
           <div className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8">
             {modul.Editor?.map((data, idComponent) =>
@@ -1050,18 +1058,6 @@ export default function ModulSlug({
               ) : data.type === 'stack-with-drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
                   <DragDrop data={data} idComponent={idComponent} />
-                  {/* <div className="w-full flex flex-col space-y-4">
-                    {data.Drop.map((item, idStack) => (
-                      <div className="w-full grid grid-cols-12" key={idStack}>
-                        <div className="outline-none rounded-l-md border border-yellow-400 flex justify-center items-center">
-                          <span>{idStack + 1}</span>
-                        </div>
-                        <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
-                          <span>{item.Content}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div> */}
                   <div className="flex justify-end w-full mt-3">
                     <FancyLink
                       onClick={() => resetDnd()}
@@ -1149,7 +1145,7 @@ export default function ModulSlug({
               ))}
             </div>
           </div>
-          <div className="w-full h-16 fixed bottom-0 left-0 right-0 border-t-2 bg-gray-50">
+          <div className="w-full h-16 fixed bottom-0 left-0 right-0 z-10 border-t-2 bg-gray-50">
             <Container className="h-full grid grid-cols-3 grid-flow-col py-2.5">
               {modulList[modulList.map((e) => e.id).indexOf(modulId) - 1] ? (
                 modulList[modulList.map((e) => e.id).indexOf(modulId) - 1]
@@ -1161,7 +1157,7 @@ export default function ModulSlug({
                           modulList.map((e) => e.id).indexOf(modulId) - 1
                         ].attributes.Slug
                       }`}
-                      className="flex items-center font-medium text-yellow-500 py-1 px-2"
+                      className="flex items-center font-medium text-sm lg:text-base text-yellow-500"
                     >
                       <GrPrevious size={18} className="arrow mr-1" />
                       Previous
@@ -1175,8 +1171,8 @@ export default function ModulSlug({
               )}
               <div className="w-full h-full flex justify-center">
                 <button
-                  type="submit"
-                  className="flex items-center font-medium text-white bg-yellow-400 py-1 px-2"
+                  onClick={doAnswer}
+                  className="flex items-center font-medium text-xs lg:text-base text-white bg-yellow-400 py-1 px-2"
                 >
                   <BsCheck2 size={28} className="mr-1" />
                   Mark as complete
@@ -1192,7 +1188,7 @@ export default function ModulSlug({
                           modulList.map((e) => e.id).indexOf(modulId) + 1
                         ].attributes.Slug
                       }`}
-                      className="flex items-center font-medium text-yellow-500 py-1 px-2"
+                      className="flex items-center font-medium text-sm lg:text-base text-yellow-500"
                     >
                       Next
                       <GrNext size={18} className="arrow ml-1" />
@@ -1207,7 +1203,8 @@ export default function ModulSlug({
             </Container>
           </div>
         </Container>
-      </form>
+      </div>
+      <Footer seo={seo} className="pb-20" />
     </Layout>
   )
 }

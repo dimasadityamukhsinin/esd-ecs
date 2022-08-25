@@ -8,6 +8,7 @@ import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
 import axios from 'axios'
 import { useRouter } from 'next/router'
+import Footer from '@/components/modules/footer'
 
 export default function Home({ user, modul, seo, checkNotif }) {
   const router = useRouter()
@@ -25,22 +26,24 @@ export default function Home({ user, modul, seo, checkNotif }) {
 
   return (
     <Layout>
-      <Header
-        user={user}
-        notif={checkNotif}
-        logo={seo.Logo.data.attributes.url}
-        title={seo.Website_Title}
-      />
       <SEO
         title={'Your Learning'}
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <div className="w-full my-8 text-center font-medium">
-        <h2>Your Learning</h2>
+      <div className="w-full flex flex-col">
+        <Header
+          user={user}
+          notif={checkNotif}
+          logo={seo.Logo.data.attributes.url}
+          title={seo.Website_Title}
+        />
+        <div className="w-full py-8 flex justify-center items-center h-full font-medium">
+          <h2>Your Learning</h2>
+        </div>
       </div>
-      <div className="border-t bg-gray-50 pb-12 w-full min-h-[60vh]">
-        <Container className="mt-4 md:mt-6 xl:mt-8">
+      <div className={`border-t bg-gray-50 w-full min-h-[60vh] grow`}>
+        <Container className="mt-4 md:mt-6 xl:mt-8 pb-12">
           <div className="flex space-x-8 mt-12 md:ml-[0.7rem] overflow-auto">
             <FancyLink
               destination="/"
@@ -108,32 +111,7 @@ export default function Home({ user, modul, seo, checkNotif }) {
           </div>
         </Container>
       </div>
-      <div className="w-full bg-[#3a343a]">
-        <Container className="w-full h-full py-6 flex justify-between">
-          <div className="flex justify-center items-center">
-            <FancyLink
-              className="text-white font-medium text-xl hidden md:block"
-              destination="/"
-            >
-              Your Learning
-            </FancyLink>
-            <FancyLink
-              className="ml-5 text-white font-medium text-xl hidden md:block"
-              destination="/about"
-            >
-              About
-            </FancyLink>
-          </div>
-          <div className="relative w-16 h-16 aspect-square">
-            <Image
-              src={seo.Logo.data.attributes.url}
-              alt={seo.Website_Title}
-              layout="fill"
-              objectFit="contain"
-            />
-          </div>
-        </Container>
-      </div>
+      <Footer seo={seo} />
     </Layout>
   )
 }
@@ -212,10 +190,16 @@ export async function getServerSideProps(ctx) {
     },
   )
 
-  modul.data = modul.data.map((item,id) => {
+  modul.data = modul.data.map((item, id) => {
     return {
       ...item,
-      status: completed.data.data.find((data) => parseInt(data.attributes.idModul) === parseInt(item.id) && parseInt(data.attributes.idUser) === parseInt(user.data.id)) ? 'completed' : '',
+      status: completed.data.data.find(
+        (data) =>
+          parseInt(data.attributes.idModul) === parseInt(item.id) &&
+          parseInt(data.attributes.idUser) === parseInt(user.data.id),
+      )
+        ? 'completed'
+        : '',
     }
   })
 

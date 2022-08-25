@@ -8,6 +8,7 @@ import nookies from 'nookies'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import SEO from '@/components/utils/seo'
+import Footer from '@/components/modules/footer'
 
 export default function Notifications({
   user,
@@ -56,11 +57,18 @@ export default function Notifications({
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
-      <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
-        <h2>Notifications</h2>
+      <div className="w-full flex flex-col">
+        <Header
+          user={user}
+          notif={checkNotif}
+          logo={seo.Logo.data.attributes.url}
+          title={seo.Website_Title}
+        />
       </div>
-      <Container className="mt-12">
+      <Container className="h-full lg:pb-12 row-span-5">
+        <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
+          <h2>Notifications</h2>
+        </div>
         <div className="w-full max-w-3xl flex flex-col items-center mx-auto">
           <div className="w-full flex flex-col mt-12 space-y-12">
             {notif.map((data, id) => (
@@ -94,6 +102,7 @@ export default function Notifications({
           </div>
         </div>
       </Container>
+      <Footer seo={seo} />
     </Layout>
   )
 }

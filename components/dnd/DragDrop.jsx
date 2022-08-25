@@ -2,15 +2,21 @@ import { useCallback, useEffect } from 'react'
 import { useState } from 'react'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import FancyLink from '../utils/fancyLink'
+import update from 'immutability-helper'
 
 const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
-  const [lastDropped, setLastDropped] = useState(null)
-  const [hasDropped, setHasDropped] = useState(false)
   const [{ isOver, isOverCurrent }, drop] = useDrop(
     () => ({
       accept: 'box',
       drop(_item, monitor) {
-        setLastDropped(monitor.getItem())
+        let answer = document.getElementsByName(
+          `${question}_${name}_${idName + 1}`,
+        )[0]
+        answer.textContent = monitor.getItem().content
+        setTimeout(() => {
+          answer.classList.add('pointer-events-none')
+        }, 10)
         getDrop({
           ...monitor.getItem(),
           idDrop,
@@ -20,14 +26,15 @@ const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
         if (didDrop) {
           return
         }
-        setHasDropped(true)
       },
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        isOverCurrent: monitor.isOver({ shallow: true }),
-      }),
+      collect: (monitor) => {
+        return {
+          isOver: monitor.isOver(),
+          isOverCurrent: monitor.isOver({ shallow: true }),
+        }
+      },
     }),
-    [setHasDropped],
+    [],
   )
   let border = 'rounded-md border-2 border-transparent'
   if (isOverCurrent || isOver) {
@@ -36,20 +43,20 @@ const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
   return (
     <span
       ref={drop}
-      //   style={{ backgroundColor: backgroundColor }}
       name={`${question}_${name}_${idName + 1}`}
-      className={`text-yellow-500 ${border} ${hasDropped ? 'pointer-events-none' : ''}`}
+      className={`text-yellow-500 bg-white px-2 ${border}`}
     >
-      {`${hasDropped ? lastDropped.content : `..........`}`}
+      ..........
     </span>
   )
 }
 
-const Box = ({ id, children }) => {
+const Box = ({ id, index, children }) => {
   const [, drag] = useDrag(() => ({
     type: 'box',
     item: {
       id: id,
+      index: index,
       content: children,
     },
   }))
@@ -65,16 +72,54 @@ const Box = ({ id, children }) => {
 }
 
 const DragDrop = ({ data, idComponent }) => {
+  const [remove, setRemove] = useState([])
   const [dragDrop, setDragDrop] = useState(data)
   const [droppedBoxNames, setDroppedBoxNames] = useState([])
 
-  const getDrop = useCallback(
-    (e) => {
-      document.getElementById(`dataDrag-${e.id}`).remove()
-      setDroppedBoxNames((prev) => [...prev, e])
-    },
-    [droppedBoxNames],
-  )
+  const getDrop = useCallback((e) => {
+    setDroppedBoxNames((prev) => [...prev, e])
+    document.getElementById(`dataDrag-${e.id}`).classList.add('hidden')
+  }, [])
+
+  const removeDrag = (question, item) => {
+    let idName = 0
+    droppedBoxNames.forEach((data) => {
+      if (data.idDrop === item.id) {
+        document
+          .getElementById(`dataDrag-${data.id}`)
+          .classList.remove('hidden')
+      }
+    })
+
+    setDroppedBoxNames(
+      droppedBoxNames.filter((data) => data.idDrop !== item.id),
+    )
+    item.Content.forEach((data) => {
+      if (!data) {
+        idName = idName + 1
+        document.getElementsByName(
+          `${question}_${item.Name}_${idName}`,
+        )[0].textContent = '..........'
+        document
+          .getElementsByName(`${question}_${item.Name}_${idName}`)[0]
+          .classList.remove('pointer-events-none')
+      }
+    })
+    setRemove(remove.filter((data) => data !== item.id))
+  }
+
+  useEffect(() => {
+    if (droppedBoxNames.length > 0) {
+      if (remove.length > 0) {
+        droppedBoxNames.forEach((data) => {
+          remove.find((item) => item !== data.idDrop) &&
+            setRemove((prev) => [...prev, data.idDrop])
+        })
+      } else {
+        setRemove([droppedBoxNames[0].idDrop])
+      }
+    }
+  }, [droppedBoxNames])
 
   let idName = 0
 
@@ -83,50 +128,63 @@ const DragDrop = ({ data, idComponent }) => {
       <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400">
         <div className="flex flex-wrap drag">
           {dragDrop.Drag.map((item, idDrag) => (
-            <Box key={idDrag} id={item.id} children={item.Content} />
+            <Box
+              key={idDrag}
+              index={idDrag}
+              id={item.id}
+              children={item.Content}
+            />
           ))}
         </div>
-        <ol
-          className={`list-inside list-decimal space-y-4 drops-${idComponent}`}
-        >
+        <div className="w-full flex flex-col space-y-4">
           {dragDrop.Drop.map((item, id) => {
             idName = 0
             return (
-              <li key={id}>
-                <div className="inline max-w-md">
-                  {item.Content.map((i, idAnswer) =>
-                    i ? (
-                      <span>{i}</span>
-                    ) : (
-                      <>
-                        &nbsp;
-                        <Answer
-                          question={dragDrop.Name}
-                          name={item.Name}
-                          getDrop={getDrop}
-                          idName={idName++}
-                          idAnswer={idAnswer}
-                          idDrop={item.id}
-                        />
-                        &nbsp;
-                      </>
-                    ),
-                  )}
+              <div className="w-full flex flex-col" key={id}>
+                <div className="w-full grid grid-cols-12">
+                  <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-yellow-400 flex justify-center items-center">
+                    <span>{id + 1}</span>
+                  </div>
+                  <div className="w-full h-full p-3 col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
+                    {item.Content.map((i, idAnswer) =>
+                      i ? (
+                        <span key={idAnswer}>{i}</span>
+                      ) : (
+                        <>
+                          &nbsp;
+                          <Answer
+                            key={idAnswer}
+                            question={dragDrop.Name}
+                            name={item.Name}
+                            getDrop={getDrop}
+                            idName={idName++}
+                            idAnswer={idAnswer}
+                            idDrop={item.id}
+                          />
+                          &nbsp;
+                        </>
+                      ),
+                    )}
+                  </div>
                 </div>
-                {/* {checkDrop
-                .filter((data) => data.id === idComponent)
-                .find((item) => item.index === id) && (
-                <FancyLink
-                  onClick={() => removeDrag(idComponent, id, item)}
-                  className="ml-6 rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-white"
-                >
-                  Remove
-                </FancyLink>
-              )} */}
-              </li>
+                {remove.length > 0 ? (
+                  remove.find((data) => data === item.id) && (
+                    <div className="w-fit h-full mt-3 flex justify-center items-center">
+                      <FancyLink
+                        onClick={() => removeDrag(dragDrop.Name, item)}
+                        className="font-medium text-white bg-yellow-400 w-full px-4 py-2 rounded-md"
+                      >
+                        Remove
+                      </FancyLink>
+                    </div>
+                  )
+                ) : (
+                  <></>
+                )}
+              </div>
             )
           })}
-        </ol>
+        </div>
       </div>
     </DndProvider>
   )
