@@ -3,12 +3,21 @@ import Container from '@/components/modules/container'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import { useState } from 'react'
 import Image from 'next/image'
+import nookies from 'nookies'
+import { useRouter } from 'next/router'
 
 export default function Header({ className, user, notif, logo, title }) {
   const [reveal, setReveal] = useState({
     option: '',
     status: false,
   })
+  const route = useRouter()
+
+  const logout = () => {
+    nookies.destroy(null, 'token')
+    route.replace('/login')
+  }
+
   return (
     <>
       <header className={`py-4 border-b w-full z-10 ${className}`}>
@@ -75,7 +84,7 @@ export default function Header({ className, user, notif, logo, title }) {
                     Account
                   </FancyLink>
                   <FancyLink
-                    destination="/logout"
+                    onClick={logout}
                     className="font-medium text-yellow-500"
                   >
                     Sign out
