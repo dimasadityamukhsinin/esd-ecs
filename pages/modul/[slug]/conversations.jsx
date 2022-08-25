@@ -8,6 +8,7 @@ import nookies from 'nookies'
 import axios from 'axios'
 import { useState } from 'react'
 import SEO from '@/components/utils/seo'
+import Footer from '@/components/modules/footer'
 
 export default function Conversations({
   user,
@@ -81,21 +82,28 @@ export default function Conversations({
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
-      <div className="setflex-center-row border-b py-6 space-x-8">
-        <FancyLink destination="/" className="font-medium flex items-center">
-          <BsCheck2Square size={20} className="mr-2" />
-          Assignment
-        </FancyLink>
-        <FancyLink
-          destination="/conversations"
-          className="font-medium flex items-center"
-        >
-          <BiConversation size={20} className="mr-2" />
-          Conversations
-        </FancyLink>
+      <div className="w-full flex flex-col">
+        <Header
+          user={user}
+          notif={checkNotif}
+          logo={seo.Logo.data.attributes.url}
+          title={seo.Website_Title}
+        />
+        <div className="setflex-center-row border-b py-6 space-x-8">
+          <FancyLink destination="/" className="font-medium flex items-center">
+            <BsCheck2Square size={20} className="mr-2" />
+            Assignment
+          </FancyLink>
+          <FancyLink
+            destination="/conversations"
+            className="font-medium flex items-center"
+          >
+            <BiConversation size={20} className="mr-2" />
+            Conversations
+          </FancyLink>
+        </div>
       </div>
-      <Container className="mt-4 md:mt-6 xl:mt-8">
+      <Container className="mt-4 md:mt-6 xl:mt-8 pb-12 grow">
         <div className="w-full my-12 max-w-3xl flex flex-col mx-auto">
           <span className="text-2xl font-medium">{modul.Title}</span>
           <span className="mt-2">
@@ -175,6 +183,7 @@ export default function Conversations({
           </div>
         </div>
       </Container>
+      <Footer seo={seo} />
     </Layout>
   )
 }

@@ -6,6 +6,7 @@ import nookies from 'nookies'
 import axios from 'axios'
 import flash from 'next-flash'
 import SEO from '@/components/utils/seo'
+import Footer from '@/components/modules/footer'
 
 const Password = ({ seo, token, user, flashData, checkNotif }) => {
   return (
@@ -15,11 +16,18 @@ const Password = ({ seo, token, user, flashData, checkNotif }) => {
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <Header user={user} notif={checkNotif} logo={seo.Logo.data.attributes.url} title={seo.Website_Title} />
-      <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
-        <h2>Your Account</h2>
+      <div className="w-full flex flex-col">
+        <Header
+          user={user}
+          notif={checkNotif}
+          logo={seo.Logo.data.attributes.url}
+          title={seo.Website_Title}
+        />
+        <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
+          <h2>Your Account</h2>
+        </div>
       </div>
-      <Container className="mt-4 md:mt-6 xl:mt-8 border-t bg-gray-50">
+      <div className="mt-4 md:mt-6 xl:mt-8 pb-12 grow border-t bg-gray-50">
         <div className="w-full flex flex-col pt-8 pb-8">
           <div className="setflex-center-row space-x-8">
             <FancyLink
@@ -74,7 +82,8 @@ const Password = ({ seo, token, user, flashData, checkNotif }) => {
             </div>
           </div>
         </div>
-      </Container>
+      </div>
+      <Footer seo={seo} />
     </Layout>
   )
 }
