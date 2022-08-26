@@ -38,7 +38,7 @@ export default function Home({ user, modul, seo, checkNotif }) {
           logo={seo.Logo.data.attributes.url}
           title={seo.Website_Title}
         />
-        <div className="w-full py-8 flex justify-center items-center h-full font-medium">
+        <div className="w-full py-4 lg:py-8 flex justify-center items-center h-full font-medium">
           <h2>Your Learning</h2>
         </div>
       </div>

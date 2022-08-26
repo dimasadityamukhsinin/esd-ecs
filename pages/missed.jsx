@@ -39,7 +39,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
           title={seo.Website_Title}
         />
         <div className="w-full py-8 flex justify-center items-center h-full font-medium">
-          <h2>Your Learning</h2>
+          <h2 className='m-0'>Your Learning</h2>
         </div>
       </div>
       <div className={`border-t bg-gray-50 w-full min-h-[60vh] grow`}>

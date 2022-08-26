@@ -20,7 +20,7 @@ export default function Header({ className, user, notif, logo, title }) {
 
   return (
     <>
-      <header className={`py-4 border-b w-full z-10 ${className}`}>
+      <header className={`relative py-4 border-b w-full z-20 ${className}`}>
         <Container className="flex flex-col">
           <div className="flex justify-between items-center">
             <div className="w-full flex items-center">
@@ -73,7 +73,7 @@ export default function Header({ className, user, notif, logo, title }) {
                   {user.Full_Name.split('')[0]}
                 </FancyLink>
                 <div
-                  className={`absolute w-40 right-0 top-12 flex flex-col items-center space-y-3 p-6 text-sm bg-white border shadow-[0_1px_5px_1px_rgb(0_0_0_/_5%)] ${
+                  className={`absolute w-36 right-0 top-12 flex flex-col items-center space-y-3 p-6 text-sm bg-white border shadow-[0_1px_5px_1px_rgb(0_0_0_/_5%)] ${
                     reveal.status ? 'block' : 'hidden'
                   }`}
                 >
