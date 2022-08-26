@@ -29,6 +29,15 @@ module.exports = {
       transitionProperty: {
         background: 'background',
       },
+      animation: {
+        FadeIn: 'fadein 1s',
+      },
+      keyframes: {
+        fadein: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+      },
     },
   },
   variants: {

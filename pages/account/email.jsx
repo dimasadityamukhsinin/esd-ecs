@@ -33,7 +33,7 @@ const Email = ({ seo, user, token, flashData, checkNotif }) => {
 
   const doUpdate = async (e) => {
     if (validateSubmit(e)) {
-      e.prevenDefault()
+      e.preventDefault()
     } else {
       setProgress(true)
       const req = await fetch(

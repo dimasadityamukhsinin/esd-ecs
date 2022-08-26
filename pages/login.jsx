@@ -9,10 +9,11 @@ import Router from 'next/router'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 
-const Login = ({ seo, flashData }) => {
+const Login = ({ seo }) => {
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
   const route = useRouter()
+  let flashData = null;
 
   const [error, setError] = useState({
     identifier: '',
@@ -147,7 +148,11 @@ const Login = ({ seo, flashData }) => {
             </div>
           )}
           <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
-            <form method="post" onSubmit={doLogin} className="relative px-5 py-7">
+            <form
+              method="post"
+              onSubmit={doLogin}
+              className="relative px-5 py-7"
+            >
               {progress && (
                 <div className="absolute inset-0 z-10 bg-white/50" />
               )}
@@ -226,7 +231,7 @@ const Login = ({ seo, flashData }) => {
   )
 }
 
-Login.getInitialProps = async (ctx) => {
+export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
   const req = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
@@ -241,8 +246,9 @@ Login.getInitialProps = async (ctx) => {
   }
 
   return {
-    seo: seo.data.attributes,
-    flashData: flash.get(ctx),
+    props: {
+      seo: seo.data.attributes,
+    },
   }
 }
 

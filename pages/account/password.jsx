@@ -9,11 +9,12 @@ import SEO from '@/components/utils/seo'
 import Footer from '@/components/modules/footer'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import FlashMessage from 'react-flash-message'
 
-const Password = ({ seo, token, user, flashData, checkNotif }) => {
+const Password = ({ seo, token, user, checkNotif }) => {
+  const [showMessage, setShowMessage] = useState(null)
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
-  const router = useRouter()
 
   const [error, setError] = useState({
     password: '',
@@ -32,47 +33,36 @@ const Password = ({ seo, token, user, flashData, checkNotif }) => {
   }
 
   const doPassword = async (e) => {
-    if (validateSubmit(e)) {
-      e.prevenDefault()
-    } else {
-      setProgress(true)
-      const req = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/change-password`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(field),
+    setShowMessage(null)
+    e.preventDefault()
+    if (validateSubmit(e)) return
+
+    setProgress(true)
+    const req = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/change-password`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-      )
-      const res = await req.json()
-      setProgress(false)
+        body: JSON.stringify(field),
+      },
+    )
+    const res = await req.json()
+    setProgress(false)
 
-      if (res.error) {
-        router.reload(window.location.pathname)
-        flash.set({
-          type: 'error',
-          message: res.error.message,
-        })
-      } else {
-        router.reload(window.location.pathname)
-        flash.set({
-          type: 'update',
-          message: 'You’ve updated your password.',
-        })
-      }
+    if (res.error) {
+      setShowMessage({
+        type: 'error',
+        message: res.error.message,
+      })
+    } else {
+      setShowMessage({
+        type: 'update',
+        message: 'You’ve updated your password.',
+      })
     }
-  }
-
-  const ShowFlash = () => {
-    let message = flashData.message
-    // Make sure we're in the browser
-    if (typeof window !== 'undefined') {
-      flash.set(null)
-    }
-    return <>{message}</>
   }
 
   const validateSubmit = (e) => {
@@ -204,16 +194,20 @@ const Password = ({ seo, token, user, flashData, checkNotif }) => {
             </FancyLink>
           </div>
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
-            {flashData ? (
-              flashData.type === 'update' ? (
-                <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
-                  <ShowFlash />
-                </div>
-              ) : (
-                flashData.type === 'error' && (
-                  <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
-                    <ShowFlash />
+            {showMessage ? (
+              showMessage.type === 'update' ? (
+                <FlashMessage duration={6000}>
+                  <div className="bg-green-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
+                    {showMessage.message}
                   </div>
+                </FlashMessage>
+              ) : (
+                showMessage.type === 'error' && (
+                  <FlashMessage duration={6000}>
+                    <div className="bg-red-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
+                      {showMessage.message}
+                    </div>
+                  </FlashMessage>
                 )
               )
             ) : (
@@ -286,14 +280,15 @@ const Password = ({ seo, token, user, flashData, checkNotif }) => {
   )
 }
 
-Password.getInitialProps = async (ctx) => {
+export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
 
   if (!cookies.token) {
-    ctx.res.writeHead(302, {
-      Location: '/login',
-    })
-    ctx.res.end()
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
   }
 
   const reqSeo = await fetch(
@@ -346,11 +341,12 @@ Password.getInitialProps = async (ctx) => {
   ]
 
   return {
-    seo: seo.data.attributes,
-    token: cookies.token,
-    user: user.data,
-    flashData: flash.get(ctx),
-    checkNotif: checkNotif.data.length === all.length ? false : true,
+    props: {
+      seo: seo.data.attributes,
+      token: cookies.token,
+      user: user.data,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
+    },
   }
 }
 
