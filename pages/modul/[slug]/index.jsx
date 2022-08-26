@@ -620,6 +620,27 @@ export default function ModulSlug({
             }
           })
         })
+      } else if(data.type === "stack-with-drag") {
+        // let idName = 0
+        // data.Drop.forEach((item, id) => {
+        //   idName = 0
+        //   item.Content.forEach((e) => {
+        //     if (!e) {
+        //       idName++
+        //       dataAnswer.push({
+        //         name: `${data.Name}_${item.Name}_${idName}`,
+        //         value:
+        //           document.getElementsByName(
+        //             `${data.Name}_${item.Name}_${idName}`,
+        //           )[0].innerText !== '..........'
+        //             ? document.getElementsByName(
+        //                 `${data.Name}_${item.Name}_${idName}`,
+        //               )[0].innerText
+        //             : '',
+        //       })
+        //     }
+        //   })
+        // })
       } else if (
         data.type === 'fill-left-answer' ||
         data.type === 'fill-right-answer'
@@ -866,7 +887,7 @@ export default function ModulSlug({
                   className="w-full flex flex-col space-y-3 editor"
                   dangerouslySetInnerHTML={{ __html: data.Content }}
                 ></div>
-              ) : data.__component === 'editor.drag-and-drop' ? (
+              ) : data.type === 'drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
                   <DragDrop data={data} idComponent={idComponent} />
                 </div>
