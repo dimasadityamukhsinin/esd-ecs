@@ -228,11 +228,10 @@ Email.getInitialProps = async (ctx) => {
   const cookies = nookies.get(ctx)
 
   if (!cookies.token) {
-    return {
-      redirect: {
-        destination: '/login',
-      },
-    }
+    ctx.res.writeHead(302, {
+      Location: '/login',
+    })
+    ctx.res.end()
   }
 
   const reqSeo = await fetch(

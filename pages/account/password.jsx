@@ -7,8 +7,162 @@ import axios from 'axios'
 import flash from 'next-flash'
 import SEO from '@/components/utils/seo'
 import Footer from '@/components/modules/footer'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 
 const Password = ({ seo, token, user, flashData, checkNotif }) => {
+  const [field, setField] = useState({})
+  const [progress, setProgress] = useState(false)
+  const router = useRouter()
+
+  const [error, setError] = useState({
+    password: '',
+  })
+
+  const setValue = (e) => {
+    const target = e.target
+    const name = target.name
+    const value = target.value
+
+    setField({
+      ...field,
+      [name]: value,
+    })
+    validateInput(e)
+  }
+
+  const doPassword = async (e) => {
+    if (validateSubmit(e)) {
+      e.prevenDefault()
+    } else {
+      setProgress(true)
+      const req = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/change-password`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(field),
+        },
+      )
+      const res = await req.json()
+      setProgress(false)
+
+      if (res.error) {
+        router.reload(window.location.pathname)
+        flash.set({
+          type: 'error',
+          message: res.error.message,
+        })
+      } else {
+        router.reload(window.location.pathname)
+        flash.set({
+          type: 'update',
+          message: 'You’ve updated your password.',
+        })
+      }
+    }
+  }
+
+  const ShowFlash = () => {
+    let message = flashData.message
+    // Make sure we're in the browser
+    if (typeof window !== 'undefined') {
+      flash.set(null)
+    }
+    return <>{message}</>
+  }
+
+  const validateSubmit = (e) => {
+    const currentTarget = e.target[0]
+    const current = currentTarget.name
+    const currentValue = currentTarget.value
+
+    const newTarget = e.target[1]
+    const newPassword = newTarget.name
+    const newValue = newTarget.value
+
+    const confirmationTarget = e.target[2]
+    const confirmation = confirmationTarget.name
+    const confirmationlValue = confirmationTarget.value
+
+    const stateObj = {
+      currentPassword: '',
+      newPassword: '',
+      passwordConfirmation: '',
+    }
+
+    if (current) {
+      if (!currentValue) {
+        stateObj.currentPassword = 'Please enter Current Password.'
+      }
+    }
+
+    if (newPassword) {
+      if (!newValue) {
+        stateObj.newPassword = 'Please enter New Password.'
+      } else {
+        const regexPassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
+        if (!regexPassword.test(newValue)) {
+          stateObj.newPassword =
+            'Your password must be at least 8 characters, and include at least one uppercase letter, and a number.'
+        }
+      }
+    }
+
+    if (confirmation) {
+      if (!confirmationlValue) {
+        stateObj.passwordConfirmation =
+          'Please enter New Password Confirmation.'
+      }
+    }
+
+    setError(stateObj)
+    if (
+      stateObj.currentPassword ||
+      stateObj.newPassword ||
+      stateObj.passwordConfirmation
+    ) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const validateInput = (e) => {
+    let { name, value } = e.target
+    setError((prev) => {
+      const stateObj = { ...prev, [name]: '' }
+
+      switch (name) {
+        case 'currentPassword':
+          if (!value) {
+            stateObj[name] = 'Please enter Current Password.'
+          }
+          break
+
+        case 'password':
+          if (!value) {
+            stateObj[name] = 'Please enter New Password.'
+          }
+          break
+
+        case 'passwordConfirmation':
+          if (!value) {
+            stateObj[name] = 'Please enter New Password Confirmation.'
+          }
+          break
+
+        default:
+          break
+      }
+
+      return stateObj
+    })
+  }
+
   return (
     <Layout>
       <SEO
@@ -50,29 +204,73 @@ const Password = ({ seo, token, user, flashData, checkNotif }) => {
             </FancyLink>
           </div>
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
+            {flashData ? (
+              flashData.type === 'update' ? (
+                <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
+                  <ShowFlash />
+                </div>
+              ) : (
+                flashData.type === 'error' && (
+                  <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+                    <ShowFlash />
+                  </div>
+                )
+              )
+            ) : (
+              <></>
+            )}
             <div className="flex flex-col">
               <span className="text-xl font-medium">
                 Change the password for your account
               </span>
-              <form className="mt-6">
+              <form method="post" onSubmit={doPassword} className="mt-6">
                 <div className="flex flex-col">
                   <div className="h-full w-full flex flex-col">
                     <label className="font-medium">Current password</label>
                     <input
-                      type="text"
+                      type="password"
                       name="currentPassword"
+                      onChange={setValue}
+                      onBlur={validateInput}
                       className="w-full h-11 border p-2 mt-2"
                     />
+                    {error.currentPassword && (
+                      <span className="block text-red-500">
+                        {error.currentPassword}
+                      </span>
+                    )}
+                  </div>
+                  <div className="h-full w-full mt-6 flex flex-col">
+                    <label className="font-medium">New password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      onChange={setValue}
+                      onBlur={validateInput}
+                      className="w-full h-11 border p-2 mt-2"
+                    />
+                    {error.newPassword && (
+                      <span className="block text-red-500">
+                        {error.newPassword}
+                      </span>
+                    )}
                   </div>
                   <div className="h-full w-full mt-6 flex flex-col">
                     <label className="font-medium">
-                      Enter a new password (min. 8 characters)
+                      New password confirmation
                     </label>
                     <input
-                      type="text"
-                      name="newPassword"
+                      type="password"
+                      name="passwordConfirmation"
+                      onChange={setValue}
+                      onBlur={validateInput}
                       className="w-full h-11 border p-2 mt-2"
                     />
+                    {error.passwordConfirmation && (
+                      <span className="block text-red-500">
+                        {error.passwordConfirmation}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <FancyLink className="bg-yellow-400 w-full mt-6 text-white font-medium py-2 px-3">
@@ -92,11 +290,10 @@ Password.getInitialProps = async (ctx) => {
   const cookies = nookies.get(ctx)
 
   if (!cookies.token) {
-    return {
-      redirect: {
-        destination: '/login',
-      },
-    }
+    ctx.res.writeHead(302, {
+      Location: '/login',
+    })
+    ctx.res.end()
   }
 
   const reqSeo = await fetch(

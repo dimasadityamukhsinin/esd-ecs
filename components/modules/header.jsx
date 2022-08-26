@@ -15,7 +15,8 @@ export default function Header({ className, user, notif, logo, title }) {
 
   const logout = () => {
     nookies.destroy(null, 'token')
-    route.replace('/login')
+    console.log("mati")
+    // route.reload(window.location.pathname)
   }
 
   return (
