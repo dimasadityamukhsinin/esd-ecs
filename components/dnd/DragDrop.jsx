@@ -9,7 +9,7 @@ const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
       accept: 'box',
       drop(_item, monitor) {
         let answer = document.getElementsByName(
-          `${question}_${name}_${idName + 1}`,
+          `${question}_${name}_${idAnswer + 1}`,
         )[0]
         answer.textContent = monitor.getItem().content
         setTimeout(() => {
@@ -41,7 +41,7 @@ const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
   return (
     <span
       ref={drop}
-      name={`${question}_${name}_${idName + 1}`}
+      name={`${question}_${name}_${idAnswer + 1}`}
       className={`text-yellow-500 bg-white px-2 ${border}`}
     >
       ..........
@@ -69,9 +69,8 @@ const Box = ({ id, index, children }) => {
   )
 }
 
-const DragDrop = ({ data, idComponent }) => {
+const DragDrop = ({ dragDrop, idComponent }) => {
   const [remove, setRemove] = useState([])
-  const [dragDrop, setDragDrop] = useState(data)
   const [droppedBoxNames, setDroppedBoxNames] = useState([])
 
   const getDrop = useCallback((e) => {
@@ -93,7 +92,7 @@ const DragDrop = ({ data, idComponent }) => {
       droppedBoxNames.filter((data) => data.idDrop !== item.id),
     )
     item.Content.forEach((data) => {
-      if (!data) {
+      if (!data.Answer) {
         idName = idName + 1
         document.getElementsByName(
           `${question}_${item.Name}_${idName}`,
@@ -114,7 +113,7 @@ const DragDrop = ({ data, idComponent }) => {
     data.Drop.forEach((e) => {
       let idName = 0
       e.Content.forEach((item) => {
-        if (!item) {
+        if (!item.Answer) {
           idName = idName + 1
           document.getElementsByName(
             `${data.Name}_${e.Name}_${idName}`,
@@ -160,15 +159,24 @@ const DragDrop = ({ data, idComponent }) => {
           {dragDrop.Drop.map((item, id) => {
             idName = 0
             return (
-              <div className="w-full flex flex-col" key={id}>
+              <div
+                id={`${dragDrop.Name}_${item.Name}`}
+                className="w-full flex flex-col"
+                key={id}
+              >
                 <div className="w-full grid grid-cols-12">
                   <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-yellow-400 flex justify-center items-center">
                     <span>{id + 1}</span>
                   </div>
                   <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
                     {item.Content.map((i, idAnswer) =>
-                      i ? (
-                        <span key={idAnswer}>{i}</span>
+                      !i.Answer ? (
+                        <span
+                          name={`${dragDrop.Name}_${item.Name}_${idAnswer + 1}`}
+                          key={idAnswer}
+                        >
+                          {i.Content}
+                        </span>
                       ) : (
                         <>
                           &nbsp;
@@ -208,7 +216,7 @@ const DragDrop = ({ data, idComponent }) => {
       </div>
       <div className="flex justify-end w-full mt-3">
         <FancyLink
-          onClick={() => resetDnd(data)}
+          onClick={() => resetDnd(dragDrop)}
           className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
         >
           Reset

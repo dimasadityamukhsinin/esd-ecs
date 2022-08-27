@@ -112,7 +112,7 @@ export default function ModulSlug({
         data.Drop.forEach((item, id) => {
           idName = 0
           item.Content.forEach((e) => {
-            if (!e) {
+            if (!e.Answer) {
               idName++
               dataAnswer.push({
                 name: `${data.Name}_${item.Name}_${idName}`,
@@ -149,7 +149,7 @@ export default function ModulSlug({
             }
           })
         })
-      } else if(data.type === "stack-with-drag") {
+      } else if(data.type === "stack") {
         // let idName = 0
         // data.Drop.forEach((item, id) => {
         //   idName = 0
@@ -199,7 +199,7 @@ export default function ModulSlug({
     //   })
     // }
 
-    console.log(dataAnswer)
+    // console.log(dataAnswer)
 
     modul.Editor.forEach((data) => {
       const check = dataAnswer.filter(
@@ -255,21 +255,30 @@ export default function ModulSlug({
             test.filter((item) => item.Answer === true).length,
         })
       } else if (data.type === 'drag-drop') {
-        let test = []
-        data.Drag.forEach((item, id) => {
-          test.push({
-            Name: item.To,
-            Key: check[id].value,
-            Answer: check[id].value === item.Content,
+        let content = []
+        let idName = 0
+        data.Drop.forEach((item, id) => {
+          item.Content.forEach((e) => {
+            if (e.Answer) {
+              if(check[idName]) {
+                content.push({
+                  Name: item.Name,
+                  Key: check[idName].value,
+                  Answer: check[idName].value === e.Content,
+                })
+              }
+              idName++
+            }
           })
         })
+
         dataContent.push({
           __component: 'question.drag-and-drop',
           Name: data.Name,
-          Content: test,
+          Content: content,
           Score:
             (data.Point / data.Drag.length) *
-            test.filter((item) => item.Answer === true).length,
+            content.filter((item) => item.Answer === true).length,
         })
       } else if (data.type === 'stack-with-drag-drop') {
         let test = []
@@ -311,11 +320,10 @@ export default function ModulSlug({
 
     let Total_Score = 0
 
-    console.log(dataContent)
-
     dataContent.forEach((item) => {
       Total_Score = Total_Score + item.Score
     })
+
 
     let date = new Date()
     let dd = String(date.getDate()).padStart(2, '0')
@@ -418,7 +426,7 @@ export default function ModulSlug({
                 ></div>
               ) : data.type === 'drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
-                  <DragDrop data={data} idComponent={idComponent} />
+                  <DragDrop dragDrop={data} idComponent={idComponent} />
                 </div>
               ) : data.type === 'fill-left-answer' ? (
                 <div
@@ -535,7 +543,7 @@ export default function ModulSlug({
                     </div>
                   ))}
                 </div>
-              ) : data.type === 'stack-with-drag' ? (
+              ) : data.type === 'stack' ? (
                 <div
                   className="w-full flex flex-col space-y-4"
                   key={idComponent}
@@ -828,10 +836,10 @@ export async function getServerSideProps(ctx) {
           ...data,
           Drop: data.Drop.map((item) => {
             return {
-              ...item,
+              id: item.id,
               Name: item.Name,
               Content: data.Drop.filter((i) => i.Name === item.Name).map(
-                (k) => k.Content,
+                (k) => ({Answer: k.Answer, Content: k.Content})
               ),
             }
           }).reduce((unique, o) => {
