@@ -197,7 +197,7 @@ export default function Preview({ modul, seo }) {
 
 export async function getServerSideProps(ctx) {
   const req = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[Slug][$eq]=${ctx.params.slug}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[id][$eq]=${ctx.params.slug}&populate=deep`,
   )
   const res = await req.json()
 

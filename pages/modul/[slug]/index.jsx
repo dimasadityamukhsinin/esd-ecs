@@ -266,7 +266,7 @@ export default function ModulSlug({
                     content.push({
                       Name: item.Name,
                       Key: check[idName].value,
-                      Answer: check[idName].value === e.Content,
+                      Answer: check[idName].value.toLowerCase() === e.Content.toLowerCase(),
                     })
                   }
                   idName++
