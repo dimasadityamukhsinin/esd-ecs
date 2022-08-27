@@ -196,55 +196,50 @@ export default function Preview({ modul, seo }) {
 }
 
 export async function getServerSideProps(ctx) {
-  if (ctx.preview) {
-    const req = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[Slug][$eq]=${ctx.params.slug}&populate=deep`,
-    )
-    const res = await req.json()
+  const req = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[Slug][$eq]=${ctx.params.slug}&populate=deep`,
+  )
+  const res = await req.json()
 
-    const reqSeo = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
-    )
-    const seo = await reqSeo.json()
+  const reqSeo = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
+  )
+  const seo = await reqSeo.json()
 
-    res.data[0].attributes.Editor = res.data[0].attributes.Editor.map(
-      (data, id) => {
-        if (
-          data.__component === 'editor.drag-and-drop' ||
-          data.type === 'stack-with-drag-drop'
-        ) {
-          return {
-            ...data,
-            Drop: data.Drop.map((item) => {
-              return {
-                ...item,
-                Name: item.Name,
-                Content: data.Drop.filter((i) => i.Name === item.Name).map(
-                  (k) => k.Content,
-                ),
-              }
-            }).reduce((unique, o) => {
-              if (!unique.some((obj) => obj.Name === o.Name)) {
-                unique.push(o)
-              }
-              return unique
-            }, []),
-          }
-        } else {
-          return data
+
+  res.data[0].attributes.Editor = res.data[0].attributes.Editor.map(
+    (data, id) => {
+      if (
+        data.__component === 'editor.drag-and-drop' ||
+        data.type === 'stack-with-drag-drop'
+      ) {
+        return {
+          ...data,
+          Drop: data.Drop.map((item) => {
+            return {
+              ...item,
+              Name: item.Name,
+              Content: data.Drop.filter((i) => i.Name === item.Name).map(
+                (k) => k.Content,
+              ),
+            }
+          }).reduce((unique, o) => {
+            if (!unique.some((obj) => obj.Name === o.Name)) {
+              unique.push(o)
+            }
+            return unique
+          }, []),
         }
-      },
-    )
+      } else {
+        return data
+      }
+    },
+  )
 
-    return {
-      props: {
-        seo: seo.data.attributes,
-        modul: res.data[0].attributes,
-      },
-    }
-  } else {
-    return {
-      notFound: true,
-    }
+  return {
+    props: {
+      seo: seo.data.attributes,
+      modul: res.data[0].attributes,
+    },
   }
 }
