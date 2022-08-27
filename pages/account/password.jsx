@@ -97,7 +97,7 @@ const Password = ({ seo, token, user, checkNotif }) => {
         const regexPassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
         if (!regexPassword.test(newValue)) {
           stateObj.newPassword =
-            'Your password must be at least 8 characters, and include at least one uppercase letter, and a number.'
+          'Your password must be at least 8 characters, 1 uppercase, 1 lowercase & 1 number'
         }
       }
     }

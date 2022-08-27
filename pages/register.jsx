@@ -2,15 +2,16 @@ import Layout from '@/components/modules/layout'
 import { useEffect, useState } from 'react'
 import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
-import flash from 'next-flash'
 import Image from 'next/image'
 import FancyLink from '@/components/utils/fancyLink'
 import { useRouter } from 'next/router'
+import FlashMessage from 'react-flash-message'
+import { scrollToTop } from '@/components/utils/scrollToTop'
 
-const Register = ({ seo, flashData, major }) => {
+const Register = ({ seo, major }) => {
+  const [showMessage, setShowMessage] = useState(null)
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
-  const route = useRouter()
 
   const [error, setError] = useState({
     Full_Name: '',
@@ -22,14 +23,6 @@ const Register = ({ seo, flashData, major }) => {
   })
 
   const setValue = (e) => {
-    const target = e.target
-    const name = target.name
-    const value = target.value
-
-    setField({
-      ...field,
-      [name]: value,
-    })
     validateInput(e)
   }
 
@@ -81,7 +74,7 @@ const Register = ({ seo, flashData, major }) => {
 
     if (major) {
       if (!majorValue) {
-        stateObj.major = 'Please enter Jurusan.'
+        stateObj.major = 'Please enter Major.'
       }
     }
 
@@ -104,7 +97,7 @@ const Register = ({ seo, flashData, major }) => {
         const regexPassword = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/
         if (!regexPassword.test(passwordValue)) {
           stateObj.password =
-            'Your password must be at least 8 characters, and include at least one uppercase letter, and a number.'
+            'Your password must be at least 8 characters, 1 uppercase, 1 lowercase & 1 number'
         }
       }
     }
@@ -144,7 +137,7 @@ const Register = ({ seo, flashData, major }) => {
 
         case 'major':
           if (!value) {
-            stateObj[name] = 'Please enter Jurusan.'
+            stateObj[name] = 'Please enter Major.'
           }
           break
 
@@ -175,53 +168,79 @@ const Register = ({ seo, flashData, major }) => {
   }
 
   const doRegister = async (e) => {
-    if (validateSubmit(e)) {
-      e.preventDefault()
-    } else {
-      setProgress(true)
+    scrollToTop()
+    setShowMessage(null)
+    e.preventDefault()
+    if (validateSubmit(e)) return
 
-      const req = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(field),
+    const fullNameTarget = e.target[0]
+    const fullName = fullNameTarget.name
+    const fullNameValue = fullNameTarget.value
+
+    const nimTarget = e.target[1]
+    const nim = nimTarget.name
+    const nimValue = nimTarget.value
+
+    const majorTarget = e.target[2]
+    const major = majorTarget.name
+    const majorValue = majorTarget.value
+
+    const usernameTarget = e.target[3]
+    const username = usernameTarget.name
+    const usernameValue = usernameTarget.value
+
+    const emailTarget = e.target[4]
+    const email = emailTarget.name
+    const emailValue = emailTarget.value
+
+    const passwordTarget = e.target[5]
+    const password = passwordTarget.name
+    const passwordValue = passwordTarget.value
+
+    setProgress(true)
+
+    const req = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local/register`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-      const res = await req.json()
-      console.log(field)
-      console.log(res)
+        body: JSON.stringify({
+          Full_Name: fullNameValue,
+          Nim: nimValue,
+          major: majorValue,
+          username: usernameValue,
+          email: emailValue,
+          password: passwordValue,
+        }),
+      },
+    )
+    const res = await req.json()
+    console.log({
+      Full_Name: fullNameValue,
+      Nim: nimValue,
+      major: majorValue,
+      username: usernameValue,
+      email: emailValue,
+      password: passwordValue,
+    })
 
-      if (res.jwt) {
-        setField({})
-        e.target.reset()
-        setSuccess(true)
-        route.reload(window.location.pathname)
-        flash.set({
-          type: 'success',
-          message: 'Congratulations! Your account has been registered.',
-        })
-      } else {
-        route.reload(window.location.pathname)
-        flash.set({
-          type: 'error',
-          message: 'Username, Email or Nim already in use!',
-        })
-      }
-
-      setProgress(false)
+    if (res.jwt) {
+      setField({})
+      e.target.reset()
+      setShowMessage({
+        type: 'success',
+        message: 'Congratulations! Your account has been registered.',
+      })
+    } else {
+      setShowMessage({
+        type: 'error',
+        message: 'Username, Email or Nim already in use!',
+      })
     }
-  }
 
-  const ShowFlash = () => {
-    const message = flashData.message
-    // Make sure we're in the browser
-    // if (typeof window !== 'undefined') {
-    //   flash.set(null)
-    // }
-    return <>{message}</>
+    setProgress(false)
   }
 
   return (
@@ -241,19 +260,20 @@ const Register = ({ seo, flashData, major }) => {
               objectFit="contain"
             />
           </div>
-          {
-            console.log(flashData)
-          }
-          {flashData ? (
-            flashData.type === 'success' ? (
-              <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
-                <ShowFlash />
-              </div>
-            ) : (
-              flashData?.type === 'error' && (
-                <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
-                  <ShowFlash />
+          {showMessage ? (
+            showMessage.type === 'success' ? (
+              <FlashMessage duration={6000}>
+                <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
+                  {showMessage.message}
                 </div>
+              </FlashMessage>
+            ) : (
+              showMessage.type === 'error' && (
+                <FlashMessage duration={6000}>
+                  <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+                    {showMessage.message}
+                  </div>
+                </FlashMessage>
               )
             )
           ) : (
@@ -323,7 +343,7 @@ const Register = ({ seo, flashData, major }) => {
                 <span className="block text-red-500 mb-5">{error.Nim}</span>
               )}
               <label className="font-semibold text-sm text-gray-600 pb-1 block">
-                Jurusan
+                Major
               </label>
               <select
                 id="lang"
@@ -419,7 +439,7 @@ const Register = ({ seo, flashData, major }) => {
   )
 }
 
-Register.getInitialProps = async (ctx) => {
+export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
   const reqSeo = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
@@ -430,16 +450,18 @@ Register.getInitialProps = async (ctx) => {
   const major = await reqMajor.json()
 
   if (cookies.token) {
-    ctx.res.writeHead(302, {
-      Location: '/',
-    })
-    ctx.res.end()
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
   }
 
   return {
-    major: major.data,
-    seo: seo.data.attributes,
-    flashData: flash.get(ctx),
+    props: {
+      major: major.data,
+      seo: seo.data.attributes,
+    },
   }
 }
 
