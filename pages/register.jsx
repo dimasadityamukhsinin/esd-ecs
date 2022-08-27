@@ -217,14 +217,6 @@ const Register = ({ seo, major }) => {
       },
     )
     const res = await req.json()
-    console.log({
-      Full_Name: fullNameValue,
-      Nim: nimValue,
-      major: majorValue,
-      username: usernameValue,
-      email: emailValue,
-      password: passwordValue,
-    })
 
     if (res.jwt) {
       setField({})
@@ -263,14 +255,14 @@ const Register = ({ seo, major }) => {
           {showMessage ? (
             showMessage.type === 'success' ? (
               <FlashMessage duration={6000}>
-                <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
+                <div className="bg-green-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
                   {showMessage.message}
                 </div>
               </FlashMessage>
             ) : (
               showMessage.type === 'error' && (
                 <FlashMessage duration={6000}>
-                  <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+                  <div className="bg-red-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
                     {showMessage.message}
                   </div>
                 </FlashMessage>

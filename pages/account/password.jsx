@@ -4,11 +4,9 @@ import Layout from '@/components/modules/layout'
 import FancyLink from '@/components/utils/fancyLink'
 import nookies from 'nookies'
 import axios from 'axios'
-import flash from 'next-flash'
 import SEO from '@/components/utils/seo'
 import Footer from '@/components/modules/footer'
 import { useState } from 'react'
-import { useRouter } from 'next/router'
 import FlashMessage from 'react-flash-message'
 
 const Password = ({ seo, token, user, checkNotif }) => {

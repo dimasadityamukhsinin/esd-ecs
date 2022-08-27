@@ -1,17 +1,14 @@
-import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import Layout from '@/components/modules/layout'
 import FancyLink from '@/components/utils/fancyLink'
 import nookies from 'nookies'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-import flash from 'next-flash'
-import { useRouter } from 'next/router'
 import SEO from '@/components/utils/seo'
 import Footer from '@/components/modules/footer'
 
-const Email = ({ seo, user, token, flashData, checkNotif }) => {
-  const router = useRouter()
+const Email = ({ seo, user, token, checkNotif }) => {
+  const [showMessage, setShowMessage] = useState(null)
   const [field, setField] = useState({
     email: user.email,
   })
@@ -32,47 +29,36 @@ const Email = ({ seo, user, token, flashData, checkNotif }) => {
   }
 
   const doUpdate = async (e) => {
-    if (validateSubmit(e)) {
-      e.preventDefault()
-    } else {
-      setProgress(true)
-      const req = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(field),
+    setShowMessage(null)
+    e.preventDefault()
+    if (validateSubmit(e)) return
+
+    setProgress(true)
+    const req = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-      )
-      const res = await req.json()
-      setProgress(false)
+        body: JSON.stringify(field),
+      },
+    )
+    const res = await req.json()
+    setProgress(false)
 
-      if (res.error) {
-        router.reload(window.location.pathname)
-        flash.set({
-          type: 'error',
-          message: res.error.message,
-        })
-      } else {
-        router.reload(window.location.pathname)
-        flash.set({
-          type: 'update',
-          message: 'You’ve updated your email.',
-        })
-      }
+    if (res.error) {
+      showMessage({
+        type: 'error',
+        message: res.error.message,
+      })
+    } else {
+      showMessage({
+        type: 'update',
+        message: 'You’ve updated your email.',
+      })
     }
-  }
-
-  const ShowFlash = () => {
-    let message = flashData.message
-    // Make sure we're in the browser
-    if (typeof window !== 'undefined') {
-      flash.set(null)
-    }
-    return <>{message}</>
   }
 
   const validateSubmit = (e) => {
@@ -115,17 +101,6 @@ const Email = ({ seo, user, token, flashData, checkNotif }) => {
       return stateObj
     })
   }
-
-  useEffect(() => {
-    if (!user.username || !user.email || !user.Full_Name) {
-      flash.set({
-        type: 'warning',
-        message:
-          'Please complete your personal data such as username, email, and full name!',
-      })
-    }
-  }, [])
-
   return (
     <Layout>
       <SEO
@@ -167,19 +142,15 @@ const Email = ({ seo, user, token, flashData, checkNotif }) => {
             </FancyLink>
           </div>
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
-            {flashData ? (
-              flashData.type === 'update' ? (
-                <div className="bg-green-500 text-white rounded mb-4 px-4 py-3">
-                  <ShowFlash />
-                </div>
-              ) : flashData.type === 'error' ? (
-                <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
-                  <ShowFlash />
+            {showMessage ? (
+              showMessage.type === 'update' ? (
+                <div className="bg-green-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
+                  {showMessage.message}
                 </div>
               ) : (
-                flashData.type === 'warning' && (
-                  <div className="bg-yellow-400 text-white rounded mb-4 px-4 py-3">
-                    <ShowFlash />
+                showMessage.type === 'error' && (
+                  <div className="bg-red-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
+                    {showMessage.message}
                   </div>
                 )
               )
@@ -224,14 +195,15 @@ const Email = ({ seo, user, token, flashData, checkNotif }) => {
   )
 }
 
-Email.getInitialProps = async (ctx) => {
+export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
 
   if (!cookies.token) {
-    ctx.res.writeHead(302, {
-      Location: '/login',
-    })
-    ctx.res.end()
+    return {
+      redirect: {
+        destination: '/login',
+      },
+    }
   }
 
   const reqSeo = await fetch(
@@ -284,11 +256,12 @@ Email.getInitialProps = async (ctx) => {
   ]
 
   return {
-    seo: seo.data.attributes,
-    token: cookies.token,
-    user: user.data,
-    flashData: flash.get(ctx),
-    checkNotif: checkNotif.data.length === all.length ? false : true,
+    props: {
+      seo: seo.data.attributes,
+      token: cookies.token,
+      user: user.data,
+      checkNotif: checkNotif.data.length === all.length ? false : true,
+    },
   }
 }
 
