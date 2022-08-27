@@ -103,6 +103,17 @@ export default function ModulSlug({
   }
 
   const doAnswer = async (e) => {
+    swal({
+      title: 'Have you finished your assignment?',
+      icon: 'warning',
+      buttons: true,
+      // dangerMode: true,
+    }).then((willDelete) => {
+      if (willDelete) {
+        swal('Congratulations, your assignment has been completed!', {
+          icon: 'success',
+        })
+
     let dataAnswer = []
     let dataContent = []
 
@@ -191,15 +202,6 @@ export default function ModulSlug({
         })
       }
     })
-
-    // for (let i = 0; i < e.target.length; i++) {
-    //   dataAnswer.push({
-    //     name: e.target[i].name,
-    //     value: e.target[i].value,
-    //   })
-    // }
-
-    // console.log(dataAnswer)
 
     modul.Editor.forEach((data) => {
       const check = dataAnswer.filter(
@@ -368,6 +370,9 @@ export default function ModulSlug({
     const res = await req.json()
 
     console.log(res)
+    
+  }
+})
   }
 
   useEffect(() => {
