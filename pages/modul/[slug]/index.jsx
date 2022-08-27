@@ -17,6 +17,7 @@ import StackDrag from '@/components/dnd/StackDrag'
 import { useEffect } from 'react'
 import { scrollToTop } from '@/components/utils/scrollToTop'
 import Footer from '@/components/modules/footer'
+import { useRouter } from 'next/router'
 
 export default function ModulSlug({
   user,
@@ -30,6 +31,7 @@ export default function ModulSlug({
   checkNotif,
 }) {
   const ref = useRef()
+  const route = useRouter()
   const [answer, setAnswer] = useState([])
   const [fieldModul, setFieldModul] = useState({})
   const [fieldComment, setFieldComment] = useState({})
@@ -110,269 +112,266 @@ export default function ModulSlug({
       // dangerMode: true,
     }).then((willDelete) => {
       if (willDelete) {
-        swal('Congratulations, your assignment has been completed!', {
-          icon: 'success',
-        })
+        let dataAnswer = []
+        let dataContent = []
 
-    let dataAnswer = []
-    let dataContent = []
-
-    modul.Editor.filter((data) => data.Name).forEach((data) => {
-      if (data.type === 'drag-drop') {
-        let idName = 0
-        data.Drop.forEach((item, id) => {
-          idName = 0
-          item.Content.forEach((e) => {
-            if (!e.Answer) {
-              idName++
-              dataAnswer.push({
-                name: `${data.Name}_${item.Name}_${idName}`,
-                value:
-                  document.getElementsByName(
-                    `${data.Name}_${item.Name}_${idName}`,
-                  )[0].innerText !== '..........'
-                    ? document.getElementsByName(
+        modul.Editor.filter((data) => data.Name).forEach((data) => {
+          if (data.type === 'drag-drop') {
+            let idName = 0
+            data.Drop.forEach((item, id) => {
+              idName = 0
+              item.Content.forEach((e) => {
+                if (!e.Answer) {
+                  idName++
+                  dataAnswer.push({
+                    name: `${data.Name}_${item.Name}_${idName}`,
+                    value:
+                      document.getElementsByName(
                         `${data.Name}_${item.Name}_${idName}`,
-                      )[0].innerText
-                    : '',
+                      )[0].innerText !== '..........'
+                        ? document.getElementsByName(
+                            `${data.Name}_${item.Name}_${idName}`,
+                          )[0].innerText
+                        : '',
+                  })
+                }
               })
-            }
-          })
-        })
-      } else if (data.type === 'stack-with-drag-drop') {
-        let idName = 0
-        data.Drop.forEach((item, id) => {
-          idName = 0
-          item.Content.forEach((e) => {
-            if (!e) {
-              idName++
-              dataAnswer.push({
-                name: `${data.Name}_${item.Name}_${idName}`,
-                value:
-                  document.getElementsByName(
-                    `${data.Name}_${item.Name}_${idName}`,
-                  )[0].innerText !== '..........'
-                    ? document.getElementsByName(
+            })
+          } else if (data.type === 'stack-with-drag-drop') {
+            let idName = 0
+            data.Drop.forEach((item, id) => {
+              idName = 0
+              item.Content.forEach((e) => {
+                if (!e) {
+                  idName++
+                  dataAnswer.push({
+                    name: `${data.Name}_${item.Name}_${idName}`,
+                    value:
+                      document.getElementsByName(
                         `${data.Name}_${item.Name}_${idName}`,
-                      )[0].innerText
-                    : '',
+                      )[0].innerText !== '..........'
+                        ? document.getElementsByName(
+                            `${data.Name}_${item.Name}_${idName}`,
+                          )[0].innerText
+                        : '',
+                  })
+                }
               })
-            }
-          })
+            })
+          } else if (data.type === 'stack') {
+            // let idName = 0
+            // data.Drop.forEach((item, id) => {
+            //   idName = 0
+            //   item.Content.forEach((e) => {
+            //     if (!e) {
+            //       idName++
+            //       dataAnswer.push({
+            //         name: `${data.Name}_${item.Name}_${idName}`,
+            //         value:
+            //           document.getElementsByName(
+            //             `${data.Name}_${item.Name}_${idName}`,
+            //           )[0].innerText !== '..........'
+            //             ? document.getElementsByName(
+            //                 `${data.Name}_${item.Name}_${idName}`,
+            //               )[0].innerText
+            //             : '',
+            //       })
+            //     }
+            //   })
+            // })
+          } else if (
+            data.type === 'fill-left-answer' ||
+            data.type === 'fill-right-answer'
+          ) {
+            data.question_and_answer.forEach((_, id) => {
+              dataAnswer.push({
+                name: `${data.Name}_${id + 1}`,
+                value: document.getElementsByName(`${data.Name}_${id + 1}`)[0]
+                  .value,
+              })
+            })
+          } else if (data.type === 'arrange') {
+            data.Arrange.forEach((_, id) => {
+              dataAnswer.push({
+                name: `${data.Name}_${id + 1}`,
+                value: document.getElementsByName(`${data.Name}_${id + 1}`)[0]
+                  .value,
+              })
+            })
+          }
         })
-      } else if(data.type === "stack") {
-        // let idName = 0
-        // data.Drop.forEach((item, id) => {
-        //   idName = 0
-        //   item.Content.forEach((e) => {
-        //     if (!e) {
-        //       idName++
-        //       dataAnswer.push({
-        //         name: `${data.Name}_${item.Name}_${idName}`,
-        //         value:
-        //           document.getElementsByName(
-        //             `${data.Name}_${item.Name}_${idName}`,
-        //           )[0].innerText !== '..........'
-        //             ? document.getElementsByName(
-        //                 `${data.Name}_${item.Name}_${idName}`,
-        //               )[0].innerText
-        //             : '',
-        //       })
-        //     }
-        //   })
+
+        modul.Editor.forEach((data) => {
+          const check = dataAnswer.filter(
+            (item) => item.name.split('_')[0] === data.Name,
+          )
+
+          if (data.type === 'fill-left-answer') {
+            let test = []
+            data.question_and_answer.forEach((item, id) => {
+              test.push({
+                Key: check[id].value,
+                Answer:
+                  check[id].value.toLowerCase() === item.Answer.toLowerCase(),
+              })
+            })
+            dataContent.push({
+              __component: 'question.fill-in-the-blank-left-answer',
+              Name: data.Name,
+              Content: test,
+              Score:
+                (data.Point / data.question_and_answer.length) *
+                test.filter((item) => item.Answer === true).length,
+            })
+          } else if (data.type === 'fill-right-answer') {
+            let test = []
+            data.question_and_answer.forEach((item, id) => {
+              test.push({
+                Key: check[id].value,
+                Answer:
+                  check[id].value.toLowerCase() === item.Answer.toLowerCase(),
+              })
+            })
+            dataContent.push({
+              __component: 'question.fill-in-the-blank-right-answer',
+              Name: data.Name,
+              Content: test,
+              Score:
+                (data.Point / data.question_and_answer.length) *
+                test.filter((item) => item.Answer === true).length,
+            })
+          } else if (data.type === 'arrange') {
+            let test = []
+            data.Arrange.forEach((item, id) => {
+              test.push({
+                Key: check[id].value,
+                Answer: parseInt(check[id].value) === parseInt(item.Number),
+              })
+            })
+            dataContent.push({
+              __component: 'question.arrange',
+              Name: data.Name,
+              Content: test,
+              Score:
+                (data.Point / data.Arrange.length) *
+                test.filter((item) => item.Answer === true).length,
+            })
+          } else if (data.type === 'drag-drop') {
+            let content = []
+            let idName = 0
+            data.Drop.forEach((item, id) => {
+              item.Content.forEach((e) => {
+                if (e.Answer) {
+                  if (check[idName]) {
+                    content.push({
+                      Name: item.Name,
+                      Key: check[idName].value,
+                      Answer: check[idName].value === e.Content,
+                    })
+                  }
+                  idName++
+                }
+              })
+            })
+
+            dataContent.push({
+              __component: 'question.drag-and-drop',
+              Name: data.Name,
+              Content: content,
+              Score:
+                (data.Point / data.Drag.length) *
+                content.filter((item) => item.Answer === true).length,
+            })
+          } else if (data.type === 'stack-with-drag-drop') {
+            let test = []
+            // let stack = []
+
+            // data.Drop.forEach((item, id) => {
+            //   stack.push({
+            //     Name: check[id].name.split('_')[1],
+            //     Stack_Number: check.map((item) => item.name.split('_')[1]).indexOf(item.Name),
+            //   })
+            // })
+
+            // data.Drag.forEach((_, id) => {
+            //   test.push({
+            //     Name: check[id].name.split('_')[1],
+            //     Key: check[id].value,
+            //     Answer:
+            //       check[id].value ===
+            //       data.Drag.find(
+            //         (item) =>
+            //           item.To === check[id].name.split('_')[1] &&
+            //           item.Number === parseInt(check[id].name.split('_')[2]),
+            //       ).Content,
+            //   })
+            // })
+
+            // console.log(`stack ${check.map((item) => item.name.split('_')[1]).indexOf()}`)
+
+            // dataContent.push({
+            //   __component: data.__component,
+            //   Name: data.Name,
+            //   Content: test,
+            //   Score:
+            //     (data.Point / data.Drag.length) *
+            //     test.filter((item) => item.Answer === true).length,
+            // })
+          }
+        })
+
+        let Total_Score = 0
+
+        dataContent.forEach((item) => {
+          Total_Score = Total_Score + item.Score
+        })
+
+        let date = new Date()
+        let dd = String(date.getDate()).padStart(2, '0')
+        let mm = String(date.getMonth() + 1).padStart(2, '0') //January is 0!
+        let yyyy = date.getFullYear()
+
+        date = yyyy + '-' + mm + '-' + dd
+
+        // console.log({
+        //   data: {
+        //     idModul: modulId,
+        //     idUser: user.id,
+        //     User: user.Full_Name,
+        //     Modul_Name: modul.Title,
+        //     Question: dataContent,
+        //     Date: date,
+        //     Total_Score: Total_Score,
+        //   },
         // })
-      } else if (
-        data.type === 'fill-left-answer' ||
-        data.type === 'fill-right-answer'
-      ) {
-        data.question_and_answer.forEach((_, id) => {
-          dataAnswer.push({
-            name: `${data.Name}_${id + 1}`,
-            value: document.getElementsByName(`${data.Name}_${id + 1}`)[0]
-              .value,
-          })
-        })
-      } else if (data.type === 'arrange') {
-        data.Arrange.forEach((_, id) => {
-          dataAnswer.push({
-            name: `${data.Name}_${id + 1}`,
-            value: document.getElementsByName(`${data.Name}_${id + 1}`)[0]
-              .value,
-          })
-        })
-      }
-    })
 
-    modul.Editor.forEach((data) => {
-      const check = dataAnswer.filter(
-        (item) => item.name.split('_')[0] === data.Name,
-      )
-
-      if (data.type === 'fill-left-answer') {
-        let test = []
-        data.question_and_answer.forEach((item, id) => {
-          test.push({
-            Key: check[id].value,
-            Answer: check[id].value.toLowerCase() === item.Answer.toLowerCase(),
-          })
-        })
-        dataContent.push({
-          __component: 'question.fill-in-the-blank-left-answer',
-          Name: data.Name,
-          Content: test,
-          Score:
-            (data.Point / data.question_and_answer.length) *
-            test.filter((item) => item.Answer === true).length,
-        })
-      } else if (data.type === 'fill-right-answer') {
-        let test = []
-        data.question_and_answer.forEach((item, id) => {
-          test.push({
-            Key: check[id].value,
-            Answer: check[id].value.toLowerCase() === item.Answer.toLowerCase(),
-          })
-        })
-        dataContent.push({
-          __component: 'question.fill-in-the-blank-right-answer',
-          Name: data.Name,
-          Content: test,
-          Score:
-            (data.Point / data.question_and_answer.length) *
-            test.filter((item) => item.Answer === true).length,
-        })
-      } else if (data.type === 'arrange') {
-        let test = []
-        data.Arrange.forEach((item, id) => {
-          test.push({
-            Key: check[id].value,
-            Answer: parseInt(check[id].value) === parseInt(item.Number),
-          })
-        })
-        dataContent.push({
-          __component: 'question.arrange',
-          Name: data.Name,
-          Content: test,
-          Score:
-            (data.Point / data.Arrange.length) *
-            test.filter((item) => item.Answer === true).length,
-        })
-      } else if (data.type === 'drag-drop') {
-        let content = []
-        let idName = 0
-        data.Drop.forEach((item, id) => {
-          item.Content.forEach((e) => {
-            if (e.Answer) {
-              if(check[idName]) {
-                content.push({
-                  Name: item.Name,
-                  Key: check[idName].value,
-                  Answer: check[idName].value === e.Content,
-                })
-              }
-              idName++
-            }
-          })
-        })
-
-        dataContent.push({
-          __component: 'question.drag-and-drop',
-          Name: data.Name,
-          Content: content,
-          Score:
-            (data.Point / data.Drag.length) *
-            content.filter((item) => item.Answer === true).length,
-        })
-      } else if (data.type === 'stack-with-drag-drop') {
-        let test = []
-        // let stack = []
-
-        // data.Drop.forEach((item, id) => {
-        //   stack.push({
-        //     Name: check[id].name.split('_')[1],
-        //     Stack_Number: check.map((item) => item.name.split('_')[1]).indexOf(item.Name),
-        //   })
-        // })
-
-        // data.Drag.forEach((_, id) => {
-        //   test.push({
-        //     Name: check[id].name.split('_')[1],
-        //     Key: check[id].value,
-        //     Answer:
-        //       check[id].value ===
-        //       data.Drag.find(
-        //         (item) =>
-        //           item.To === check[id].name.split('_')[1] &&
-        //           item.Number === parseInt(check[id].name.split('_')[2]),
-        //       ).Content,
-        //   })
-        // })
-
-        // console.log(`stack ${check.map((item) => item.name.split('_')[1]).indexOf()}`)
-
-        // dataContent.push({
-        //   __component: data.__component,
-        //   Name: data.Name,
-        //   Content: test,
-        //   Score:
-        //     (data.Point / data.Drag.length) *
-        //     test.filter((item) => item.Answer === true).length,
-        // })
-      }
-    })
-
-    let Total_Score = 0
-
-    dataContent.forEach((item) => {
-      Total_Score = Total_Score + item.Score
-    })
-
-
-    let date = new Date()
-    let dd = String(date.getDate()).padStart(2, '0')
-    let mm = String(date.getMonth() + 1).padStart(2, '0') //January is 0!
-    let yyyy = date.getFullYear()
-
-    date = yyyy + '-' + mm + '-' + dd
-
-    // console.log({
-    //   data: {
-    //     idModul: modulId,
-    //     idUser: user.id,
-    //     User: user.Full_Name,
-    //     Modul_Name: modul.Title,
-    //     Question: dataContent,
-    //     Date: date,
-    //     Total_Score: Total_Score,
-    //   },
-    // })
-
-    const req = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/completeds`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          data: {
-            idModul: modulId,
-            idUser: user.id,
-            User: user.Full_Name,
-            Modul_Name: modul.Title,
-            Question: dataContent,
-            Date: date,
-            Total_Score: Total_Score,
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-        }),
-      },
-    )
-    const res = await req.json()
-
-    console.log(res)
-    
-  }
-})
+          body: JSON.stringify({
+            data: {
+              idModul: modulId,
+              idUser: user.id,
+              User: user.Full_Name,
+              Modul_Name: modul.Title,
+              Question: dataContent,
+              Date: date,
+              Total_Score: Total_Score,
+            },
+          }),
+        }).then(() => {
+          swal('Congratulations, your assignment has been completed!', {
+            icon: 'success',
+          })
+          setTimeout(() => {
+            route.replace('/')
+          }, 50)
+        })
+      }
+    })
   }
 
   useEffect(() => {
@@ -443,8 +442,10 @@ export default function ModulSlug({
                       idLeft !== 0 ? (
                         <input
                           key={idLeft}
-                          onKeyDown={(e) => e.keyCode === 32 ? false : true}
-                          onChange={(e) => e.target.value = e.target.value.replace(/\s/g, "")}
+                          onKeyDown={(e) => (e.keyCode === 32 ? false : true)}
+                          onChange={(e) =>
+                            (e.target.value = e.target.value.replace(/\s/g, ''))
+                          }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
@@ -452,8 +453,10 @@ export default function ModulSlug({
                       ) : (
                         <input
                           key={idLeft}
-                          onKeyDown={(e) => e.keyCode === 32 ? false : true}
-                          onChange={(e) => e.target.value = e.target.value.replace(/\s/g, "")}
+                          onKeyDown={(e) => (e.keyCode === 32 ? false : true)}
+                          onChange={(e) =>
+                            (e.target.value = e.target.value.replace(/\s/g, ''))
+                          }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
@@ -511,7 +514,7 @@ export default function ModulSlug({
                         <input
                           key={idRight}
                           name={`${data.Name}_${idRight + 1}`}
-                          onChange={(e) => e.target.value.replace(/\s/g, "")}
+                          onChange={(e) => e.target.value.replace(/\s/g, '')}
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
@@ -519,7 +522,7 @@ export default function ModulSlug({
                         <input
                           key={idRight}
                           name={`${data.Name}_${idRight + 1}`}
-                          onChange={(e) => e.target.value.replace(/\s/g, "")}
+                          onChange={(e) => e.target.value.replace(/\s/g, '')}
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
@@ -843,9 +846,9 @@ export async function getServerSideProps(ctx) {
             return {
               id: item.id,
               Name: item.Name,
-              Content: data.Drop.filter((i) => i.Name === item.Name).map(
-                (k) => ({Answer: k.Answer, Content: k.Content})
-              ),
+              Content: data.Drop.filter(
+                (i) => i.Name === item.Name,
+              ).map((k) => ({ Answer: k.Answer, Content: k.Content })),
             }
           }).reduce((unique, o) => {
             if (!unique.some((obj) => obj.Name === o.Name)) {
