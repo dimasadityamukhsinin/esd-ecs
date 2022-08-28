@@ -15,13 +15,10 @@ import { useRouter } from 'next/router'
 import StackDragDrop from '@/components/dnd/StackDragDrop'
 
 export default function PreviewModul({
-  user,
   userList,
   modul,
   seo,
   comments,
-  modulId,
-  token,
 }) {
 
   useEffect(() => {
@@ -270,38 +267,6 @@ export async function getServerSideProps(ctx) {
   )
   const res = await req.json()
 
-  const countdownData = (date) => {
-    let today = new Date().toISOString().slice(0, 10)
-
-    const startDate = date
-    const endDate = today
-
-    const diffInMs = new Date(startDate) - new Date(endDate)
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24)
-    return diffInDays
-  }
-
-  if (res.data[0].attributes.major.data?.attributes.Name) {
-    if (
-      !res.data[0].attributes.major.data?.attributes.Name ===
-      user.data.major.Name
-    ) {
-      return {
-        notFound: true,
-      }
-    } else {
-      if (countdownData(res.data[0].attributes.Assignment_Deadline) < 0) {
-        return {
-          notFound: true,
-        }
-      }
-    }
-  } else {
-    return {
-      notFound: true,
-    }
-  }
-
   const userList = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users`
   )
@@ -344,25 +309,8 @@ export async function getServerSideProps(ctx) {
     },
   )
 
-  const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`
-  )
-
-  if (
-    completed.data.data.find(
-      (data) =>
-        parseInt(data.attributes.idModul) === parseInt(res.data[0].id) &&
-        parseInt(data.attributes.idUser) === parseInt(user.data.id),
-    )
-  ) {
-    return {
-      notFound: true,
-    }
-  }
-
   return {
     props: {
-      user: user.data,
       userList: userList.data,
       seo: seo.data.attributes,
       modul: res.data[0].attributes,
