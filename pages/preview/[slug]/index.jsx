@@ -267,6 +267,12 @@ export async function getServerSideProps(ctx) {
   )
   const res = await req.json()
 
+  if(!res.data || res.data.length === 0) {
+    return {
+      notFound: true,
+    }
+  }
+
   const userList = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users`
   )

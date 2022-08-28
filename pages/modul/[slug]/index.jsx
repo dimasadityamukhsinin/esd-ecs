@@ -419,18 +419,6 @@ export default function ModulSlug({
 
         date = yyyy + '-' + mm + '-' + dd
 
-        console.log({
-          data: {
-            idModul: modulId,
-            idUser: user.id,
-            User: user.Full_Name,
-            Modul_Name: modul.Title,
-            Question: dataContent,
-            Date: date,
-            Total_Score: Total_Score,
-          },
-        })
-
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
           method: 'POST',
           headers: {
