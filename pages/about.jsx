@@ -15,7 +15,7 @@ const About = ({ seo, about, user, token, checkNotif }) => {
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <div className="w-full">
+      <div className="w-full flex flex-col">
         <Header
           user={user}
           notif={checkNotif}

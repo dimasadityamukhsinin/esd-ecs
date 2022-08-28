@@ -98,7 +98,7 @@ export default function Conversations({
           </FancyLink>
         </div>
       </div>
-      <Container className="mt-4 md:mt-6 xl:mt-8 pb-12 grow">
+      <Container className="mt-4 md:mt-6 xl:mt-8 pb-12 min-h-[60vh] grow">
         <div className="w-full my-12 max-w-3xl flex flex-col mx-auto">
           <span className="text-2xl font-medium">{modul.Title}</span>
           <span className="mt-2">

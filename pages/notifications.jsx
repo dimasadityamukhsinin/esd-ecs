@@ -65,7 +65,7 @@ export default function Notifications({
           title={seo.Website_Title}
         />
       </div>
-      <Container className="h-full lg:pb-12 row-span-5">
+      <Container className="h-full lg:pb-12 row-span-5 grow">
         <div className="w-full mt-4 md:mt-6 xl:mt-8 text-center font-medium">
           <h2>Notifications</h2>
         </div>
