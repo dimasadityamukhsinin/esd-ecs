@@ -143,7 +143,7 @@ export default function ModulSlug({
             data.Drop.forEach((item, id) => {
               idName = 0
               item.Content.forEach((e) => {
-                if (!e) {
+                if (!e.Answer) {
                   idName++
                   dataAnswer.push({
                     name: `${data.Name}_${item.Name}_${idName}`,
@@ -394,33 +394,33 @@ export default function ModulSlug({
           },
         })
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            data: {
-              idModul: modulId,
-              idUser: user.id,
-              User: user.Full_Name,
-              Modul_Name: modul.Title,
-              Question: dataContent,
-              Date: date,
-              Total_Score: Number.isInteger(Total_Score)
-                ? Total_Score
-                : parseFloat(Total_Score).toFixed(2),
-            },
-          }),
-        }).then(() => {
-          swal('Congratulations, your assignment has been completed!', {
-            icon: 'success',
-          })
-          setTimeout(() => {
-            route.replace('/')
-          }, 50)
-        })
+        // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        //   body: JSON.stringify({
+        //     data: {
+        //       idModul: modulId,
+        //       idUser: user.id,
+        //       User: user.Full_Name,
+        //       Modul_Name: modul.Title,
+        //       Question: dataContent,
+        //       Date: date,
+        //       Total_Score: Number.isInteger(Total_Score)
+        //         ? Total_Score
+        //         : parseFloat(Total_Score).toFixed(2),
+        //     },
+        //   }),
+        // }).then(() => {
+        //   swal('Congratulations, your assignment has been completed!', {
+        //     icon: 'success',
+        //   })
+        //   setTimeout(() => {
+        //     route.replace('/')
+        //   }, 50)
+        // })
       }
     })
   }

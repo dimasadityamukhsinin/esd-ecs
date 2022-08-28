@@ -79,7 +79,6 @@ const DragDrop = ({ dragDrop, idComponent }) => {
   }, [])
 
   const removeDrag = (question, item) => {
-    let idName = 0
     droppedBoxNames.forEach((data) => {
       if (data.idDrop === item.id) {
         document
@@ -91,14 +90,13 @@ const DragDrop = ({ dragDrop, idComponent }) => {
     setDroppedBoxNames(
       droppedBoxNames.filter((data) => data.idDrop !== item.id),
     )
-    item.Content.forEach((data) => {
-      if (!data.Answer) {
-        idName = idName + 1
+    item.Content.forEach((data,id) => {
+      if (data.Answer) {
         document.getElementsByName(
-          `${question}_${item.Name}_${idName}`,
+          `${question}_${item.Name}_${id+1}`,
         )[0].textContent = '..........'
         document
-          .getElementsByName(`${question}_${item.Name}_${idName}`)[0]
+          .getElementsByName(`${question}_${item.Name}_${id+1}`)[0]
           .classList.remove('pointer-events-none')
       }
     })
@@ -111,15 +109,13 @@ const DragDrop = ({ dragDrop, idComponent }) => {
     })
 
     data.Drop.forEach((e) => {
-      let idName = 0
-      e.Content.forEach((item) => {
-        if (!item.Answer) {
-          idName = idName + 1
+      e.Content.forEach((item,id) => {
+        if (item.Answer) {
           document.getElementsByName(
-            `${data.Name}_${e.Name}_${idName}`,
+            `${data.Name}_${e.Name}_${id+1}`,
           )[0].textContent = '..........'
           document
-            .getElementsByName(`${data.Name}_${e.Name}_${idName}`)[0]
+            .getElementsByName(`${data.Name}_${e.Name}_${id+1}`)[0]
             .classList.remove('pointer-events-none')
         }
       })
