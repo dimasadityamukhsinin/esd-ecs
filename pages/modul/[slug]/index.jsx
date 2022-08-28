@@ -159,13 +159,15 @@ export default function ModulSlug({
               })
             })
           } else if (data.type === 'stack') {
-            data.Drag.forEach((_, id) => {
+            data.Drag.forEach((item, id) => {
               let name = document.getElementById(`${data.Name}`).children[id]
                 .attributes.name.value
               dataAnswer.push({
                 name: `${name}_to_${id + 1}`,
                 value: data.Drag.find(
-                  (e) => e.Number === parseInt(name.split('_')[1]),
+                  (e) =>
+                    parseInt(e.Name.split('-')[1]) ===
+                    parseInt(name.split('_')[1].split('-')[1]),
                 ).Content,
               })
             })
@@ -197,9 +199,9 @@ export default function ModulSlug({
           )
 
           if (data.type === 'fill-left-answer') {
-            let test = []
+            let content = []
             data.question_and_answer.forEach((item, id) => {
-              test.push({
+              content.push({
                 Key: check[id].value,
                 Answer:
                   check[id].value.toLowerCase() === item.Answer.toLowerCase(),
@@ -208,15 +210,22 @@ export default function ModulSlug({
             dataContent.push({
               __component: 'question.fill-in-the-blank-left-answer',
               Name: data.Name,
-              Content: test,
-              Score:
+              Content: content,
+              Score: Number.isInteger(
                 (data.Point / data.question_and_answer.length) *
-                test.filter((item) => item.Answer === true).length,
+                  content.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point / data.question_and_answer.length) *
+                  content.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point / data.question_and_answer.length) *
+                      content.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
             })
           } else if (data.type === 'fill-right-answer') {
-            let test = []
+            let content = []
             data.question_and_answer.forEach((item, id) => {
-              test.push({
+              content.push({
                 Key: check[id].value,
                 Answer:
                   check[id].value.toLowerCase() === item.Answer.toLowerCase(),
@@ -225,19 +234,26 @@ export default function ModulSlug({
             dataContent.push({
               __component: 'question.fill-in-the-blank-right-answer',
               Name: data.Name,
-              Content: test,
-              Score:
+              Content: content,
+              Score: Number.isInteger(
                 (data.Point / data.question_and_answer.length) *
-                test.filter((item) => item.Answer === true).length,
+                  content.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point / data.question_and_answer.length) *
+                  content.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point / data.question_and_answer.length) *
+                      content.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
             })
           } else if (data.type === 'stack') {
             let content = []
             data.Drag.forEach((_, id) => {
               content.push({
-                Number: parseInt(check[id].name.split('_')[1]),
+                Name: check[id].name.split('_')[1],
                 Content: check[id].value,
                 Answer:
-                  parseInt(check[id].name.split('_')[1]) ===
+                  parseInt(check[id].name.split('_')[1].split('-')[1]) ===
                   parseInt(check[id].name.split('_')[3]),
               })
             })
@@ -245,9 +261,16 @@ export default function ModulSlug({
               __component: 'question.stack',
               Name: data.Name,
               Content: content,
-              Score:
+              Score: Number.isInteger(
                 (data.Point / data.Drag.length) *
-                content.filter((item) => item.Answer === true).length,
+                  content.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point / data.Drag.length) *
+                  content.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point / data.Drag.length) *
+                      content.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
             })
           } else if (data.type === 'arrange') {
             let content = []
@@ -261,9 +284,16 @@ export default function ModulSlug({
               __component: 'question.arrange',
               Name: data.Name,
               Content: content,
-              Score:
+              Score: Number.isInteger(
                 (data.Point / data.Arrange.length) *
-                content.filter((item) => item.Answer === true).length,
+                  content.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point / data.Arrange.length) *
+                  content.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point / data.Arrange.length) *
+                      content.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
             })
           } else if (data.type === 'drag-drop') {
             let content = []
@@ -289,9 +319,16 @@ export default function ModulSlug({
               __component: 'question.drag-and-drop',
               Name: data.Name,
               Content: content,
-              Score:
+              Score: Number.isInteger(
                 (data.Point / data.Drag.length) *
-                content.filter((item) => item.Answer === true).length,
+                  content.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point / data.Drag.length) *
+                  content.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point / data.Drag.length) *
+                      content.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
             })
           } else if (data.type === 'stack-with-drag-drop') {
             let test = []
@@ -370,7 +407,9 @@ export default function ModulSlug({
               Modul_Name: modul.Title,
               Question: dataContent,
               Date: date,
-              Total_Score: Total_Score,
+              Total_Score: Number.isInteger(Total_Score)
+                ? Total_Score
+                : parseFloat(Total_Score).toFixed(2),
             },
           }),
         }).then(() => {

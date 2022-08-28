@@ -2,7 +2,7 @@ import { useDrag, useDrop } from 'react-dnd'
 import update from 'immutability-helper'
 import { useCallback, useState, useRef } from 'react'
 
-const Card = ({ id, text, index, moveCard, name, number }) => {
+const Card = ({ id, text, index, moveCard, name, cardName }) => {
   const ref = useRef(null)
   const [{ handlerId }, drop] = useDrop({
     accept: 'card',
@@ -64,7 +64,7 @@ const Card = ({ id, text, index, moveCard, name, number }) => {
   return (
     <div
       ref={ref}
-      name={`${name}_${number}`}
+      name={`${name}_${cardName}`}
       className="w-full grid grid-cols-12"
       style={{ opacity }}
       data-handler-id={handlerId}
@@ -98,7 +98,7 @@ const StackDrag = ({ data, idComponent }) => {
         index={index}
         id={card.id}
         text={card.Content}
-        number={card.Number}
+        cardName={card.Name}
         name={data.Name}
         moveCard={moveCard}
       />
