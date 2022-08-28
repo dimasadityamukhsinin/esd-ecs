@@ -2,7 +2,7 @@ import { useDrag, useDrop } from 'react-dnd'
 import update from 'immutability-helper'
 import { useCallback, useState, useRef } from 'react'
 
-const Card = ({ id, text, index, moveCard }) => {
+const Card = ({ id, text, index, moveCard, name, number }) => {
   const ref = useRef(null)
   const [{ handlerId }, drop] = useDrop({
     accept: 'card',
@@ -62,9 +62,6 @@ const Card = ({ id, text, index, moveCard }) => {
   const opacity = isDragging ? 0 : 1
   drag(drop(ref))
   return (
-    // <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
-    //   {text}
-    // </div>
     <div
       ref={ref}
       className="w-full grid grid-cols-12"
@@ -75,14 +72,14 @@ const Card = ({ id, text, index, moveCard }) => {
         <span>{index + 1}</span>
       </div>
       <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
-        <span>{text}</span>
+        <span name={`${name}_${number}`}>{text}</span>
       </div>
     </div>
   )
 }
 
 const StackDrag = ({ data, idComponent }) => {
-  const [cards, setCards] = useState(data)
+  const [cards, setCards] = useState(data.Drag)
   const moveCard = useCallback((dragIndex, hoverIndex) => {
     setCards((prevCards) =>
       update(prevCards, {
@@ -100,6 +97,8 @@ const StackDrag = ({ data, idComponent }) => {
         index={index}
         id={card.id}
         text={card.Content}
+        number={card.Number}
+        name={data.Name}
         moveCard={moveCard}
       />
     )

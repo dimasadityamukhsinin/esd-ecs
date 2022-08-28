@@ -4,7 +4,6 @@ import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
 import Image from 'next/image'
 import FancyLink from '@/components/utils/fancyLink'
-import { useRouter } from 'next/router'
 import FlashMessage from 'react-flash-message'
 import { scrollToTop } from '@/components/utils/scrollToTop'
 
@@ -444,7 +443,7 @@ export async function getServerSideProps(ctx) {
   if (cookies.token) {
     return {
       redirect: {
-        destination: '/login',
+        destination: '/',
       },
     }
   }

@@ -1,19 +1,18 @@
 import Layout from '@/components/modules/layout'
-import Header from '@/components/modules/header'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import FancyLink from '@/components/utils/fancyLink'
 import nookies from 'nookies'
 import SEO from '@/components/utils/seo'
-import flash from 'next-flash'
 import Router from 'next/router'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import FlashMessage from 'react-flash-message'
 
 const Login = ({ seo }) => {
+  const [showMessage, setShowMessage] = useState(null)
   const [field, setField] = useState({})
   const [progress, setProgress] = useState(false)
   const route = useRouter()
-  let flashData = null;
 
   const [error, setError] = useState({
     identifier: '',
@@ -89,40 +88,32 @@ const Login = ({ seo }) => {
   }
 
   const doLogin = async (e) => {
+    setShowMessage(null)
     e.preventDefault()
+    if (validateSubmit(e)) return
 
-    if (!validateSubmit(e)) {
-      setProgress(true)
+    setProgress(true)
 
-      const req = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(field),
+    const req = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-      const res = await req.json()
+        body: JSON.stringify(field),
+      },
+    )
+    const res = await req.json()
 
-      if (res.jwt) {
-        nookies.set(null, 'token', res.jwt)
-        Router.replace('/')
-      } else {
-        route.reload(window.location.pathname)
-        flash.set('Wrong username or password!')
-      }
-
-      setProgress(false)
+    if (res.jwt) {
+      nookies.set(null, 'token', res.jwt)
+      Router.replace('/')
+    } else {
+      setShowMessage('Wrong username or password!')
     }
-  }
 
-  const ShowFlash = () => {
-    useEffect(() => {
-      flash.set(null)
-    }, [])
-    return <>{flashData}</>
+    setProgress(false)
   }
 
   return (
@@ -142,10 +133,12 @@ const Login = ({ seo }) => {
               objectFit="contain"
             />
           </div>
-          {flashData && (
-            <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
-              <ShowFlash />
-            </div>
+          {showMessage && (
+            <FlashMessage duration={6000}>
+              <div className="bg-red-500 text-white rounded mb-4 px-4 py-3">
+                {showMessage}
+              </div>
+            </FlashMessage>
           )}
           <div className="bg-white shadow w-full rounded-lg divide-y divide-gray-200">
             <form
@@ -239,10 +232,11 @@ export async function getServerSideProps(ctx) {
   const seo = await req.json()
 
   if (cookies.token) {
-    ctx.res.writeHead(302, {
-      Location: '/',
-    })
-    ctx.res.end()
+    return {
+      redirect: {
+        destination: '/',
+      },
+    }
   }
 
   return {

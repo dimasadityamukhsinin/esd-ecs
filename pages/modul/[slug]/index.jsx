@@ -159,26 +159,13 @@ export default function ModulSlug({
               })
             })
           } else if (data.type === 'stack') {
-            // let idName = 0
-            // data.Drop.forEach((item, id) => {
-            //   idName = 0
-            //   item.Content.forEach((e) => {
-            //     if (!e) {
-            //       idName++
-            //       dataAnswer.push({
-            //         name: `${data.Name}_${item.Name}_${idName}`,
-            //         value:
-            //           document.getElementsByName(
-            //             `${data.Name}_${item.Name}_${idName}`,
-            //           )[0].innerText !== '..........'
-            //             ? document.getElementsByName(
-            //                 `${data.Name}_${item.Name}_${idName}`,
-            //               )[0].innerText
-            //             : '',
-            //       })
-            //     }
-            //   })
-            // })
+            data.Drag.forEach((item, id) => {
+              dataAnswer.push({
+                name: `${data.Name}_${item.Number}`,
+                value: document.getElementsByName(`${data.Name}_${item.Number}`)[0]
+                  .innerText,
+              })
+            })
           } else if (
             data.type === 'fill-left-answer' ||
             data.type === 'fill-right-answer'
@@ -240,10 +227,31 @@ export default function ModulSlug({
                 (data.Point / data.question_and_answer.length) *
                 test.filter((item) => item.Answer === true).length,
             })
+          } else if (data.type === 'stack') {
+            let content = []
+            data.Drag.forEach((item,id) => {
+              // console.log(parseInt(check[id].value.split('_')[1]) === id+1)
+              // console.log(check[id].value)
+              // console.log(item.Content)
+              // console.log(data.Drag.find((e) => e.Content === check[id].value))
+              // console.log(check.find((e) => e.value === e.Content).Number)
+              // console.log(check.map((e) => e.value).indexOf(check[id].value)+1)
+              // console.log(data.Drag.find((e) => e.Content === check[id].value).Number)
+              // console.log(check.find((e) => e.value == item.Content))
+              // console.log(item.Content)
+              // console.log(check)
+              content.push({
+                Number: parseInt(check[id].name.split('_')[1]),
+                Key: check[id].value,
+                Answer: parseInt(check[id].name.split('_')[1]) === id+1
+              })
+            })
+            console.log(check)
+            console.log(content)
           } else if (data.type === 'arrange') {
-            let test = []
+            let content = []
             data.Arrange.forEach((item, id) => {
-              test.push({
+              content.push({
                 Key: check[id].value,
                 Answer: parseInt(check[id].value) === parseInt(item.Number),
               })
@@ -251,10 +259,10 @@ export default function ModulSlug({
             dataContent.push({
               __component: 'question.arrange',
               Name: data.Name,
-              Content: test,
+              Content: content,
               Score:
                 (data.Point / data.Arrange.length) *
-                test.filter((item) => item.Answer === true).length,
+                content.filter((item) => item.Answer === true).length,
             })
           } else if (data.type === 'drag-drop') {
             let content = []
@@ -266,7 +274,9 @@ export default function ModulSlug({
                     content.push({
                       Name: item.Name,
                       Key: check[idName].value,
-                      Answer: check[idName].value.toLowerCase() === e.Content.toLowerCase(),
+                      Answer:
+                        check[idName].value.toLowerCase() ===
+                        e.Content.toLowerCase(),
                     })
                   }
                   idName++
@@ -345,31 +355,31 @@ export default function ModulSlug({
         //   },
         // })
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            data: {
-              idModul: modulId,
-              idUser: user.id,
-              User: user.Full_Name,
-              Modul_Name: modul.Title,
-              Question: dataContent,
-              Date: date,
-              Total_Score: Total_Score,
-            },
-          }),
-        }).then(() => {
-          swal('Congratulations, your assignment has been completed!', {
-            icon: 'success',
-          })
-          setTimeout(() => {
-            route.replace('/')
-          }, 50)
-        })
+        // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     Authorization: `Bearer ${token}`,
+        //   },
+        //   body: JSON.stringify({
+        //     data: {
+        //       idModul: modulId,
+        //       idUser: user.id,
+        //       User: user.Full_Name,
+        //       Modul_Name: modul.Title,
+        //       Question: dataContent,
+        //       Date: date,
+        //       Total_Score: Total_Score,
+        //     },
+        //   }),
+        // }).then(() => {
+        //   swal('Congratulations, your assignment has been completed!', {
+        //     icon: 'success',
+        //   })
+        //   setTimeout(() => {
+        //     route.replace('/')
+        //   }, 50)
+        // })
       }
     })
   }
@@ -556,7 +566,7 @@ export default function ModulSlug({
                   className="w-full flex flex-col space-y-4"
                   key={idComponent}
                 >
-                  <StackDrag data={data.Drag} idComponent={idComponent} />
+                  <StackDrag data={data} idComponent={idComponent} />
                 </div>
               ) : data.__component === 'editor.audio' ? (
                 <div className="w-full" key={idComponent}>
