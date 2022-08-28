@@ -6,6 +6,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import SEO from '@/components/utils/seo'
 import Footer from '@/components/modules/footer'
+import FlashMessage from 'react-flash-message'
 
 const Email = ({ seo, user, token, checkNotif }) => {
   const [showMessage, setShowMessage] = useState(null)
@@ -144,14 +145,18 @@ const Email = ({ seo, user, token, checkNotif }) => {
           <div className="flex flex-col max-w-md w-full mx-auto px-12 mt-12">
             {showMessage ? (
               showMessage.type === 'update' ? (
+                <FlashMessage duration={6000}>
                 <div className="bg-green-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
                   {showMessage.message}
                 </div>
+                </FlashMessage>
               ) : (
                 showMessage.type === 'error' && (
+                  <FlashMessage duration={6000}>
                   <div className="bg-red-500 animate-FadeIn text-white rounded mb-4 px-4 py-3">
                     {showMessage.message}
                   </div>
+                </FlashMessage>
                 )
               )
             ) : (
