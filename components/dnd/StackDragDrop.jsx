@@ -9,7 +9,6 @@ const Card = ({
   index,
   moveCard,
   dragDrop,
-  cardName,
   cardData,
   droppedBoxNames,
   setDroppedBoxNames,
@@ -109,7 +108,7 @@ const Card = ({
   return (
     <div
       ref={ref}
-      id={`${dragDrop.Name}_${cardData.Name}`}
+      name={`${dragDrop.Name}_${cardData.Name}`}
       className="w-full flex flex-col"
       style={{ opacity }}
       data-handler-id={handlerId}
@@ -135,7 +134,7 @@ const Card = ({
                   question={dragDrop.Name}
                   name={cardData.Name}
                   getDrop={getDrop}
-                  idName={index++}
+                  idName={index+1}
                   idAnswer={idAnswer}
                   idDrop={cardData.id}
                 />
@@ -253,7 +252,6 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
         id={card.id}
         dragDrop={dragDrop}
         cardData={card}
-        cardName={card.Name}
         moveCard={moveCard}
         droppedBoxNames={droppedBoxNames}
         setDroppedBoxNames={setDroppedBoxNames}
@@ -300,7 +298,7 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
 
   return (
     <div className="w-full flex flex-col">
-      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400 h-[70vh] overflow-y-auto scrollbar-hide">
+      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400 h-[80vh] overflow-y-auto scrollbar-hide">
         <div className="flex flex-wrap drag">
           {dragDrop.Drag.map((item, idDrag) => (
             <Box
@@ -311,7 +309,7 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
             />
           ))}
         </div>
-        <div className="w-full flex flex-col space-y-4">
+        <div className="w-full flex flex-col space-y-4" id={dragDrop.Name}>
           {cards.map((card, i) => renderCard(card, i))}
         </div>
       </div>

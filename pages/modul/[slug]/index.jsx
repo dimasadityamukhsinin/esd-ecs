@@ -139,25 +139,47 @@ export default function ModulSlug({
               })
             })
           } else if (data.type === 'stack-with-drag-drop') {
-            let idName = 0
-            data.Drop.forEach((item, id) => {
-              idName = 0
-              item.Content.forEach((e) => {
-                if (!e.Answer) {
-                  idName++
-                  dataAnswer.push({
-                    name: `${data.Name}_${item.Name}_${idName}`,
+            let dragDrop = []
+            let stack = []
+
+            data.Drop.forEach((item) => {
+              item.Content.forEach((e, id) => {
+                if (e.Answer) {
+                  dragDrop.push({
+                    name: `${data.Name}_${item.Name}_${id + 1}`,
                     value:
                       document.getElementsByName(
-                        `${data.Name}_${item.Name}_${idName}`,
+                        `${data.Name}_${item.Name}_${id + 1}`,
                       )[0].innerText !== '..........'
                         ? document.getElementsByName(
-                            `${data.Name}_${item.Name}_${idName}`,
+                            `${data.Name}_${item.Name}_${id + 1}`,
                           )[0].innerText
                         : '',
                   })
                 }
               })
+            })
+
+            data.Drop.forEach((item, id) => {
+              let name = document.getElementById(`${data.Name}`).children[id]
+                .attributes.name.value
+              stack.push({
+                name: `${name}_to_${id + 1}`,
+                value: data.Drop.find(
+                  (e) =>
+                    parseInt(e.Name.split('-')[1]) ===
+                    parseInt(name.split('_')[1].split('-')[1]),
+                )
+                  .Content.map((e) => e.Content)
+                  .join(' '),
+              })
+            })
+
+            dataAnswer.push({
+              name: data.Name,
+              dragDrop: dragDrop,
+              stack: stack,
+              type: 'stack-with-drag-drop',
             })
           } else if (data.type === 'stack') {
             data.Drag.forEach((item, id) => {
@@ -332,40 +354,60 @@ export default function ModulSlug({
                   ).toFixed(2),
             })
           } else if (data.type === 'stack-with-drag-drop') {
-            let test = []
-            // let stack = []
+            let dragDrop = []
 
-            // data.Drop.forEach((item, id) => {
-            //   stack.push({
-            //     Name: check[id].name.split('_')[1],
-            //     Stack_Number: check.map((item) => item.name.split('_')[1]).indexOf(item.Name),
-            //   })
-            // })
+            data.Drop.forEach((item) => {
+              item.Content.forEach((e, id) => {
+                if (e.Answer) {
+                  dragDrop.push({
+                    Name: item.Name,
+                    Key: check[0].dragDrop.find(
+                      (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                    ).value,
+                    Answer:
+                      check[0].dragDrop
+                        .find(
+                          (y) =>
+                            y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                        )
+                        .value.toLowerCase() === e.Content.toLowerCase(),
+                  })
+                }
+              })
+            })
 
-            // data.Drag.forEach((_, id) => {
-            //   test.push({
-            //     Name: check[id].name.split('_')[1],
-            //     Key: check[id].value,
-            //     Answer:
-            //       check[id].value ===
-            //       data.Drag.find(
-            //         (item) =>
-            //           item.To === check[id].name.split('_')[1] &&
-            //           item.Number === parseInt(check[id].name.split('_')[2]),
-            //       ).Content,
-            //   })
-            // })
-
-            // console.log(`stack ${check.map((item) => item.name.split('_')[1]).indexOf()}`)
-
-            // dataContent.push({
-            //   __component: data.__component,
-            //   Name: data.Name,
-            //   Content: test,
-            //   Score:
-            //     (data.Point / data.Drag.length) *
-            //     test.filter((item) => item.Answer === true).length,
-            // })
+            let stack = []
+            data.Drop.forEach((_, id) => {
+              stack.push({
+                Name: check[0].stack[id].name.split('_')[1],
+                Content: check[0].stack[id].value,
+                Answer:
+                  parseInt(check[0].stack[id].name.split('_')[1].split('-')[1]) ===
+                  parseInt(check[0].stack[id].name.split('_')[3]),
+              })
+            })
+            dataContent.push({
+              __component: 'question.stack-with-drag-and-drop',
+              Name: data.Name,
+              Drag_Drop: dragDrop,
+              Stack: stack,
+              Score: Number.isInteger(
+                (data.Point_Stack / data.Drop.length) *
+                  dragDrop.filter((item) => item.Answer === true).length +
+                  (data.Point_Drop / data.Drop.length) *
+                    dragDrop.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point_Stack / data.Drop.length) *
+                    dragDrop.filter((item) => item.Answer === true).length +
+                  (data.Point_Drop / data.Drop.length) *
+                    dragDrop.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point_Stack / data.Drop.length) *
+                      dragDrop.filter((item) => item.Answer === true).length +
+                      (data.Point_Drop / data.Drop.length) *
+                        dragDrop.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
+            })
           }
         })
 
@@ -394,33 +436,33 @@ export default function ModulSlug({
           },
         })
 
-        // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        //   body: JSON.stringify({
-        //     data: {
-        //       idModul: modulId,
-        //       idUser: user.id,
-        //       User: user.Full_Name,
-        //       Modul_Name: modul.Title,
-        //       Question: dataContent,
-        //       Date: date,
-        //       Total_Score: Number.isInteger(Total_Score)
-        //         ? Total_Score
-        //         : parseFloat(Total_Score).toFixed(2),
-        //     },
-        //   }),
-        // }).then(() => {
-        //   swal('Congratulations, your assignment has been completed!', {
-        //     icon: 'success',
-        //   })
-        //   setTimeout(() => {
-        //     route.replace('/')
-        //   }, 50)
-        // })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            data: {
+              idModul: modulId,
+              idUser: user.id,
+              User: user.Full_Name,
+              Modul_Name: modul.Title,
+              Question: dataContent,
+              Date: date,
+              Total_Score: Number.isInteger(Total_Score)
+                ? Total_Score
+                : parseFloat(Total_Score).toFixed(2),
+            },
+          }),
+        }).then(() => {
+          swal('Congratulations, your assignment has been completed!', {
+            icon: 'success',
+          })
+          setTimeout(() => {
+            route.replace('/')
+          }, 50)
+        })
       }
     })
   }
@@ -565,7 +607,10 @@ export default function ModulSlug({
                         <input
                           key={idRight}
                           name={`${data.Name}_${idRight + 1}`}
-                          onChange={(e) => e.target.value.replace(/\s/g, '')}
+                          onKeyDown={(e) => (e.keyCode === 32 ? false : true)}
+                          onChange={(e) =>
+                            (e.target.value = e.target.value.replace(/\s/g, ''))
+                          }
                           placeholder="..............."
                           className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
@@ -573,7 +618,10 @@ export default function ModulSlug({
                         <input
                           key={idRight}
                           name={`${data.Name}_${idRight + 1}`}
-                          onChange={(e) => e.target.value.replace(/\s/g, '')}
+                          onKeyDown={(e) => (e.keyCode === 32 ? false : true)}
+                          onChange={(e) =>
+                            (e.target.value = e.target.value.replace(/\s/g, ''))
+                          }
                           placeholder="..............."
                           className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
                         />
