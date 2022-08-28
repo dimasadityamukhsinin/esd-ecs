@@ -185,7 +185,7 @@ const DragDrop = ({ dragDrop, idComponent }) => {
                             question={dragDrop.Name}
                             name={item.Name}
                             getDrop={getDrop}
-                            idName={idName++}
+                            idName={id++}
                             idAnswer={idAnswer}
                             idDrop={item.id}
                           />

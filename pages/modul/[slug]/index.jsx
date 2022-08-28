@@ -18,6 +18,7 @@ import { useEffect } from 'react'
 import { scrollToTop } from '@/components/utils/scrollToTop'
 import Footer from '@/components/modules/footer'
 import { useRouter } from 'next/router'
+import StackDragDrop from '@/components/dnd/StackDragDrop'
 
 export default function ModulSlug({
   user,
@@ -622,7 +623,7 @@ export default function ModulSlug({
                 </div>
               ) : data.type === 'stack-with-drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
-                  <DragDrop data={data} idComponent={idComponent} />
+                  <StackDragDrop dragDrop={data} idComponent={idComponent} />
                 </div>
               ) : (
                 <></>
