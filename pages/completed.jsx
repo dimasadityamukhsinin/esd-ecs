@@ -230,12 +230,7 @@ export async function getServerSideProps(ctx) {
   const modul = await reqModul.json()
 
   const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
-      },
-    },
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`
   )
 
   modul.data = modul.data.map((item, id) => {

@@ -59,12 +59,7 @@ export default function Conversations({
     const res = await req.json()
 
     const newComment = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`
     )
 
     setComments(newComment.data.data)
@@ -229,21 +224,11 @@ export async function getServerSideProps(ctx) {
   }
 
   const userList = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
-      },
-    },
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users`
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
-      },
-    },
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`
   )
 
   const reqSeo = await fetch(
