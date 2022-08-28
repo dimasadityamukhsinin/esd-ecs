@@ -102,7 +102,7 @@ export default function Home({ user, modul, seo, checkNotif }) {
                         </p>
                       </div>
                       <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                        Go to modul
+                        Go to Module
                       </div>
                     </div>
                   </FancyLink>
