@@ -64,6 +64,7 @@ const Card = ({ id, text, index, moveCard, name, number }) => {
   return (
     <div
       ref={ref}
+      name={`${name}_${number}`}
       className="w-full grid grid-cols-12"
       style={{ opacity }}
       data-handler-id={handlerId}
@@ -72,7 +73,7 @@ const Card = ({ id, text, index, moveCard, name, number }) => {
         <span>{index + 1}</span>
       </div>
       <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
-        <span name={`${name}_${number}`}>{text}</span>
+        <span>{text}</span>
       </div>
     </div>
   )

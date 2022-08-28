@@ -159,11 +159,14 @@ export default function ModulSlug({
               })
             })
           } else if (data.type === 'stack') {
-            data.Drag.forEach((item, id) => {
+            data.Drag.forEach((_, id) => {
+              let name = document.getElementById(`${data.Name}`).children[id]
+                .attributes.name.value
               dataAnswer.push({
-                name: `${data.Name}_${item.Number}`,
-                value: document.getElementsByName(`${data.Name}_${item.Number}`)[0]
-                  .innerText,
+                name: `${name}_to_${id + 1}`,
+                value: data.Drag.find(
+                  (e) => e.Number === parseInt(name.split('_')[1]),
+                ).Content,
               })
             })
           } else if (
@@ -229,25 +232,23 @@ export default function ModulSlug({
             })
           } else if (data.type === 'stack') {
             let content = []
-            data.Drag.forEach((item,id) => {
-              // console.log(parseInt(check[id].value.split('_')[1]) === id+1)
-              // console.log(check[id].value)
-              // console.log(item.Content)
-              // console.log(data.Drag.find((e) => e.Content === check[id].value))
-              // console.log(check.find((e) => e.value === e.Content).Number)
-              // console.log(check.map((e) => e.value).indexOf(check[id].value)+1)
-              // console.log(data.Drag.find((e) => e.Content === check[id].value).Number)
-              // console.log(check.find((e) => e.value == item.Content))
-              // console.log(item.Content)
-              // console.log(check)
+            data.Drag.forEach((_, id) => {
               content.push({
                 Number: parseInt(check[id].name.split('_')[1]),
-                Key: check[id].value,
-                Answer: parseInt(check[id].name.split('_')[1]) === id+1
+                Content: check[id].value,
+                Answer:
+                  parseInt(check[id].name.split('_')[1]) ===
+                  parseInt(check[id].name.split('_')[3]),
               })
             })
-            console.log(check)
-            console.log(content)
+            dataContent.push({
+              __component: 'question.stack',
+              Name: data.Name,
+              Content: content,
+              Score:
+                (data.Point / data.Drag.length) *
+                content.filter((item) => item.Answer === true).length,
+            })
           } else if (data.type === 'arrange') {
             let content = []
             data.Arrange.forEach((item, id) => {
@@ -343,43 +344,43 @@ export default function ModulSlug({
 
         date = yyyy + '-' + mm + '-' + dd
 
-        // console.log({
-        //   data: {
-        //     idModul: modulId,
-        //     idUser: user.id,
-        //     User: user.Full_Name,
-        //     Modul_Name: modul.Title,
-        //     Question: dataContent,
-        //     Date: date,
-        //     Total_Score: Total_Score,
-        //   },
-        // })
+        console.log({
+          data: {
+            idModul: modulId,
+            idUser: user.id,
+            User: user.Full_Name,
+            Modul_Name: modul.Title,
+            Question: dataContent,
+            Date: date,
+            Total_Score: Total_Score,
+          },
+        })
 
-        // fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${token}`,
-        //   },
-        //   body: JSON.stringify({
-        //     data: {
-        //       idModul: modulId,
-        //       idUser: user.id,
-        //       User: user.Full_Name,
-        //       Modul_Name: modul.Title,
-        //       Question: dataContent,
-        //       Date: date,
-        //       Total_Score: Total_Score,
-        //     },
-        //   }),
-        // }).then(() => {
-        //   swal('Congratulations, your assignment has been completed!', {
-        //     icon: 'success',
-        //   })
-        //   setTimeout(() => {
-        //     route.replace('/')
-        //   }, 50)
-        // })
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            data: {
+              idModul: modulId,
+              idUser: user.id,
+              User: user.Full_Name,
+              Modul_Name: modul.Title,
+              Question: dataContent,
+              Date: date,
+              Total_Score: Total_Score,
+            },
+          }),
+        }).then(() => {
+          swal('Congratulations, your assignment has been completed!', {
+            icon: 'success',
+          })
+          setTimeout(() => {
+            route.replace('/')
+          }, 50)
+        })
       }
     })
   }
@@ -563,6 +564,7 @@ export default function ModulSlug({
                 </div>
               ) : data.type === 'stack' ? (
                 <div
+                  id={data.Name}
                   className="w-full flex flex-col space-y-4"
                   key={idComponent}
                 >
