@@ -104,7 +104,7 @@ export default function Conversations({
           <span className="mt-2">
             View and write a new comment from{' '}
             <span className="font-medium text-yellow-500">{modul.Title}</span>{' '}
-            Modul
+            Module
           </span>
           <div className="border-b w-full mt-6 pb-2">
             <span className="font-medium border-b border-black pb-2.5">

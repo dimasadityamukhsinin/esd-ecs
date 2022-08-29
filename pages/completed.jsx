@@ -137,7 +137,7 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
                       <div className="w-full flex flex-col justify-between p-3 space-y-3">
                         <div className="flex flex-col  space-y-3">
                           <span className="font-medium text-gray-500">
-                            Modul {id + 1}
+                            Module {id + 1}
                           </span>
                           <span className="font-medium text-lg text-left">
                             {attributes.Title}
