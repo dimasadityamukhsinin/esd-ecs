@@ -8,6 +8,7 @@ import { useRef, useState } from 'react'
 import { BsCheck2, BsCheck2Square } from 'react-icons/bs'
 import { BiConversation } from 'react-icons/bi'
 import { GrNext, GrPrevious } from 'react-icons/gr'
+import { AiOutlineLike, AiFillLike } from 'react-icons/ai'
 import swal from 'sweetalert'
 import DragDrop from '@/components/dnd/DragDrop'
 import SEO from '@/components/utils/seo'
@@ -89,7 +90,7 @@ export default function ModulSlug({
     const res = await req.json()
 
     const newComment = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
     )
 
     setComments(newComment.data.data)
@@ -377,8 +378,9 @@ export default function ModulSlug({
                 Name: check[0].stack[id].name.split('_')[1],
                 Content: check[0].stack[id].value,
                 Answer:
-                  parseInt(check[0].stack[id].name.split('_')[1].split('-')[1]) ===
-                  parseInt(check[0].stack[id].name.split('_')[3]),
+                  parseInt(
+                    check[0].stack[id].name.split('_')[1].split('-')[1],
+                  ) === parseInt(check[0].stack[id].name.split('_')[3]),
               })
             })
             dataContent.push({
@@ -450,8 +452,73 @@ export default function ModulSlug({
     })
   }
 
+  const doLike = (id, data) => {
+    axios
+      .put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+        {
+          data: {
+            Liked: 1,
+            Liked_User: [
+              ...data.attributes.Liked_User,
+              {
+                idUser: user.id,
+              },
+            ],
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(() => {
+        axios
+          .get(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+          )
+          .then(({ data }) => {
+            setComments(data.data)
+          })
+      })
+  }
+
+  const doRemoveLike = (id, data) => {
+    axios
+      .put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+        {
+          data: {
+            Liked: parseInt(data.attributes.Liked) - 1,
+            Liked_User: [
+              ...data.attributes.Liked_User.filter(
+                (item) => parseInt(item.idUser) !== parseInt(user.id),
+              ),
+            ],
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(() => {
+        axios
+          .get(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+          )
+          .then(({ data }) => {
+            setComments(data.data)
+          })
+      })
+  }
+
   useEffect(() => {
-    scrollToTop()
+    // scrollToTop()
   }, [])
 
   return (
@@ -697,38 +764,74 @@ export default function ModulSlug({
             </div>
             <div className="flex flex-col w-full space-y-6">
               {dataComments.map((data, id) => (
-                <div key={id} className="w-full border-b pb-6 flex mt-10">
-                  <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
-                    {
-                      userList
-                        .find(
-                          (item) =>
-                            item.id.toString() === data.attributes.idUser,
-                        )
-                        .Full_Name.split('')[0]
-                    }
-                  </span>
-                  <div className="w-full flex flex-col">
-                    <div className="flex justify-between">
-                      <span className="mb-2 font-medium">
-                        {
-                          userList.find(
+                <div
+                  key={id}
+                  className="w-full border-b pb-3 flex flex-col space-y-5 mt-10"
+                >
+                  <div className="w-full flex">
+                    <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                      {
+                        userList
+                          .find(
                             (item) =>
                               item.id.toString() === data.attributes.idUser,
-                          ).Full_Name
-                        }
-                      </span>
-                      <span className="text-gray-500">
-                        {`${new Date(
-                          data.attributes.publishedAt,
-                        ).getFullYear()}-${
-                          new Date(data.attributes.publishedAt).getMonth() + 1
-                        }-${new Date(data.attributes.publishedAt).getDate()}`}
-                      </span>
+                          )
+                          .Full_Name.split('')[0]
+                      }
+                    </span>
+                    <div className="w-full flex flex-col">
+                      <div className="flex justify-between">
+                        <span className="mb-2 font-medium">
+                          {
+                            userList.find(
+                              (item) =>
+                                item.id.toString() === data.attributes.idUser,
+                            ).Full_Name
+                          }
+                        </span>
+                        <span className="text-gray-500">
+                          {`${new Date(
+                            data.attributes.publishedAt,
+                          ).getFullYear()}-${
+                            new Date(data.attributes.publishedAt).getMonth() + 1
+                          }-${new Date(data.attributes.publishedAt).getDate()}`}
+                        </span>
+                      </div>
+                      <div className="w-full h-full">
+                        <p>{data.attributes.Content}</p>
+                      </div>
                     </div>
-                    <div className="w-full h-full">
-                      <p>{data.attributes.Content}</p>
-                    </div>
+                  </div>
+                  <div className="w-full flex pl-14">
+                    {data.attributes.Liked_User.find(
+                      (item) => parseInt(item.idUser) === user.id,
+                    ) ? (
+                      <FancyLink
+                        onClick={() => doRemoveLike(data.id, data)}
+                        className="text-yellow-500 flex items-center"
+                      >
+                        <AiFillLike size={22} className="mr-1" />
+                        Liked{' '}
+                        {data.attributes.Liked
+                          ? parseInt(data.attributes.Liked) === 0
+                            ? ''
+                            : data.attributes.Liked
+                          : ''}
+                      </FancyLink>
+                    ) : (
+                      <FancyLink
+                        onClick={() => doLike(data.id, data)}
+                        className="text-yellow-500 flex items-center"
+                      >
+                        <AiOutlineLike size={22} className="mr-1" />
+                        Like{' '}
+                        {data.attributes.Liked
+                          ? parseInt(data.attributes.Liked) === 0
+                            ? ''
+                            : data.attributes.Liked
+                          : ''}
+                      </FancyLink>
+                    )}
                   </div>
                 </div>
               ))}
@@ -860,11 +963,11 @@ export async function getServerSideProps(ctx) {
   }
 
   const userList = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
   )
 
   const reqSeo = await fetch(
@@ -937,7 +1040,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
   )
 
   if (
