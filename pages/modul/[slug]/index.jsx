@@ -452,67 +452,81 @@ export default function ModulSlug({
     })
   }
 
-  const doLike = (id, data) => {
+  const doLike = (id) => {
     axios
-      .put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
-        {
-          data: {
-            Liked: data.attributes.Liked ? parseInt(data.attributes.Liked) + 1 : 1,
-            Liked_User: [
-              ...data.attributes.Liked_User,
-              {
-                idUser: user.id,
-              },
-            ],
-          },
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
       )
-      .then(() => {
+      .then(({ data }) => {
         axios
-          .get(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Liked: data.attributes.Liked
+                  ? parseInt(data.attributes.Liked) + 1
+                  : 1,
+                Liked_User: [
+                  ...data.attributes.Liked_User,
+                  {
+                    idUser: user.id,
+                  },
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
           )
-          .then(({ data }) => {
-            setComments(data.data)
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
           })
       })
   }
 
-  const doRemoveLike = (id, data) => {
+  const doRemoveLike = (id) => {
     axios
-      .put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
-        {
-          data: {
-            Liked: parseInt(data.attributes.Liked) - 1,
-            Liked_User: [
-              ...data.attributes.Liked_User.filter(
-                (item) => parseInt(item.idUser) !== parseInt(user.id),
-              ),
-            ],
-          },
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
       )
-      .then(() => {
+      .then(({ data }) => {
         axios
-          .get(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Liked: parseInt(data.attributes.Liked) - 1,
+                Liked_User: [
+                  ...data.attributes.Liked_User.filter(
+                    (item) => parseInt(item.idUser) !== parseInt(user.id),
+                  ),
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
           )
-          .then(({ data }) => {
-            setComments(data.data)
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
           })
       })
   }
@@ -807,7 +821,7 @@ export default function ModulSlug({
                       (item) => parseInt(item.idUser) === user.id,
                     ) ? (
                       <FancyLink
-                        onClick={() => doRemoveLike(data.id, data)}
+                        onClick={() => doRemoveLike(data.id)}
                         className="text-yellow-500 flex items-center"
                       >
                         <AiFillLike size={22} className="mr-1" />
@@ -820,7 +834,7 @@ export default function ModulSlug({
                       </FancyLink>
                     ) : (
                       <FancyLink
-                        onClick={() => doLike(data.id, data)}
+                        onClick={() => doLike(data.id)}
                         className="text-yellow-500 flex items-center"
                       >
                         <AiOutlineLike size={22} className="mr-1" />
