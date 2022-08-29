@@ -458,7 +458,7 @@ export default function ModulSlug({
         `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
         {
           data: {
-            Liked: parseInt(data.attributes.Like) + 1,
+            Liked: data.attributes.Like ? parseInt(data.attributes.Like) + 1 : 1,
             Liked_User: [
               ...data.attributes.Liked_User,
               {
