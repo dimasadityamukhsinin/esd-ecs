@@ -455,7 +455,12 @@ export default function ModulSlug({
   const doLike = (id) => {
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       )
       .then(({ data }) => {
         axios
@@ -463,11 +468,11 @@ export default function ModulSlug({
             `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
             {
               data: {
-                Liked: data.attributes.Liked
-                  ? parseInt(data.attributes.Liked) + 1
+                Liked: data.data.attributes.Liked
+                  ? parseInt(data.data.attributes.Liked) + 1
                   : 1,
                 Liked_User: [
-                  ...data.attributes.Liked_User,
+                  ...data.data.attributes.Liked_User,
                   {
                     idUser: user.id,
                   },
@@ -496,7 +501,12 @@ export default function ModulSlug({
   const doRemoveLike = (id) => {
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       )
       .then(({ data }) => {
         axios
@@ -504,9 +514,9 @@ export default function ModulSlug({
             `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
             {
               data: {
-                Liked: parseInt(data.attributes.Liked) - 1,
+                Liked: parseInt(data.data.attributes.Liked) - 1,
                 Liked_User: [
-                  ...data.attributes.Liked_User.filter(
+                  ...data.data.attributes.Liked_User.filter(
                     (item) => parseInt(item.idUser) !== parseInt(user.id),
                   ),
                 ],
