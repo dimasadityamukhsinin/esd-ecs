@@ -87,7 +87,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
                     </div>
                     <div className="w-full flex items-start flex-col p-3 space-y-3">
                       <span className="font-medium text-gray-500">
-                        Modul {id + 1}
+                        Module {id + 1}
                       </span>
                       <span className="font-medium text-lg text-left">
                         {attributes.Title}
@@ -96,7 +96,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
                         {attributes.Short_Description}
                       </p>
                       <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                        Go to modul
+                        Go to module
                       </div>
                     </div>
                   </FancyLink>
