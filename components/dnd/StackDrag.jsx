@@ -69,10 +69,10 @@ const Card = ({ id, text, index, moveCard, name, cardName }) => {
       style={{ opacity }}
       data-handler-id={handlerId}
     >
-      <div className="outline-none rounded-l-md border border-yellow-400 flex justify-center items-center">
+      <div className="outline-none rounded-l-md border border-green-400 flex justify-center items-center">
         <span>{index + 1}</span>
       </div>
-      <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
+      <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
         <span>{text}</span>
       </div>
     </div>

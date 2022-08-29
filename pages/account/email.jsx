@@ -125,19 +125,19 @@ const Email = ({ seo, user, token, checkNotif }) => {
           <div className="setflex-center-row space-x-8">
             <FancyLink
               destination="/account"
-              className="pb-2 text-yellow-500 text-xl font-medium"
+              className="pb-2 text-green-500 text-xl font-medium"
             >
               About you
             </FancyLink>
             <FancyLink
               destination="/account/email"
-              className="border-b border-yellow-500 pb-2 text-yellow-500 text-xl font-medium"
+              className="border-b border-green-500 pb-2 text-green-500 text-xl font-medium"
             >
               Email address
             </FancyLink>
             <FancyLink
               destination="/account/password"
-              className="pb-2 text-yellow-500 text-xl font-medium"
+              className="pb-2 text-green-500 text-xl font-medium"
             >
               Password
             </FancyLink>
@@ -186,7 +186,7 @@ const Email = ({ seo, user, token, checkNotif }) => {
                 <button
                   type="submit"
                   disabled={progress}
-                  className="bg-yellow-400 w-full mt-6 text-white font-medium py-2 px-3"
+                  className="bg-green-400 w-full mt-6 text-white font-medium py-2 px-3"
                 >
                   Change my email address
                 </button>

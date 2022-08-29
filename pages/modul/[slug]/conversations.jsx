@@ -378,7 +378,7 @@ export default function Conversations({
           <span className="text-2xl font-medium">{modul.Title}</span>
           <span className="mt-2">
             View and write a new comment from{' '}
-            <span className="font-medium text-yellow-500">{modul.Title}</span>{' '}
+            <span className="font-medium text-green-500">{modul.Title}</span>{' '}
             Module
           </span>
           <div className="border-b w-full mt-6 pb-2">
@@ -387,7 +387,7 @@ export default function Conversations({
             </span>
           </div>
           <div className="w-full min-h-[10rem] flex mt-10 font-medium">
-            <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400">
+            <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400">
               {user.Full_Name.split('')[0]}
             </span>
             <div className="w-full flex flex-col">
@@ -407,7 +407,7 @@ export default function Conversations({
                 ></textarea>
                 <button
                   type="submit"
-                  className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                  className="w-fit mt-3 flex items-center font-medium text-white bg-green-400 py-2 px-3"
                 >
                   Post
                 </button>
@@ -421,7 +421,7 @@ export default function Conversations({
                   className="w-full border-b pb-3 flex flex-col space-y-5 mt-10"
                 >
                   <div className="w-full flex">
-                    <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                    <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
                       {
                         userList
                           .find(
@@ -460,7 +460,7 @@ export default function Conversations({
                     ) ? (
                       <FancyLink
                         onClick={() => doRemoveLike(data.id)}
-                        className="text-yellow-500 flex items-center"
+                        className="text-green-500 flex items-center"
                       >
                         <AiFillLike size={22} className="mr-1" />
                         Liked{' '}
@@ -473,7 +473,7 @@ export default function Conversations({
                     ) : (
                       <FancyLink
                         onClick={() => doLike(data.id)}
-                        className="text-yellow-500 flex items-center"
+                        className="text-green-500 flex items-center"
                       >
                         <AiOutlineLike size={22} className="mr-1" />
                         Like{' '}
@@ -486,7 +486,7 @@ export default function Conversations({
                     )}
                     <FancyLink
                       onClick={() => setReply([true, id])}
-                      className="text-yellow-500 flex items-center"
+                      className="text-green-500 flex items-center"
                     >
                       <BsReply size={22} className="mr-1" />
                       Reply
@@ -498,7 +498,7 @@ export default function Conversations({
                       className="w-full pl-14 flex flex-col space-y-5 mt-12"
                     >
                       <div className="w-full flex">
-                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
                           {
                             userList
                               .find(
@@ -538,7 +538,7 @@ export default function Conversations({
                             onClick={() =>
                               doRemoveLikeReply(data.id, dataReply)
                             }
-                            className="text-yellow-500 flex items-center"
+                            className="text-green-500 flex items-center"
                           >
                             <AiFillLike size={22} className="mr-1" />
                             Liked{' '}
@@ -551,7 +551,7 @@ export default function Conversations({
                         ) : (
                           <FancyLink
                             onClick={() => doLikeReply(data.id, dataReply)}
-                            className="text-yellow-500 flex items-center"
+                            className="text-green-500 flex items-center"
                           >
                             <AiOutlineLike size={22} className="mr-1" />
                             Like{' '}
@@ -567,7 +567,7 @@ export default function Conversations({
                   ))}
                   {reply[0] && reply[1] === id ? (
                     <div className="w-full min-h-[10rem] pl-14 flex mt-10 font-medium">
-                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400">
+                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400">
                         {user.Full_Name.split('')[0]}
                       </span>
                       <div className="w-full flex flex-col">
@@ -587,7 +587,7 @@ export default function Conversations({
                           ></textarea>
                           <button
                             type="submit"
-                            className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                            className="w-fit mt-3 flex items-center font-medium text-white bg-green-400 py-2 px-3"
                           >
                             Post
                           </button>

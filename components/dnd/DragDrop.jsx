@@ -36,13 +36,13 @@ const Answer = ({ question, name, idDrop, idAnswer, getDrop, idName }) => {
   )
   let border = 'rounded-md border-2 border-transparent'
   if (isOverCurrent || isOver) {
-    border = 'rounded-md border-2 border-yellow-500'
+    border = 'rounded-md border-2 border-green-500'
   }
   return (
     <span
       ref={drop}
       name={`${question}_${name}_${idAnswer + 1}`}
-      className={`text-yellow-500 bg-white px-2 ${border}`}
+      className={`text-green-500 bg-white px-2 ${border}`}
     >
       ..........
     </span>
@@ -62,7 +62,7 @@ const Box = ({ id, index, children }) => {
     <span
       ref={drag}
       id={`dataDrag-${id}`}
-      className="bg-yellow-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
+      className="bg-green-400 w-fit py-2 px-3 text-white text-center font-medium rounded-md"
     >
       {children}
     </span>
@@ -140,7 +140,7 @@ const DragDrop = ({ dragDrop, idComponent }) => {
 
   return (
     <div className="w-full flex flex-col">
-      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-yellow-400 h-[60vh] overflow-y-auto scrollbar-hide">
+      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-green-400 h-[60vh] overflow-y-auto scrollbar-hide">
         <div className="flex flex-wrap drag">
           {dragDrop.Drag.map((item, idDrag) => (
             <Box
@@ -161,10 +161,10 @@ const DragDrop = ({ dragDrop, idComponent }) => {
                 key={id}
               >
                 <div className="w-full grid grid-cols-12">
-                  <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-yellow-400 flex justify-center items-center">
+                  <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-green-400 flex justify-center items-center">
                     <span>{id + 1}</span>
                   </div>
-                  <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-yellow-400 bg-yellow-400 text-white">
+                  <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
                     {item.Content.map((i, idAnswer) =>
                       !i.Answer ? (
                         <span
@@ -196,7 +196,7 @@ const DragDrop = ({ dragDrop, idComponent }) => {
                     <div className="w-fit h-full mt-3 flex justify-center items-center">
                       <FancyLink
                         onClick={() => removeDrag(dragDrop.Name, item)}
-                        className="font-medium text-white bg-yellow-400 w-full px-4 py-2 rounded-md"
+                        className="font-medium text-white bg-green-400 w-full px-4 py-2 rounded-md"
                       >
                         Remove
                       </FancyLink>
@@ -213,7 +213,7 @@ const DragDrop = ({ dragDrop, idComponent }) => {
       <div className="flex justify-end w-full mt-3">
         <FancyLink
           onClick={() => resetDnd(dragDrop)}
-          className="font-medium text-white bg-yellow-400 py-2 px-4 rounded-md"
+          className="font-medium text-white bg-green-400 py-2 px-4 rounded-md"
         >
           Reset
         </FancyLink>

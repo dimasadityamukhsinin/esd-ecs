@@ -785,7 +785,7 @@ export default function ModulSlug({
                           }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
-                          className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ) : (
                         <input
@@ -796,7 +796,7 @@ export default function ModulSlug({
                           }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
-                          className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ),
                     )}
@@ -856,7 +856,7 @@ export default function ModulSlug({
                             (e.target.value = e.target.value.replace(/\s/g, ''))
                           }
                           placeholder="..............."
-                          className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ) : (
                         <input
@@ -867,7 +867,7 @@ export default function ModulSlug({
                             (e.target.value = e.target.value.replace(/\s/g, ''))
                           }
                           placeholder="..............."
-                          className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ),
                     )}
@@ -883,13 +883,13 @@ export default function ModulSlug({
                       key={idArrange}
                       className="w-full grid grid-cols-4 grid-flow-col"
                     >
-                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-yellow-400 col-span-3 flex justify-center items-center">
+                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-green-400 col-span-3 flex justify-center items-center">
                         <span>{item.Content}</span>
                       </div>
                       <input
                         type="number"
                         name={`${data.Name}_${idArrange + 1}`}
-                        className="outline-none text-center border rounded-r-md bg-yellow-400 text-white border-yellow-400"
+                        className="outline-none text-center border rounded-r-md bg-green-400 text-white border-green-400"
                       />
                     </div>
                   ))}
@@ -929,7 +929,7 @@ export default function ModulSlug({
               </span>
             </div>
             <div className="w-full min-h-[10rem] flex mt-10 font-medium">
-              <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400">
+              <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400">
                 {user.Full_Name.split('')[0]}
               </span>
               <div className="w-full flex flex-col">
@@ -949,7 +949,7 @@ export default function ModulSlug({
                   ></textarea>
                   <button
                     type="submit"
-                    className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                    className="w-fit mt-3 flex items-center font-medium text-white bg-green-400 py-2 px-3"
                   >
                     Post
                   </button>
@@ -963,7 +963,7 @@ export default function ModulSlug({
                   className="w-full border-b pb-3 flex flex-col space-y-5 mt-10"
                 >
                   <div className="w-full flex">
-                    <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                    <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
                       {
                         userList
                           .find(
@@ -1002,7 +1002,7 @@ export default function ModulSlug({
                     ) ? (
                       <FancyLink
                         onClick={() => doRemoveLike(data.id)}
-                        className="text-yellow-500 flex items-center"
+                        className="text-green-500 flex items-center"
                       >
                         <AiFillLike size={22} className="mr-1" />
                         Liked{' '}
@@ -1015,7 +1015,7 @@ export default function ModulSlug({
                     ) : (
                       <FancyLink
                         onClick={() => doLike(data.id)}
-                        className="text-yellow-500 flex items-center"
+                        className="text-green-500 flex items-center"
                       >
                         <AiOutlineLike size={22} className="mr-1" />
                         Like{' '}
@@ -1028,7 +1028,7 @@ export default function ModulSlug({
                     )}
                     <FancyLink
                       onClick={() => setReply([true, id])}
-                      className="text-yellow-500 flex items-center"
+                      className="text-green-500 flex items-center"
                     >
                       <BsReply size={22} className="mr-1" />
                       Reply
@@ -1040,7 +1040,7 @@ export default function ModulSlug({
                       className="w-full pl-14 flex flex-col space-y-5 mt-12"
                     >
                       <div className="w-full flex">
-                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
                           {
                             userList
                               .find(
@@ -1080,7 +1080,7 @@ export default function ModulSlug({
                             onClick={() =>
                               doRemoveLikeReply(data.id, dataReply)
                             }
-                            className="text-yellow-500 flex items-center"
+                            className="text-green-500 flex items-center"
                           >
                             <AiFillLike size={22} className="mr-1" />
                             Liked{' '}
@@ -1093,7 +1093,7 @@ export default function ModulSlug({
                         ) : (
                           <FancyLink
                             onClick={() => doLikeReply(data.id, dataReply)}
-                            className="text-yellow-500 flex items-center"
+                            className="text-green-500 flex items-center"
                           >
                             <AiOutlineLike size={22} className="mr-1" />
                             Like{' '}
@@ -1109,7 +1109,7 @@ export default function ModulSlug({
                   ))}
                   {reply[0] && reply[1] === id ? (
                     <div className="w-full min-h-[10rem] pl-14 flex mt-10 font-medium">
-                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400">
+                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400">
                         {user.Full_Name.split('')[0]}
                       </span>
                       <div className="w-full flex flex-col">
@@ -1129,7 +1129,7 @@ export default function ModulSlug({
                           ></textarea>
                           <button
                             type="submit"
-                            className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                            className="w-fit mt-3 flex items-center font-medium text-white bg-green-400 py-2 px-3"
                           >
                             Post
                           </button>
@@ -1155,7 +1155,7 @@ export default function ModulSlug({
                           modulList.map((e) => e.id).indexOf(modulId) - 1
                         ].attributes.Slug
                       }`}
-                      className="flex items-center font-medium text-sm lg:text-base text-yellow-500"
+                      className="flex items-center font-medium text-sm lg:text-base text-green-500"
                     >
                       <GrPrevious size={18} className="arrow mr-1" />
                       Previous
@@ -1170,7 +1170,7 @@ export default function ModulSlug({
               <div className="w-full h-full flex justify-center">
                 <button
                   onClick={doAnswer}
-                  className="flex items-center font-medium text-xs lg:text-base text-white bg-yellow-400 py-1 px-2"
+                  className="flex items-center font-medium text-xs lg:text-base text-white bg-green-400 py-1 px-2"
                 >
                   <BsCheck2 size={28} className="mr-1" />
                   Mark as complete
@@ -1186,7 +1186,7 @@ export default function ModulSlug({
                           modulList.map((e) => e.id).indexOf(modulId) + 1
                         ].attributes.Slug
                       }`}
-                      className="flex items-center font-medium text-sm lg:text-base text-yellow-500"
+                      className="flex items-center font-medium text-sm lg:text-base text-green-500"
                     >
                       Next
                       <GrNext size={18} className="arrow ml-1" />

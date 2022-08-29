@@ -508,7 +508,7 @@ export default function ModulCompleted({
                           }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
-                          className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ) : (
                         <input
@@ -519,7 +519,7 @@ export default function ModulCompleted({
                           }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
-                          className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ),
                     )}
@@ -579,7 +579,7 @@ export default function ModulCompleted({
                             (e.target.value = e.target.value.replace(/\s/g, ''))
                           }
                           placeholder="..............."
-                          className="w-full pl-3 py-1 border-t border-black placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ) : (
                         <input
@@ -590,7 +590,7 @@ export default function ModulCompleted({
                             (e.target.value = e.target.value.replace(/\s/g, ''))
                           }
                           placeholder="..............."
-                          className="w-full pl-3 py-1 placeholder:text-yellow-500 text-yellow-500 outline-none"
+                          className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
                         />
                       ),
                     )}
@@ -606,13 +606,13 @@ export default function ModulCompleted({
                       key={idArrange}
                       className="w-full grid grid-cols-4 grid-flow-col"
                     >
-                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-yellow-400 col-span-3 flex justify-center items-center">
+                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-green-400 col-span-3 flex justify-center items-center">
                         <span>{item.Content}</span>
                       </div>
                       <input
                         type="number"
                         name={`${data.Name}_${idArrange + 1}`}
-                        className="outline-none text-center border rounded-r-md bg-yellow-400 text-white border-yellow-400"
+                        className="outline-none text-center border rounded-r-md bg-green-400 text-white border-green-400"
                       />
                     </div>
                   ))}
@@ -654,7 +654,7 @@ export default function ModulCompleted({
             <div className="flex flex-col w-full space-y-6">
               {dataComments.map((data, id) => (
                 <div key={id} className="w-full border-b pb-6 flex mt-10">
-                  <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                  <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
                     {
                       userList
                         .find(
