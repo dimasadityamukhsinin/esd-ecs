@@ -14,13 +14,7 @@ import { scrollToTop } from '@/components/utils/scrollToTop'
 import { useRouter } from 'next/router'
 import StackDragDrop from '@/components/dnd/StackDragDrop'
 
-export default function PreviewModul({
-  userList,
-  modul,
-  seo,
-  comments,
-}) {
-
+export default function PreviewModul({ userList, modul, seo, comments }) {
   useEffect(() => {
     scrollToTop()
   }, [])
@@ -34,9 +28,7 @@ export default function PreviewModul({
       />
       <div className="relative flex flex-col w-full pb-12 grow">
         <Container className="mt-4 md:mt-6 xl:mt-8">
-          <div
-            className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8"
-          >
+          <div className="w-full max-w-4xl flex flex-col items-center mx-auto space-y-8">
             {modul.Editor?.map((data, idComponent) =>
               data.__component === 'editor.title' ? (
                 <TitleComponent
@@ -267,18 +259,18 @@ export async function getServerSideProps(ctx) {
   )
   const res = await req.json()
 
-  if(!res.data || res.data.length === 0) {
+  if (!res.data || res.data.length === 0) {
     return {
       notFound: true,
     }
   }
 
   const userList = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
   )
 
   const reqSeo = await fetch(
