@@ -721,7 +721,7 @@ export default function ModulSlug({
   const updateSizeChange = (name) => {
     const span = document.getElementsByName(name)
     const input = document.getElementsByName(name)
-    span[0].innerText = `${input[1].value}aa`
+    span[0].innerText = `${input[1].value}`
   }
 
   const doChangeInput = (e, name) => {
@@ -968,24 +968,24 @@ export default function ModulSlug({
                       <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-green-400 flex justify-center items-center">
                         <span>{id + 1}</span>
                       </div>
-                      <div className="w-full h-full flex p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
+                      <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
                         {item.Content.map((i, idAnswer) =>
                           !i.Answer ? (
                             <span
                               name={`${data.Name}_${item.Name}_${idAnswer + 1}`}
                               key={idAnswer}
                             >
-                              {i.Content}
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ut eleifend velit. Quisque ultricies metus in nisl molestie, eget mattis tellus vehicula.
                             </span>
                           ) : (
                             <>
                               &nbsp;
-                              <div className="relative">
+                              <div className="relative inline-block min-w-[4em]">
                                 <span
                                   name={`${data.Name}_${item.Name}_${
                                     idAnswer + 1
                                   }`}
-                                  className="invisible whitespace-pre p-0"
+                                  className="invisible whitespace-pre pl-3"
                                 ></span>
                                 <input
                                   name={`${data.Name}_${item.Name}_${
@@ -1000,7 +1000,8 @@ export default function ModulSlug({
                                     )
                                   }
                                   placeholder="..............."
-                                  className={`absolute left-0 min-w-[4em] w-full text-green-500 bg-white px-2 rounded-md outline-none placeholder:text-green-500`}
+                                  maxLength="15"
+                                  className={`absolute left-0 w-full text-green-500 bg-white px-2 rounded-md outline-none placeholder:text-green-500`}
                                 />
                               </div>
                               &nbsp;
