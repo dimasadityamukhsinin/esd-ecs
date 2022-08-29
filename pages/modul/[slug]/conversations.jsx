@@ -65,8 +65,8 @@ export default function Conversations({
           ...fieldComment,
           users_permissions_user: user.id,
           idUser: user.id,
-          idModul: modulId,
-          Modul_Name: modul.Title,
+          idModule: modulId,
+          Module_Name: modul.Title,
           User: user.Full_Name,
         },
       }),
@@ -74,7 +74,7 @@ export default function Conversations({
     const res = await req.json()
 
     const newComment = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
     )
 
     setComments(newComment.data.data)
@@ -130,7 +130,7 @@ export default function Conversations({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -181,7 +181,7 @@ export default function Conversations({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -238,7 +238,7 @@ export default function Conversations({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -281,7 +281,7 @@ export default function Conversations({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -336,7 +336,7 @@ export default function Conversations({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -652,7 +652,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${res.data[0].id}&populate=deep`
   )
 
   const reqSeo = await fetch(

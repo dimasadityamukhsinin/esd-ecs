@@ -243,18 +243,18 @@ export async function getServerSideProps(ctx) {
       ...item,
       Total_Score: completed.data.data.find(
         (data) =>
-          parseInt(data.attributes.idModul) === parseInt(item.id) &&
+          parseInt(data.attributes.idModule) === parseInt(item.id) &&
           parseInt(data.attributes.idUser) === parseInt(user.data.id),
       )
         ? completed.data.data.find(
             (data) =>
-              parseInt(data.attributes.idModul) === parseInt(item.id) &&
+              parseInt(data.attributes.idModule) === parseInt(item.id) &&
               parseInt(data.attributes.idUser) === parseInt(user.data.id),
           ).attributes.Total_Score
         : 0,
       status: completed.data.data.find(
         (data) =>
-          parseInt(data.attributes.idModul) === parseInt(item.id) &&
+          parseInt(data.attributes.idModule) === parseInt(item.id) &&
           parseInt(data.attributes.idUser) === parseInt(user.data.id),
       )
         ? 'completed'

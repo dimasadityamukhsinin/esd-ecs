@@ -270,7 +270,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${res.data[0].id}&populate=deep`,
   )
 
   const reqSeo = await fetch(

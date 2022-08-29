@@ -76,8 +76,8 @@ export default function ModulCompleted({
           ...fieldComment,
           users_permissions_user: user.id,
           idUser: user.id,
-          idModul: modulId,
-          Modul_Name: modul.Title,
+          idModule: modulId,
+          Module_Name: modul.Title,
           User: user.Full_Name,
         },
       }),
@@ -85,7 +85,7 @@ export default function ModulCompleted({
     const res = await req.json()
 
     const newComment = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
     )
 
     setComments(newComment.data.data)
@@ -424,10 +424,10 @@ export default function ModulCompleted({
           },
           body: JSON.stringify({
             data: {
-              idModul: modulId,
+              idModule: modulId,
               idUser: user.id,
               User: user.Full_Name,
-              Modul_Name: modul.Title,
+              Module_Name: modul.Title,
               Question: dataContent,
               Date: date,
               Total_Score: Number.isInteger(Total_Score)
@@ -743,7 +743,7 @@ export async function getServerSideProps(ctx) {
 
   res.data[0].attributes.status = completed.data.data.find(
     (data) =>
-      parseInt(data.attributes.idModul) === parseInt(res.data[0].id) &&
+      parseInt(data.attributes.idModule) === parseInt(res.data[0].id) &&
       parseInt(data.attributes.idUser) === parseInt(user.data.id),
   )
     ? 'completed'
@@ -756,7 +756,7 @@ export async function getServerSideProps(ctx) {
         ...item,
         status: completed.data.data.find(
           (data) =>
-            parseInt(data.attributes.idModul) === parseInt(item.id) &&
+            parseInt(data.attributes.idModule) === parseInt(item.id) &&
             parseInt(data.attributes.idUser) === parseInt(user.data.id),
         )
           ? 'completed'
@@ -777,7 +777,7 @@ export async function getServerSideProps(ctx) {
         if (
           !completed.data.data.find(
             (data) =>
-              parseInt(data.attributes.idModul) === parseInt(res.data[0].id) &&
+              parseInt(data.attributes.idModule) === parseInt(res.data[0].id) &&
               parseInt(data.attributes.idUser) === parseInt(user.data.id),
           )
         ) {
@@ -798,7 +798,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${res.data[0].id}&populate=deep`,
   )
 
   const reqSeo = await fetch(

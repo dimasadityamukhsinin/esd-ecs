@@ -80,8 +80,8 @@ export default function ModulSlug({
           ...fieldComment,
           users_permissions_user: user.id,
           idUser: user.id,
-          idModul: modulId,
-          Modul_Name: modul.Title,
+          idModule: modulId,
+          Module_Name: modul.Title,
           User: user.Full_Name,
         },
       }),
@@ -89,7 +89,7 @@ export default function ModulSlug({
     const res = await req.json()
 
     const newComment = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
     )
 
     setComments(newComment.data.data)
@@ -145,7 +145,7 @@ export default function ModulSlug({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -487,10 +487,10 @@ export default function ModulSlug({
           },
           body: JSON.stringify({
             data: {
-              idModul: modulId,
+              idModule: modulId,
               idUser: user.id,
               User: user.Full_Name,
-              Modul_Name: modul.Title,
+              Module_Name: modul.Title,
               Question: dataContent,
               Date: date,
               Total_Score: Number.isInteger(Total_Score)
@@ -547,7 +547,7 @@ export default function ModulSlug({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -604,7 +604,7 @@ export default function ModulSlug({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -647,7 +647,7 @@ export default function ModulSlug({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -702,7 +702,7 @@ export default function ModulSlug({
           .then(() => {
             axios
               .get(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${modulId}&populate=deep`,
               )
               .then(({ data }) => {
                 setComments(data.data)
@@ -1273,7 +1273,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const comments = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${res.data[0].id}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModule][$eq]=${res.data[0].id}&populate=deep`,
   )
 
   const reqSeo = await fetch(
@@ -1352,7 +1352,7 @@ export async function getServerSideProps(ctx) {
   if (
     completed.data.data.find(
       (data) =>
-        parseInt(data.attributes.idModul) === parseInt(res.data[0].id) &&
+        parseInt(data.attributes.idModule) === parseInt(res.data[0].id) &&
         parseInt(data.attributes.idUser) === parseInt(user.data.id),
     )
   ) {
@@ -1368,7 +1368,7 @@ export async function getServerSideProps(ctx) {
         ...item,
         status: completed.data.data.find(
           (data) =>
-            parseInt(data.attributes.idModul) === parseInt(item.id) &&
+            parseInt(data.attributes.idModule) === parseInt(item.id) &&
             parseInt(data.attributes.idUser) === parseInt(user.data.id),
         )
           ? 'completed'
