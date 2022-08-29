@@ -2,13 +2,14 @@ import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
 import Layout from '@/components/modules/layout'
 import FancyLink from '@/components/utils/fancyLink'
-import { BsCheck2Square } from 'react-icons/bs'
+import { BsCheck2Square, BsReply } from 'react-icons/bs'
 import { BiConversation } from 'react-icons/bi'
 import nookies from 'nookies'
 import axios from 'axios'
 import { useState } from 'react'
 import SEO from '@/components/utils/seo'
 import Footer from '@/components/modules/footer'
+import { AiOutlineLike, AiFillLike } from 'react-icons/ai'
 
 export default function Conversations({
   user,
@@ -20,17 +21,31 @@ export default function Conversations({
   token,
   checkNotif,
 }) {
-  const [field, setField] = useState({})
+  const [fieldComment, setFieldComment] = useState({})
+  const [fieldCommentReply, setFieldCommentReply] = useState({})
   const [progress, setProgress] = useState(false)
+  const [progressReply, setProgressReply] = useState(false)
   const [dataComments, setComments] = useState(comments)
+  const [reply, setReply] = useState([false, 0])
 
-  const setValue = (e) => {
+  const setValueComment = (e) => {
     const target = e.target
     const name = target.name
     const value = target.value
 
-    setField({
-      ...field,
+    setFieldComment({
+      ...fieldComment,
+      [name]: value,
+    })
+  }
+
+  const setValueCommentReply = (e) => {
+    const target = e.target
+    const name = target.name
+    const value = target.value
+
+    setFieldCommentReply({
+      ...fieldComment,
       [name]: value,
     })
   }
@@ -47,7 +62,7 @@ export default function Conversations({
       },
       body: JSON.stringify({
         data: {
-          ...field,
+          ...fieldComment,
           users_permissions_user: user.id,
           idUser: user.id,
           idModul: modulId,
@@ -59,15 +74,275 @@ export default function Conversations({
     const res = await req.json()
 
     const newComment = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`
+      `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
     )
 
     setComments(newComment.data.data)
 
-    setField({})
+    setFieldComment({})
     e.target.reset()
 
     setProgress(false)
+  }
+
+  const doReply = async (e, id) => {
+    e.preventDefault()
+    setProgressReply(true)
+
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(({ data }) => {
+        let date = new Date()
+        let dd = String(date.getDate()).padStart(2, '0')
+        let mm = String(date.getMonth() + 1).padStart(2, '0') //January is 0!
+        let yyyy = date.getFullYear()
+
+        date = yyyy + '-' + mm + '-' + dd
+        axios
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Reply: [
+                  ...data.data.attributes.Reply,
+                  {
+                    ...fieldCommentReply,
+                    idUser: user.id,
+                    Date: date,
+                  },
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
+
+            setFieldCommentReply({})
+            e.target.reset()
+
+            setProgressReply(false)
+          })
+      })
+  }
+
+  const doLike = (id) => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(({ data }) => {
+        axios
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Liked: data.data.attributes.Liked
+                  ? parseInt(data.data.attributes.Liked) + 1
+                  : 1,
+                Liked_User: [
+                  ...data.data.attributes.Liked_User,
+                  {
+                    idUser: user.id,
+                  },
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
+          })
+      })
+  }
+
+  const doLikeReply = (id, dataReply) => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(({ data }) => {
+        axios
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Reply: [
+                  ...data.data.attributes.Reply.map((item) => {
+                    if (item.id === dataReply.id) {
+                      return {
+                        ...item,
+                        Liked: dataReply.Liked
+                          ? parseInt(dataReply.Liked) + 1
+                          : 1,
+                        Liked_User: [
+                          ...dataReply.Liked_User,
+                          {
+                            idUser: user.id,
+                          },
+                        ],
+                      }
+                    } else {
+                      return item
+                    }
+                  }),
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
+          })
+      })
+  }
+
+  const doRemoveLike = (id) => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(({ data }) => {
+        axios
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Liked: parseInt(data.data.attributes.Liked) - 1,
+                Liked_User: [
+                  ...data.data.attributes.Liked_User.filter(
+                    (item) => parseInt(item.idUser) !== parseInt(user.id),
+                  ),
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
+          })
+      })
+  }
+
+  const doRemoveLikeReply = (id, dataReply) => {
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}?populate=deep`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(({ data }) => {
+        axios
+          .put(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/comments/${id}`,
+            {
+              data: {
+                Reply: [
+                  ...data.data.attributes.Reply.map((item) => {
+                    if (item.id === dataReply.id) {
+                      return {
+                        ...item,
+                        Liked: parseInt(dataReply.Liked) - 1,
+                        Liked_User: [
+                          ...dataReply.Liked_User.filter(
+                            (item) =>
+                              parseInt(item.idUser) !== parseInt(user.id),
+                          ),
+                        ],
+                      }
+                    } else {
+                      return item
+                    }
+                  }),
+                ],
+              },
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+          .then(() => {
+            axios
+              .get(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/comments?filters[idModul][$eq]=${modulId}&populate=deep`,
+              )
+              .then(({ data }) => {
+                setComments(data.data)
+              })
+          })
+      })
   }
 
   return (
@@ -126,7 +401,7 @@ export default function Conversations({
                   <div className="absolute inset-0 z-10 bg-white/50" />
                 )}
                 <textarea
-                  onChange={setValue}
+                  onChange={setValueComment}
                   name="Content"
                   className="w-full font-normal"
                 ></textarea>
@@ -139,43 +414,192 @@ export default function Conversations({
               </form>
             </div>
           </div>
-          <div className="flex flex-col w-full space-y-6">
-            {dataComments.map((data) => (
-              <div className="w-full border-b pb-6 flex mt-10">
-                <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
-                  {
-                    userList
-                      .find(
-                        (item) => item.id.toString() === data.attributes.idUser,
-                      )
-                      .Full_Name.split('')[0]
-                  }
-                </span>
-                <div className="w-full flex flex-col">
-                  <div className="flex justify-between">
-                    <span className="mb-2 font-medium">
+          <div className="flex flex-col w-full space-y-10">
+              {dataComments.map((data, id) => (
+                <div
+                  key={id}
+                  className="w-full border-b pb-3 flex flex-col space-y-5 mt-10"
+                >
+                  <div className="w-full flex">
+                    <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
                       {
-                        userList.find(
-                          (item) =>
-                            item.id.toString() === data.attributes.idUser,
-                        ).Full_Name
+                        userList
+                          .find(
+                            (item) =>
+                              item.id.toString() === data.attributes.idUser,
+                          )
+                          .Full_Name.split('')[0]
                       }
                     </span>
-                    <span className="text-gray-500">
-                      {`${new Date(
-                        data.attributes.publishedAt,
-                      ).getFullYear()}-${
-                        new Date(data.attributes.publishedAt).getMonth() + 1
-                      }-${new Date(data.attributes.publishedAt).getDate()}`}
-                    </span>
+                    <div className="w-full flex flex-col">
+                      <div className="flex justify-between">
+                        <span className="mb-2 font-medium">
+                          {
+                            userList.find(
+                              (item) =>
+                                item.id.toString() === data.attributes.idUser,
+                            ).Full_Name
+                          }
+                        </span>
+                        <span className="text-gray-500">
+                          {`${new Date(
+                            data.attributes.publishedAt,
+                          ).getFullYear()}-${
+                            new Date(data.attributes.publishedAt).getMonth() + 1
+                          }-${new Date(data.attributes.publishedAt).getDate()}`}
+                        </span>
+                      </div>
+                      <div className="w-full h-full">
+                        <p>{data.attributes.Content}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="w-full h-full">
-                    <p>{data.attributes.Content}</p>
+                  <div className="w-full flex pl-14 space-x-24">
+                    {data.attributes.Liked_User.find(
+                      (item) => parseInt(item.idUser) === user.id,
+                    ) ? (
+                      <FancyLink
+                        onClick={() => doRemoveLike(data.id)}
+                        className="text-yellow-500 flex items-center"
+                      >
+                        <AiFillLike size={22} className="mr-1" />
+                        Liked{' '}
+                        {data.attributes.Liked
+                          ? parseInt(data.attributes.Liked) === 0
+                            ? ''
+                            : data.attributes.Liked
+                          : ''}
+                      </FancyLink>
+                    ) : (
+                      <FancyLink
+                        onClick={() => doLike(data.id)}
+                        className="text-yellow-500 flex items-center"
+                      >
+                        <AiOutlineLike size={22} className="mr-1" />
+                        Like{' '}
+                        {data.attributes.Liked
+                          ? parseInt(data.attributes.Liked) === 0
+                            ? ''
+                            : data.attributes.Liked
+                          : ''}
+                      </FancyLink>
+                    )}
+                    <FancyLink
+                      onClick={() => setReply([true, id])}
+                      className="text-yellow-500 flex items-center"
+                    >
+                      <BsReply size={22} className="mr-1" />
+                      Reply
+                    </FancyLink>
                   </div>
+                  {data.attributes.Reply.map((dataReply, idReply) => (
+                    <div
+                      key={idReply}
+                      className="w-full pl-14 flex flex-col space-y-5 mt-12"
+                    >
+                      <div className="w-full flex">
+                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400 font-medium">
+                          {
+                            userList
+                              .find(
+                                (item) =>
+                                  parseInt(item.id) ===
+                                  parseInt(dataReply.idUser),
+                              )
+                              .Full_Name.split('')[0]
+                          }
+                        </span>
+                        <div className="w-full flex flex-col">
+                          <div className="flex justify-between">
+                            <span className="mb-2 font-medium">
+                              {
+                                userList.find(
+                                  (item) =>
+                                    item.id.toString() === dataReply.idUser,
+                                ).Full_Name
+                              }
+                            </span>
+                            <span className="text-gray-500">
+                              {`${new Date(dataReply.Date).getFullYear()}-${
+                                new Date(dataReply.Date).getMonth() + 1
+                              }-${new Date(dataReply.Date).getDate()}`}
+                            </span>
+                          </div>
+                          <div className="w-full h-full">
+                            <p>{dataReply.Content}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="w-full flex pl-14 space-x-24">
+                        {dataReply.Liked_User.find(
+                          (item) => parseInt(item.idUser) === user.id,
+                        ) ? (
+                          <FancyLink
+                            onClick={() =>
+                              doRemoveLikeReply(data.id, dataReply)
+                            }
+                            className="text-yellow-500 flex items-center"
+                          >
+                            <AiFillLike size={22} className="mr-1" />
+                            Liked{' '}
+                            {dataReply.Liked
+                              ? parseInt(dataReply.Liked) === 0
+                                ? ''
+                                : dataReply.Liked
+                              : ''}
+                          </FancyLink>
+                        ) : (
+                          <FancyLink
+                            onClick={() => doLikeReply(data.id, dataReply)}
+                            className="text-yellow-500 flex items-center"
+                          >
+                            <AiOutlineLike size={22} className="mr-1" />
+                            Like{' '}
+                            {dataReply.Liked
+                              ? parseInt(dataReply.Liked) === 0
+                                ? ''
+                                : dataReply.Liked
+                              : ''}
+                          </FancyLink>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {reply[0] && reply[1] === id ? (
+                    <div className="w-full min-h-[10rem] pl-14 flex mt-10 font-medium">
+                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-yellow-400">
+                        {user.Full_Name.split('')[0]}
+                      </span>
+                      <div className="w-full flex flex-col">
+                        <span className="mb-2">{user.Full_Name}</span>
+                        <form
+                          method="post"
+                          onSubmit={(e) => doReply(e, data.id)}
+                          className="relative w-full h-full"
+                        >
+                          {progressReply && (
+                            <div className="absolute inset-0 z-10 bg-white/50" />
+                          )}
+                          <textarea
+                            onChange={setValueCommentReply}
+                            name="Content"
+                            className="w-full font-normal"
+                          ></textarea>
+                          <button
+                            type="submit"
+                            className="w-fit mt-3 flex items-center font-medium text-white bg-yellow-400 py-2 px-3"
+                          >
+                            Post
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
         </div>
       </Container>
       <Footer seo={seo} />

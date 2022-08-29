@@ -43,21 +43,6 @@ export default function ModulSlug({
   const [progressReply, setProgressReply] = useState(false)
   const [dataComments, setComments] = useState(comments)
 
-  const checkComplete = () => {
-    swal({
-      title: 'Have you finished your assignment?',
-      icon: 'warning',
-      buttons: true,
-      // dangerMode: true,
-    }).then((willDelete) => {
-      if (willDelete) {
-        swal('Congratulations, your assignment has been completed!', {
-          icon: 'success',
-        })
-      }
-    })
-  }
-
   const setValueComment = (e) => {
     const target = e.target
     const name = target.name
@@ -727,7 +712,7 @@ export default function ModulSlug({
   }
 
   useEffect(() => {
-    // scrollToTop()
+    scrollToTop()
   }, [])
 
   return (
