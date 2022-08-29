@@ -84,7 +84,7 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
                         src={attributes.Thumbnail.data.attributes.url}
                         alt={attributes.title}
                         layout="fill"
-                        objectFit="cover"
+                        objectFit="contain"
                       />
                     )}
                     <div className="absolute z-10 w-full h-full bg-black opacity-40" />
