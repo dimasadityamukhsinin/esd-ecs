@@ -39,7 +39,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
           title={seo.Website_Title}
         />
         <div className="w-full py-8 flex justify-center items-center h-full font-medium">
-          <h2 className='m-0'>Your Learning</h2>
+          <h2 className="m-0">Your Learning</h2>
         </div>
       </div>
       <div className={`border-t bg-gray-50 w-full min-h-[60vh] grow`}>
@@ -76,12 +76,14 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
                       Missed
                     </span>
                     <div className="relative flex justify-center w-full h-52">
-                      <Image
-                        src={attributes.Thumbnail.data.attributes.url}
-                        alt={attributes.title}
-                        layout="fill"
-                        objectFit="cover"
-                      />
+                      {attributes.Thumbnail && (
+                        <Image
+                          src={attributes.Thumbnail.data.attributes.url}
+                          alt={attributes.title}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      )}
                       <div className="absolute z-10 w-full h-full bg-black opacity-40" />
                       <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
                     </div>
@@ -178,7 +180,7 @@ export async function getServerSideProps(ctx) {
   ]
 
   const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
   )
 
   modul.data = modul.data.map((item, id) => {

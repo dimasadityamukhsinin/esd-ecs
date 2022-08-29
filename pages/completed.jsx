@@ -28,7 +28,7 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
-      <div className='w-full flex flex-col'>
+      <div className="w-full flex flex-col">
         <Header
           user={user}
           notif={checkNotif}
@@ -64,96 +64,101 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
           <div className="flex flex-wrap modul mt-6">
             {modul.map(({ attributes, Total_Score, status }, id) =>
               status === 'completed' ? (
-                countdownData(attributes.Assignment_Deadline) < 0 ? (
-                  <FancyLink
-                    key={id}
-                    destination={`/modul/${attributes.Slug}/completed`}
-                    className="relative bg-white border"
-                  >
-                    <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                      {`${
-                        Number.isInteger(Total_Score)
-                          ? Total_Score
-                          : parseFloat(Total_Score).toFixed(2)
-                      } / 100`}
-                    </span>
-                    <div className="relative flex justify-center w-full h-52">
+                // countdownData(attributes.Assignment_Deadline) < 0 ? (
+                <div
+                  key={id}
+                  // destination={`/modul/${attributes.Slug}/completed`}
+                  className="relative bg-white border"
+                >
+                  <div className="absolute left-0 top-0 w-full h-full bg-gray-500 z-30 opacity-70" />
+                  <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
+                    {`${
+                      Number.isInteger(Total_Score)
+                        ? Total_Score
+                        : parseFloat(Total_Score).toFixed(2)
+                    } / 100`}
+                  </span>
+                  <div className="relative flex justify-center w-full h-52">
+                    {attributes.Thumbnail && (
                       <Image
                         src={attributes.Thumbnail.data.attributes.url}
                         alt={attributes.title}
                         layout="fill"
                         objectFit="cover"
                       />
-                      <div className="absolute z-10 w-full h-full bg-black opacity-40" />
-                      <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
-                    </div>
-                    <div className="w-full flex flex-col justify-between p-3 space-y-3">
-                      <div className="flex flex-col  space-y-3">
-                        <span className="font-medium text-gray-500">
-                          Module {id + 1}
-                        </span>
-                        <span className="font-medium text-lg text-left">
-                          {attributes.Title}
-                        </span>
-                        <p className="text-gray-500 font-medium text-sm text-left">
-                          {attributes.Short_Description}
-                        </p>
-                      </div>
-                      <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                        Go to module
-                      </div>
-                    </div>
-                  </FancyLink>
-                ) : (
-                  <div key={id} className="relative bg-white border">
-                    <div className="absolute left-0 top-0 w-full h-full bg-gray-500 z-30 opacity-70" />
-                    <div className="absolute left-0 top-0 w-full h-full flex justify-center z-40 items-center">
-                      <span className="text-white font-medium text-xl text-center">
-                        {`${countdownData(
-                          attributes.Assignment_Deadline,
-                        )} days left`}
-                        <br />
-                        to check the assignment
+                    )}
+                    <div className="absolute z-10 w-full h-full bg-black opacity-40" />
+                    <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
+                  </div>
+                  <div className="w-full flex flex-col justify-between p-3 space-y-3">
+                    <div className="flex flex-col  space-y-3">
+                      <span className="font-medium text-gray-500">
+                        Module {id + 1}
                       </span>
-                    </div>
-                    <div>
-                      <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                        {`${
-                          Number.isInteger(Total_Score)
-                            ? Total_Score
-                            : parseFloat(Total_Score).toFixed(2)
-                        } / 100`}
+                      <span className="font-medium text-lg text-left">
+                        {attributes.Title}
                       </span>
-                      <div className="relative flex justify-center w-full h-52">
-                        <Image
-                          src={attributes.Thumbnail.data.attributes.url}
-                          alt={attributes.title}
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                        <div className="absolute z-10 w-full h-full bg-black opacity-40" />
-                        <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
-                      </div>
-                      <div className="w-full flex flex-col justify-between p-3 space-y-3">
-                        <div className="flex flex-col  space-y-3">
-                          <span className="font-medium text-gray-500">
-                            Module {id + 1}
-                          </span>
-                          <span className="font-medium text-lg text-left">
-                            {attributes.Title}
-                          </span>
-                          <p className="text-gray-500 font-medium text-sm text-left">
-                            {attributes.Short_Description}
-                          </p>
-                        </div>
-                        <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                          Go to module
-                        </div>
-                      </div>
+                      <p className="text-gray-500 font-medium text-sm text-left">
+                        {attributes.Short_Description}
+                      </p>
+                    </div>
+                    <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
+                      Go to module
                     </div>
                   </div>
-                )
+                </div>
               ) : (
+                // ) : (
+                //   <div key={id} className="relative bg-white border">
+                //     <div className="absolute left-0 top-0 w-full h-full bg-gray-500 z-30 opacity-70" />
+                //     <div className="absolute left-0 top-0 w-full h-full flex justify-center z-40 items-center">
+                //       <span className="text-white font-medium text-xl text-center">
+                //         {`${countdownData(
+                //           attributes.Assignment_Deadline,
+                //         )} days left`}
+                //         <br />
+                //         to check the assignment
+                //       </span>
+                //     </div>
+                //     <div>
+                //       <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
+                //         {`${
+                //           Number.isInteger(Total_Score)
+                //             ? Total_Score
+                //             : parseFloat(Total_Score).toFixed(2)
+                //         } / 100`}
+                //       </span>
+                //       <div className="relative flex justify-center w-full h-52">
+                //         {attributes.Thumbnail && (
+                //           <Image
+                //             src={attributes.Thumbnail.data.attributes.url}
+                //             alt={attributes.title}
+                //             layout="fill"
+                //             objectFit="cover"
+                //           />
+                //         )}
+                //         <div className="absolute z-10 w-full h-full bg-black opacity-40" />
+                //         <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
+                //       </div>
+                //       <div className="w-full flex flex-col justify-between p-3 space-y-3">
+                //         <div className="flex flex-col  space-y-3">
+                //           <span className="font-medium text-gray-500">
+                //             Module {id + 1}
+                //           </span>
+                //           <span className="font-medium text-lg text-left">
+                //             {attributes.Title}
+                //           </span>
+                //           <p className="text-gray-500 font-medium text-sm text-left">
+                //             {attributes.Short_Description}
+                //           </p>
+                //         </div>
+                //         <div className="bg-yellow-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
+                //           Go to module
+                //         </div>
+                //       </div>
+                //     </div>
+                //   </div>
+                // )
                 <></>
               ),
             )}
@@ -230,7 +235,7 @@ export async function getServerSideProps(ctx) {
   const modul = await reqModul.json()
 
   const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
   )
 
   modul.data = modul.data.map((item, id) => {

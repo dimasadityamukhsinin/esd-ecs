@@ -80,12 +80,14 @@ export default function Home({ user, modul, seo, checkNotif }) {
                       )} days left`}
                     </span>
                     <div className="relative flex justify-center w-full h-52">
-                      <Image
-                        src={attributes.Thumbnail.data.attributes.url}
-                        alt={attributes.title}
-                        layout="fill"
-                        objectFit="cover"
-                      />
+                      {attributes.Thumbnail && (
+                        <Image
+                          src={attributes.Thumbnail.data.attributes.url}
+                          alt={attributes.title}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      )}
                       <div className="absolute z-10 w-full h-full bg-black opacity-40" />
                       <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
                     </div>
@@ -182,7 +184,7 @@ export async function getServerSideProps(ctx) {
   ]
 
   const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
   )
 
   modul.data = modul.data.map((item, id) => {
