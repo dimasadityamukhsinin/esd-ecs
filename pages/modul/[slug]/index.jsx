@@ -711,7 +711,48 @@ export default function ModulSlug({
       })
   }
 
+  const updateSize = (name) => {
+    const span = document.getElementsByName(name)
+    const input = document.getElementsByName(name)
+    span[0].innerText = input[1].value
+    input[1].value = ''
+  }
+
+  const updateSizeChange = (name) => {
+    const span = document.getElementsByName(name)
+    const input = document.getElementsByName(name)
+    span[0].innerText = `${input[1].value}aa`
+  }
+
+  const doChangeInput = (e, name) => {
+    const input = document.getElementsByName(name)
+    input[1].oninput = updateSizeChange(name)
+
+    // Provide some initial content
+    input[1].value = e.target.value.replace(/\s/g, '')
+    updateSizeChange(name)
+  }
+
   useEffect(() => {
+    modul.Editor?.filter((data) => data.type === 'essay').forEach((data) => {
+      data.Question.forEach((item) => {
+        item.Content.forEach((i, idAnswer) => {
+          if (i.Answer) {
+            const input = document.getElementsByName(
+              `${data.Name}_${item.Name}_${idAnswer + 1}`,
+            )
+            input[1].oninput = updateSize(
+              `${data.Name}_${item.Name}_${idAnswer + 1}`,
+            )
+
+            // Provide some initial content
+            input[1].value = '...............'
+            updateSize(`${data.Name}_${item.Name}_${idAnswer + 1}`)
+          }
+        })
+      })
+    })
+
     scrollToTop()
   }, [])
 
@@ -916,6 +957,59 @@ export default function ModulSlug({
               ) : data.type === 'stack-with-drag-drop' ? (
                 <div className="flex flex-col w-full" key={idComponent}>
                   <StackDragDrop dragDrop={data} idComponent={idComponent} />
+                </div>
+              ) : data.type === 'essay' ? (
+                <div
+                  className="flex flex-col w-full space-y-4"
+                  key={idComponent}
+                >
+                  {data.Question.map((item, id) => (
+                    <div className="w-full grid grid-cols-12" key={id}>
+                      <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-green-400 flex justify-center items-center">
+                        <span>{id + 1}</span>
+                      </div>
+                      <div className="w-full h-full flex p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
+                        {item.Content.map((i, idAnswer) =>
+                          !i.Answer ? (
+                            <span
+                              name={`${data.Name}_${item.Name}_${idAnswer + 1}`}
+                              key={idAnswer}
+                            >
+                              {i.Content}
+                            </span>
+                          ) : (
+                            <>
+                              &nbsp;
+                              <div className="relative">
+                                <span
+                                  name={`${data.Name}_${item.Name}_${
+                                    idAnswer + 1
+                                  }`}
+                                  className="invisible whitespace-pre p-0"
+                                ></span>
+                                <input
+                                  name={`${data.Name}_${item.Name}_${
+                                    idAnswer + 1
+                                  }`}
+                                  onChange={(e) =>
+                                    doChangeInput(
+                                      e,
+                                      `${data.Name}_${item.Name}_${
+                                        idAnswer + 1
+                                      }`,
+                                    )
+                                  }
+                                  placeholder="..............."
+                                  className={`absolute left-0 min-w-[4em] w-full text-green-500 bg-white px-2 rounded-md outline-none placeholder:text-green-500`}
+                                />
+                              </div>
+                              &nbsp;
+                            </>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <></>
@@ -1329,6 +1423,24 @@ export async function getServerSideProps(ctx) {
               id: item.id,
               Name: item.Name,
               Content: data.Drop.filter(
+                (i) => i.Name === item.Name,
+              ).map((k) => ({ Answer: k.Answer, Content: k.Content })),
+            }
+          }).reduce((unique, o) => {
+            if (!unique.some((obj) => obj.Name === o.Name)) {
+              unique.push(o)
+            }
+            return unique
+          }, []),
+        }
+      } else if (data.type === 'essay') {
+        return {
+          ...data,
+          Question: data.Question.map((item) => {
+            return {
+              id: item.id,
+              Name: item.Name,
+              Content: data.Question.filter(
                 (i) => i.Name === item.Name,
               ).map((k) => ({ Answer: k.Answer, Content: k.Content })),
             }

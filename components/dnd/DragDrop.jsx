@@ -136,8 +136,6 @@ const DragDrop = ({ dragDrop, idComponent }) => {
     }
   }, [droppedBoxNames])
 
-  let idName = 0
-
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-green-400 h-[60vh] overflow-y-auto scrollbar-hide">
@@ -153,7 +151,6 @@ const DragDrop = ({ dragDrop, idComponent }) => {
         </div>
         <div className="w-full flex flex-col space-y-4">
           {dragDrop.Drop.map((item, id) => {
-            idName = 0
             return (
               <div
                 id={`${dragDrop.Name}_${item.Name}`}
