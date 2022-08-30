@@ -7,6 +7,7 @@ import { AnimatePresence } from 'framer-motion'
 import Head from 'next/head'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import NextNProgress from 'nextjs-progressbar'
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
@@ -88,6 +89,7 @@ export default function App({ Component, pageProps }) {
         <meta name="msapplication-TileImage" content="/ms-icon-144x144.png" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
+      <NextNProgress />
       <DndProvider backend={HTML5Backend}>
         <AppWrapper>
           <Component {...pageProps} key={router.asPath} />
