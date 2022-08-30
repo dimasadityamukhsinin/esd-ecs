@@ -107,9 +107,9 @@ const Login = ({ seo }) => {
     const res = await req.json()
 
     if (res.jwt) {
-      setProgress(false)
       nookies.set(null, 'token', res.jwt)
       Router.replace('/')
+      setProgress(false)
     } else {
       setProgress(false)
       setShowMessage('Wrong username or password!')
