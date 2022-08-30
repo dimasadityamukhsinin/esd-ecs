@@ -111,6 +111,7 @@ const Login = ({ seo }) => {
       nookies.set(null, 'token', res.jwt)
       Router.replace('/')
     } else {
+      setProgress(false)
       setShowMessage('Wrong username or password!')
     }
   }
