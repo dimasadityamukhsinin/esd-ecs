@@ -975,7 +975,7 @@ export default function ModulSlug({
                               name={`${data.Name}_${item.Name}_${idAnswer + 1}`}
                               key={idAnswer}
                             >
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque ut eleifend velit. Quisque ultricies metus in nisl molestie, eget mattis tellus vehicula.
+                              {i.Content}
                             </span>
                           ) : (
                             <>
