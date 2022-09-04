@@ -298,7 +298,7 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
 
   return (
     <div className="w-full flex flex-col">
-      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-green-400 h-[80vh] overflow-y-auto scrollbar-hide">
+      <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-green-400 h-[80vh] overflow-y-auto">
         <div className="flex flex-wrap drag">
           {dragDrop.Drag.map((item, idDrag) => (
             <Box
