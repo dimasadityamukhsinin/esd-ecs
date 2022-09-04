@@ -1,13 +1,10 @@
 import '@/styles/main.scss'
 import { useRouter } from 'next/router'
-import { DefaultSeo } from 'next-seo'
-import SEO from '@/helpers/seo.config'
 import { AppWrapper } from '../context/state.js'
-import { AnimatePresence } from 'framer-motion'
 import Head from 'next/head'
 import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
 import NextNProgress from 'nextjs-progressbar'
+import { TouchBackend } from 'react-dnd-touch-backend'
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
@@ -90,7 +87,7 @@ export default function App({ Component, pageProps }) {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <NextNProgress />
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={TouchBackend}>
         <AppWrapper>
           <Component {...pageProps} key={router.asPath} />
         </AppWrapper>
