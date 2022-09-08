@@ -15,6 +15,29 @@ import { useRouter } from 'next/router'
 import StackDragDrop from '@/components/dnd/StackDragDrop'
 
 export default function PreviewModul({ userList, modul, seo, comments }) {
+
+  const updateSize = (name) => {
+    const span = document.getElementsByName(name)
+    const input = document.getElementsByName(name)
+    span[0].innerText = input[1].value
+    input[1].value = ''
+  }
+
+  const updateSizeChange = (name) => {
+    const span = document.getElementsByName(name)
+    const input = document.getElementsByName(name)
+    span[0].innerText = `${input[1].value}`
+  }
+
+  const doChangeInput = (e, name) => {
+    const input = document.getElementsByName(name)
+    input[1].oninput = updateSizeChange(name)
+
+    // Provide some initial content
+    input[1].value = e.target.value.replace(/\s/g, '')
+    updateSizeChange(name)
+  }
+
   useEffect(() => {
     modul.Editor?.filter((data) => data.type === 'essay').forEach((data) => {
       data.Question.forEach((item) => {
