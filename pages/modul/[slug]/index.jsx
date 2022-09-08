@@ -195,10 +195,9 @@ export default function ModulSlug({
                 if (e.Answer) {
                   dataAnswer.push({
                     name: `${data.Name}_${item.Name}_${id + 1}`,
-                    value:
-                      document.getElementsByName(
-                        `${data.Name}_${item.Name}_${id + 1}`,
-                      )[1].value,
+                    value: document.getElementsByName(
+                      `${data.Name}_${item.Name}_${id + 1}`,
+                    )[1].value,
                   })
                 }
               })
@@ -388,17 +387,19 @@ export default function ModulSlug({
             data.Drop.forEach((item) => {
               item.Content.forEach((e, id) => {
                 if (e.Answer) {
-                    content.push({
-                      Name: item.Name,
-                      Key: check.find(
-                        (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
-                      ).value,
-                      Answer:
-                        check.find(
-                          (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
-                        ).value.toLowerCase() ===
-                        e.Content.toLowerCase(),
-                    })
+                  content.push({
+                    Name: item.Name,
+                    Key: check.find(
+                      (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                    ).value,
+                    Answer:
+                      check
+                        .find(
+                          (y) =>
+                            y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                        )
+                        .value.toLowerCase() === e.Content.toLowerCase(),
+                  })
                 }
               })
             })
@@ -423,17 +424,19 @@ export default function ModulSlug({
             data.Question.forEach((item) => {
               item.Content.forEach((e, id) => {
                 if (e.Answer) {
-                    content.push({
-                      Name: item.Name,
-                      Key: check.find(
-                        (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
-                      ).value,
-                      Answer:
-                        check.find(
-                          (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
-                        ).value.toLowerCase() ===
-                        e.Content.toLowerCase(),
-                    })
+                  content.push({
+                    Name: item.Name,
+                    Key: check.find(
+                      (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                    ).value,
+                    Answer:
+                      check
+                        .find(
+                          (y) =>
+                            y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                        )
+                        .value.toLowerCase() === e.Content.toLowerCase(),
+                  })
                 }
               })
             })
@@ -453,7 +456,6 @@ export default function ModulSlug({
                       content.filter((item) => item.Answer === true).length,
                   ).toFixed(2),
             })
-
           } else if (data.type === 'stack-with-drag-drop') {
             let dragDrop = []
 
