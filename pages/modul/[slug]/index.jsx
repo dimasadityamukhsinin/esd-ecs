@@ -172,22 +172,33 @@ export default function ModulSlug({
 
         modul.Editor.filter((data) => data.Name).forEach((data) => {
           if (data.type === 'drag-drop') {
-            let idName = 0
-            data.Drop.forEach((item, id) => {
-              idName = 0
-              item.Content.forEach((e) => {
-                if (!e.Answer) {
-                  idName++
+            data.Drop.forEach((item) => {
+              item.Content.forEach((e, id) => {
+                if (e.Answer) {
                   dataAnswer.push({
-                    name: `${data.Name}_${item.Name}_${idName}`,
+                    name: `${data.Name}_${item.Name}_${id + 1}`,
                     value:
                       document.getElementsByName(
-                        `${data.Name}_${item.Name}_${idName}`,
+                        `${data.Name}_${item.Name}_${id + 1}`,
                       )[0].innerText !== '..........'
                         ? document.getElementsByName(
-                            `${data.Name}_${item.Name}_${idName}`,
+                            `${data.Name}_${item.Name}_${id + 1}`,
                           )[0].innerText
                         : '',
+                  })
+                }
+              })
+            })
+          } else if (data.type === 'essay') {
+            data.Question.forEach((item) => {
+              item.Content.forEach((e, id) => {
+                if (e.Answer) {
+                  dataAnswer.push({
+                    name: `${data.Name}_${item.Name}_${id + 1}`,
+                    value:
+                      document.getElementsByName(
+                        `${data.Name}_${item.Name}_${id + 1}`,
+                      )[1].value,
                   })
                 }
               })
@@ -374,20 +385,20 @@ export default function ModulSlug({
             })
           } else if (data.type === 'drag-drop') {
             let content = []
-            let idName = 0
-            data.Drop.forEach((item, id) => {
-              item.Content.forEach((e) => {
+            data.Drop.forEach((item) => {
+              item.Content.forEach((e, id) => {
                 if (e.Answer) {
-                  if (check[idName]) {
                     content.push({
                       Name: item.Name,
-                      Key: check[idName].value,
+                      Key: check.find(
+                        (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                      ).value,
                       Answer:
-                        check[idName].value.toLowerCase() ===
+                        check.find(
+                          (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                        ).value.toLowerCase() ===
                         e.Content.toLowerCase(),
                     })
-                  }
-                  idName++
                 }
               })
             })
@@ -397,16 +408,52 @@ export default function ModulSlug({
               Name: data.Name,
               Content: content,
               Score: Number.isInteger(
-                (data.Point / data.Drag.length) *
+                (data.Point / data.Drop.length) *
                   content.filter((item) => item.Answer === true).length,
               )
-                ? (data.Point / data.Drag.length) *
+                ? (data.Point / data.Drop.length) *
                   content.filter((item) => item.Answer === true).length
                 : parseFloat(
-                    (data.Point / data.Drag.length) *
+                    (data.Point / data.Drop.length) *
                       content.filter((item) => item.Answer === true).length,
                   ).toFixed(2),
             })
+          } else if (data.type === 'essay') {
+            let content = []
+            data.Question.forEach((item) => {
+              item.Content.forEach((e, id) => {
+                if (e.Answer) {
+                    content.push({
+                      Name: item.Name,
+                      Key: check.find(
+                        (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                      ).value,
+                      Answer:
+                        check.find(
+                          (y) => y.name === `${data.Name}_${item.Name}_${id + 1}`,
+                        ).value.toLowerCase() ===
+                        e.Content.toLowerCase(),
+                    })
+                }
+              })
+            })
+
+            dataContent.push({
+              __component: 'question.essay',
+              Name: data.Name,
+              Content: content,
+              Score: Number.isInteger(
+                (data.Point / data.Question.length) *
+                  content.filter((item) => item.Answer === true).length,
+              )
+                ? (data.Point / data.Question.length) *
+                  content.filter((item) => item.Answer === true).length
+                : parseFloat(
+                    (data.Point / data.Question.length) *
+                      content.filter((item) => item.Answer === true).length,
+                  ).toFixed(2),
+            })
+
           } else if (data.type === 'stack-with-drag-drop') {
             let dragDrop = []
 
