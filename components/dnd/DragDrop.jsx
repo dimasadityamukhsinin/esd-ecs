@@ -72,10 +72,10 @@ const Box = ({ id, index, children }) => {
 const DragDrop = ({ dragDrop, idComponent }) => {
   const [remove, setRemove] = useState([])
   const [droppedBoxNames, setDroppedBoxNames] = useState([])
-  document.getElementById(`dataDrag-${e.id}`).classList.add('hidden')
 
   const getDrop = useCallback((e) => {
     setDroppedBoxNames((prev) => [...prev, e])
+    document.getElementById(`dataDrag-${e.id}`).classList.add('hidden')
   }, [])
 
   const removeDrag = (question, item) => {
