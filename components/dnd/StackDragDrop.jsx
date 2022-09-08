@@ -77,9 +77,17 @@ const Card = ({
 
   const getDrop = useCallback((e) => {
     setDroppedBoxNames((prev) => [...prev, e])
+    document.getElementById(`dataDrag-${e.id}`).classList.add('hidden')
   }, [])
 
   const removeDrag = (question, item) => {
+    droppedBoxNames.forEach((data) => {
+      if (data.idDrop === item.id) {
+        document
+          .getElementById(`dataDrag-${data.id}`)
+          .classList.remove('hidden')
+      }
+    })
 
     setDroppedBoxNames(
       droppedBoxNames.filter((data) => data.idDrop !== item.id),
@@ -254,6 +262,10 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
   }, [remove, setRemove, droppedBoxNames, setDroppedBoxNames])
 
   const resetDnd = (data) => {
+    data.Drag.forEach((item) => {
+      document.getElementById(`dataDrag-${item.id}`).classList.remove('hidden')
+    })
+    
     data.Drop.forEach((e) => {
       e.Content.forEach((item,id) => {
         if (item.Answer) {

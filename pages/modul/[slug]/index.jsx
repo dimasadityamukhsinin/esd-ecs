@@ -409,13 +409,13 @@ export default function ModulSlug({
               Name: data.Name,
               Content: content,
               Score: Number.isInteger(
-                (data.Point / data.Drop.length) *
+                (data.Point / data.Drag.length) *
                   content.filter((item) => item.Answer === true).length,
               )
-                ? (data.Point / data.Drop.length) *
+                ? (data.Point / data.Drag.length) *
                   content.filter((item) => item.Answer === true).length
                 : parseFloat(
-                    (data.Point / data.Drop.length) *
+                    (data.Point / data.Drag.length) *
                       content.filter((item) => item.Answer === true).length,
                   ).toFixed(2),
             })
@@ -498,17 +498,17 @@ export default function ModulSlug({
               Score: Number.isInteger(
                 (data.Point_Stack / data.Drop.length) *
                   dragDrop.filter((item) => item.Answer === true).length +
-                  (data.Point_Drop / data.Drop.length) *
+                  (data.Point_Drop / data.Drag.length) *
                     dragDrop.filter((item) => item.Answer === true).length,
               )
                 ? (data.Point_Stack / data.Drop.length) *
                     dragDrop.filter((item) => item.Answer === true).length +
-                  (data.Point_Drop / data.Drop.length) *
+                  (data.Point_Drop / data.Drag.length) *
                     dragDrop.filter((item) => item.Answer === true).length
                 : parseFloat(
                     (data.Point_Stack / data.Drop.length) *
                       dragDrop.filter((item) => item.Answer === true).length +
-                      (data.Point_Drop / data.Drop.length) *
+                      (data.Point_Drop / data.Drag.length) *
                         dragDrop.filter((item) => item.Answer === true).length,
                   ).toFixed(2),
             })
