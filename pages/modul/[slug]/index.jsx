@@ -518,7 +518,7 @@ export default function ModulSlug({
         let Total_Score = 0
 
         dataContent.forEach((item) => {
-          Total_Score = Total_Score + item.Score
+          Total_Score = Total_Score + parseFloat(item.Score)
         })
 
         let date = new Date()
