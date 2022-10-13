@@ -1376,6 +1376,12 @@ export async function getServerSideProps(ctx) {
   )
   const res = await req.json()
 
+  if(!user.data.major?.Name) {
+    return {
+      notFound: true,
+    }
+  }
+
   const modulList = await axios.get(
     `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major.Name}&populate=deep`,
   )
@@ -1391,7 +1397,7 @@ export async function getServerSideProps(ctx) {
     return diffInDays
   }
 
-  if (res.data[0].attributes.major.data?.attributes.Name) {
+  if (res.data[0]?.attributes.major.data?.attributes.Name) {
     if (
       !res.data[0].attributes.major.data?.attributes.Name ===
       user.data.major.Name

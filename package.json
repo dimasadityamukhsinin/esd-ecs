@@ -57,6 +57,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
+    "react-dnd-touch-backend": "^16.0.1",
     "tailwindcss": "^3.1.6"
   }
 }

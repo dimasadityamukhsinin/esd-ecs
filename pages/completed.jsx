@@ -230,7 +230,7 @@ export async function getServerSideProps(ctx) {
   ]
 
   const reqModul = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major.Name}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major?.Name}&populate=deep`,
   )
   const modul = await reqModul.json()
 
