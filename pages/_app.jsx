@@ -8,10 +8,14 @@ import Head from 'next/head'
 import NextNProgress from 'nextjs-progressbar'
 import { DndProvider } from 'react-dnd-multi-backend'
 import { HTML5toTouch } from 'rdndmb-html5-to-touch' // or any other pipeline
+import { useEffect } from 'react'
 
 export default function App({ Component, pageProps }) {
   const router = useRouter()
 
+  useEffect(() => {
+    document.body.classList.add("notranslate")
+  },[])
   return (
     <>
       <Head>
