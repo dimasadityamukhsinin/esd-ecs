@@ -820,7 +820,7 @@ export default function ModulSlug({
           title={seo.Website_Title}
         />
         <div className="setflex-center-row border-b py-6 space-x-8">
-          <FancyLink destination="/" className="font-medium flex items-center">
+          <FancyLink destination="/your-learning" className="font-medium flex items-center">
             <BsCheck2Square size={20} className="mr-2" />
             Assignment
           </FancyLink>

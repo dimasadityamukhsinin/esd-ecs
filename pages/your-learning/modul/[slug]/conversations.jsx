@@ -365,7 +365,7 @@ export default function Conversations({
             Assignment
           </FancyLink>
           <FancyLink
-            destination="/conversations"
+            destination={`/your-learning/modul/${modul.Slug}/conversations`}
             className="font-medium flex items-center"
           >
             <BiConversation size={20} className="mr-2" />
