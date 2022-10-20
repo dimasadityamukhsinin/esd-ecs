@@ -90,7 +90,7 @@ export default function App({ Component, pageProps }) {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <NextNProgress />
-    <DndProvider options={HTML5toTouch}>
+      <DndProvider options={HTML5toTouch}>
         <AppWrapper>
           <Component {...pageProps} key={router.asPath} />
         </AppWrapper>

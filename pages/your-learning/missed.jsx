@@ -46,19 +46,19 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
         <Container className="mt-4 md:mt-6 xl:mt-8 pb-12">
           <div className="flex space-x-8 mt-12 md:ml-[0.7rem] overflow-auto">
             <FancyLink
-              destination="/"
+              destination="/your-learning"
               className="pb-2 text-green-500 text-xl font-medium"
             >
               Assignment
             </FancyLink>
             <FancyLink
-              destination="/missed"
+              destination="/your-learning/missed"
               className="border-b border-green-500 pb-2 text-green-500 text-xl font-medium"
             >
               Missed
             </FancyLink>
             <FancyLink
-              destination="/completed"
+              destination="/your-learning/completed"
               className="pb-2 text-green-500 text-xl font-medium"
             >
               Completed

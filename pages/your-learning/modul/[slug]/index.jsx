@@ -552,7 +552,7 @@ export default function ModulSlug({
             icon: 'success',
           })
           setTimeout(() => {
-            route.replace('/')
+            route.replace('/your-learning')
           }, 50)
         })
       }

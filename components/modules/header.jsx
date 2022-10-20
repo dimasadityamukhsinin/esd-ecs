@@ -37,7 +37,7 @@ export default function Header({ className, user, notif, logo, title }) {
 
               <FancyLink
                 className="ml-8 text-green-500 font-medium text-xl hidden md:block"
-                destination="/"
+                destination="/your-learning"
               >
                 Your Learning
               </FancyLink>
@@ -93,7 +93,7 @@ export default function Header({ className, user, notif, logo, title }) {
         <Container className="flex items-start">
           <FancyLink
             className="text-green-500 font-medium text-xl"
-            destination="/"
+            destination="/your-learning"
           >
             Your Learning
           </FancyLink>
