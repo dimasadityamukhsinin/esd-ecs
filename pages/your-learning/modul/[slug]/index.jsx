@@ -825,7 +825,7 @@ export default function ModulSlug({
             Assignment
           </FancyLink>
           <FancyLink
-            destination={`/modul/${modul.Slug}/conversations`}
+            destination={`/your-learning/modul/${modul.Slug}/conversations`}
             className="font-medium flex items-center"
           >
             <BiConversation size={20} className="mr-2" />
@@ -1294,7 +1294,7 @@ export default function ModulSlug({
                   .status !== 'completed' ? (
                   <div className="w-full h-full flex justify-start">
                     <FancyLink
-                      destination={`/modul/${
+                      destination={`/your-learning/modul/${
                         modulList[
                           modulList.map((e) => e.id).indexOf(modulId) - 1
                         ].attributes.Slug
@@ -1325,7 +1325,7 @@ export default function ModulSlug({
                   .status !== 'completed' ? (
                   <div className="w-full h-full flex justify-end">
                     <FancyLink
-                      destination={`/modul/${
+                      destination={`/your-learning/modul/${
                         modulList[
                           modulList.map((e) => e.id).indexOf(modulId) + 1
                         ].attributes.Slug

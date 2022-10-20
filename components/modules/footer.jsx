@@ -13,12 +13,6 @@ export default function Footer({seo, className = ''}) {
           >
             Your Learning
           </FancyLink>
-          <FancyLink
-            className="ml-5 text-white font-medium text-xl block"
-            destination="/about"
-          >
-            About
-          </FancyLink>
         </div>
         <div className="relative w-16 h-16 aspect-square">
           <Image

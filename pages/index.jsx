@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import Layout from '@/components/modules/layout'
 import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
@@ -13,6 +13,16 @@ import { IoNotificationsOutline } from 'react-icons/io5'
 import parse from 'html-react-parser'
 
 export default function Home({ user, home, seo }) {
+  const [reveal, setReveal] = useState({
+    option: '',
+    status: false,
+  })
+  const route = useRouter()
+
+  const logout = () => {
+    nookies.destroy(null, 'token')
+    route.replace('/login')
+  }
   return (
     <Layout>
       <SEO
@@ -23,7 +33,28 @@ export default function Home({ user, home, seo }) {
       <div className="w-full flex flex-col">
         <header className={`relative py-6 border-b w-full z-20`}>
           <Container className="flex flex-col">
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+              <div className="w-full flex items-center">
+                <FancyLink destination="/" className="font-medium text-xl">
+                  <div className="relative w-12 h-12 aspect-square">
+                    <Image
+                      src={seo.Logo.data.attributes.url}
+                      alt={seo.Website_Title}
+                      layout="fill"
+                      objectFit="contain"
+                    />
+                  </div>
+                </FancyLink>
+
+                {user && (
+                  <FancyLink
+                    className="ml-8 text-green-500 font-medium text-xl hidden md:block"
+                    destination="/your-learning"
+                  >
+                    Your Learning
+                  </FancyLink>
+                )}
+              </div>
               <nav className="flex items-center space-x-5">
                 {user && (
                   <FancyLink
@@ -146,7 +177,7 @@ export default function Home({ user, home, seo }) {
   )
 }
 
-export async function getServerSideProps({ ctx }) {
+export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
 
   const reqSeo = await fetch(

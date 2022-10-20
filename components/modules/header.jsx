@@ -41,12 +41,6 @@ export default function Header({ className, user, notif, logo, title }) {
               >
                 Your Learning
               </FancyLink>
-              <FancyLink
-                className="ml-5 text-green-500 font-medium text-xl hidden md:block"
-                destination="/about"
-              >
-                About
-              </FancyLink>
             </div>
 
             <nav className="flex items-center space-x-5">
@@ -102,12 +96,6 @@ export default function Header({ className, user, notif, logo, title }) {
             destination="/"
           >
             Your Learning
-          </FancyLink>
-          <FancyLink
-            className="ml-8 text-green-500 font-medium text-xl"
-            destination="/about"
-          >
-            About
           </FancyLink>
         </Container>
       </div>

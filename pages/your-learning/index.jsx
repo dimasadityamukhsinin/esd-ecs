@@ -71,7 +71,7 @@ export default function YourLearning({ user, modul, seo, checkNotif }) {
                 !(countdownData(attributes.Assignment_Deadline) < 0) && (
                   <FancyLink
                     key={id}
-                    destination={`/modul/${attributes.Slug}`}
+                    destination={`/your-learning/modul/${attributes.Slug}`}
                     className="relative bg-white border"
                   >
                     <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
