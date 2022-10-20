@@ -15,6 +15,11 @@ import parse from 'html-react-parser'
 export default function Home({ user, home, seo }) {
   return (
     <Layout>
+      <SEO
+        title={'Home'}
+        defaultSEO={typeof seo !== 'undefined' && seo}
+        webTitle={typeof seo !== 'undefined' && seo.Website_Title}
+      />
       <div className="w-full flex flex-col">
         <header className={`relative py-6 border-b w-full z-20`}>
           <Container className="flex flex-col">
