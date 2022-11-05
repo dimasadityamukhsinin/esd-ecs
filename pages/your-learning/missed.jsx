@@ -66,7 +66,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
           </div>
           <div className="flex flex-wrap modul mt-6">
             {modul.map(({ attributes, status }, id) =>
-              status !== 'completed' ? (
+              !status ? (
                 countdownData(attributes.Assignment_Deadline) < 0 && (
                   <FancyLink
                     key={id}
@@ -190,9 +190,11 @@ export async function getServerSideProps(ctx) {
         (data) =>
           parseInt(data.attributes.idModule) === parseInt(item.id) &&
           parseInt(data.attributes.idUser) === parseInt(user.data.id),
-      )
-        ? 'completed'
-        : '',
+      ) ? completed.data.data.find(
+        (data) =>
+          parseInt(data.attributes.idModule) === parseInt(item.id) &&
+          parseInt(data.attributes.idUser) === parseInt(user.data.id),
+      ).attributes.finish : false
     }
   })
 

@@ -63,7 +63,7 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
           </div>
           <div className="flex flex-wrap modul mt-6">
             {modul.map(({ attributes, Total_Score, status }, id) =>
-              status === 'completed' ? (
+              status ? (
                 // countdownData(attributes.Assignment_Deadline) < 0 ? (
                 <div
                   key={id}
@@ -256,9 +256,11 @@ export async function getServerSideProps(ctx) {
         (data) =>
           parseInt(data.attributes.idModule) === parseInt(item.id) &&
           parseInt(data.attributes.idUser) === parseInt(user.data.id),
-      )
-        ? 'completed'
-        : '',
+      ) ? completed.data.data.find(
+        (data) =>
+          parseInt(data.attributes.idModule) === parseInt(item.id) &&
+          parseInt(data.attributes.idUser) === parseInt(user.data.id),
+      ).attributes.finish : false
     }
   })
 

@@ -65,50 +65,52 @@ export default function YourLearning({ user, modul, seo, checkNotif }) {
             </FancyLink>
           </div>
           <div className="flex flex-wrap modul mt-6">
-            {modul.map(
-              ({ attributes, status }, id) =>
-                status !== 'completed' &&
-                !(countdownData(attributes.Assignment_Deadline) < 0) && (
-                  <FancyLink
-                    key={id}
-                    destination={`/your-learning/modul/${attributes.Slug}`}
-                    className="relative bg-white border"
-                  >
-                    <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                      {`${countdownData(
-                        attributes.Assignment_Deadline,
-                      )} days left`}
-                    </span>
-                    <div className="relative flex justify-center w-full h-52">
-                      {attributes.Thumbnail && (
-                        <Image
-                          src={attributes.Thumbnail.data.attributes.url}
-                          alt={attributes.title}
-                          layout="fill"
-                          objectFit="contain"
-                        />
-                      )}
-                      <div className="absolute z-10 w-full h-full bg-black opacity-40" />
-                      <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
+            {modul.map(({ attributes, status }, id) =>
+              !status &&
+              !(countdownData(attributes.Assignment_Deadline) < 0) &&
+              attributes.Editor[0] ? (
+                <FancyLink
+                  key={id}
+                  destination={`/your-learning/modul/${attributes.Slug}/${attributes.Editor[0].id}`}
+                  className="relative bg-white border"
+                >
+                  <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
+                    {`${countdownData(
+                      attributes.Assignment_Deadline,
+                    )} days left`}
+                  </span>
+                  <div className="relative flex justify-center w-full h-52">
+                    {attributes.Thumbnail && (
+                      <Image
+                        src={attributes.Thumbnail.data.attributes.url}
+                        alt={attributes.title}
+                        layout="fill"
+                        objectFit="contain"
+                      />
+                    )}
+                    <div className="absolute z-10 w-full h-full bg-black opacity-40" />
+                    <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
+                  </div>
+                  <div className="w-full flex flex-col justify-between p-3 space-y-3">
+                    <div className="flex flex-col  space-y-3">
+                      <span className="font-medium text-gray-500">
+                        Module {id + 1}
+                      </span>
+                      <span className="font-medium text-lg text-left">
+                        {attributes.Title}
+                      </span>
+                      <p className="text-gray-500 font-medium text-sm text-left">
+                        {attributes.Short_Description}
+                      </p>
                     </div>
-                    <div className="w-full flex flex-col justify-between p-3 space-y-3">
-                      <div className="flex flex-col  space-y-3">
-                        <span className="font-medium text-gray-500">
-                          Module {id + 1}
-                        </span>
-                        <span className="font-medium text-lg text-left">
-                          {attributes.Title}
-                        </span>
-                        <p className="text-gray-500 font-medium text-sm text-left">
-                          {attributes.Short_Description}
-                        </p>
-                      </div>
-                      <div className="bg-green-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                        Go to Module
-                      </div>
+                    <div className="bg-green-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
+                      Go to Module
                     </div>
-                  </FancyLink>
-                ),
+                  </div>
+                </FancyLink>
+              ) : (
+                <></>
+              ),
             )}
           </div>
         </Container>
@@ -195,8 +197,12 @@ export async function getServerSideProps(ctx) {
           parseInt(data.attributes.idModule) === parseInt(item.id) &&
           parseInt(data.attributes.idUser) === parseInt(user.data.id),
       )
-        ? 'completed'
-        : '',
+        ? completed.data.data.find(
+            (data) =>
+              parseInt(data.attributes.idModule) === parseInt(item.id) &&
+              parseInt(data.attributes.idUser) === parseInt(user.data.id),
+          ).attributes.finish
+        : false,
     }
   })
 

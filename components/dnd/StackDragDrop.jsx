@@ -92,13 +92,13 @@ const Card = ({
     setDroppedBoxNames(
       droppedBoxNames.filter((data) => data.idDrop !== item.id),
     )
-    item.Content.forEach((data,id) => {
+    item.Content.forEach((data, id) => {
       if (data.Answer) {
         document.getElementsByName(
-          `${question}_${item.Name}_${id+1}`,
+          `${question}_${item.Name}_${id + 1}`,
         )[0].textContent = '..........'
         document
-          .getElementsByName(`${question}_${item.Name}_${id+1}`)[0]
+          .getElementsByName(`${question}_${item.Name}_${id + 1}`)[0]
           .classList.remove('pointer-events-none')
       }
     })
@@ -134,7 +134,7 @@ const Card = ({
                   question={dragDrop.Name}
                   name={cardData.Name}
                   getDrop={getDrop}
-                  idName={index+1}
+                  idName={index + 1}
                   idAnswer={idAnswer}
                   idDrop={cardData.id}
                 />
@@ -228,10 +228,21 @@ const Box = ({ id, index, children }) => {
   )
 }
 
-const StackDragDrop = ({ dragDrop, idComponent }) => {
+const StackDragDrop = ({
+  dragDrop,
+  modulCompleted,
+  user,
+  token,
+  assessment,
+}) => {
   const [cards, setCards] = useState(dragDrop.Drop)
   const [remove, setRemove] = useState([])
   const [droppedBoxNames, setDroppedBoxNames] = useState([])
+  const showButton = modulCompleted?.attributes.Question.find(
+    (item) => item.Name === dragDrop.Name,
+  )
+    ? false
+    : true
 
   const moveCard = useCallback((dragIndex, hoverIndex) => {
     setCards((prevCards) =>
@@ -244,36 +255,212 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
     )
   }, [])
 
-  const renderCard = useCallback((card, index) => {
-    return (
-      <Card
-        key={card.id}
-        index={index}
-        id={card.id}
-        dragDrop={dragDrop}
-        cardData={card}
-        moveCard={moveCard}
-        droppedBoxNames={droppedBoxNames}
-        setDroppedBoxNames={setDroppedBoxNames}
-        remove={remove}
-        setRemove={setRemove}
-      />
+  const doSubmit = async (e) => {
+    let dataAnswer = []
+    let dataContent = []
+
+    let dragDrop1 = []
+    let stack1 = []
+
+    dragDrop.Drop.forEach((item) => {
+      item.Content.forEach((e, id) => {
+        if (e.Answer) {
+          dragDrop1.push({
+            name: `${dragDrop.Name}_${item.Name}_${id + 1}`,
+            value:
+              document.getElementsByName(
+                `${dragDrop.Name}_${item.Name}_${id + 1}`,
+              )[0].innerText !== '..........'
+                ? document.getElementsByName(
+                    `${dragDrop.Name}_${item.Name}_${id + 1}`,
+                  )[0].innerText
+                : '',
+          })
+        }
+      })
+    })
+
+    dragDrop.Drop.forEach((item, id) => {
+      let name = document.getElementById(`${dragDrop.Name}`).children[id]
+        .attributes.name.value
+      stack1.push({
+        name: `${name}_to_${id + 1}`,
+        value: dragDrop.Drop.find(
+          (e) =>
+            parseInt(e.Name.split('-')[1]) ===
+            parseInt(name.split('_')[1].split('-')[1]),
+        )
+          .Content.map((e) => e.Content)
+          .join(' '),
+      })
+    })
+
+    dataAnswer.push({
+      name: dragDrop.Name,
+      dragDrop: dragDrop1,
+      stack: stack1,
+      type: 'stack-with-drag-drop',
+    })
+
+    const check = dataAnswer.filter(
+      (item) => item.name.split('_')[0] === dragDrop.Name,
     )
-  }, [remove, setRemove, droppedBoxNames, setDroppedBoxNames])
+
+    let dataContents = []
+
+    dragDrop.Drop.forEach((item) => {
+      item.Content.forEach((e, id) => {
+        if (e.Answer) {
+          dataContents.push({
+            Name: item.Name,
+            Index: id,
+            Key: check[0].dragDrop.find(
+              (y) => y.name === `${dragDrop.Name}_${item.Name}_${id + 1}`,
+            ).value,
+            Answer:
+              check[0].dragDrop
+                .find(
+                  (y) => y.name === `${dragDrop.Name}_${item.Name}_${id + 1}`,
+                )
+                .value.toLowerCase() === e.Content.toLowerCase(),
+          })
+        }
+      })
+    })
+
+    let stack = []
+    dragDrop.Drop.forEach((_, id) => {
+      stack.push({
+        Name: check[0].stack[id].name.split('_')[1],
+        Content: check[0].stack[id].value,
+        Answer:
+          parseInt(check[0].stack[id].name.split('_')[1].split('-')[1]) ===
+          parseInt(check[0].stack[id].name.split('_')[3]),
+      })
+    })
+    dataContent.push({
+      __component: 'question.stack-with-drag-and-drop',
+      Name: dragDrop.Name,
+      Drag_Drop: dataContents,
+      Stack: stack,
+      Score: Number.isInteger(
+        (dragDrop.Point_Stack / dragDrop.Drop.length) *
+          dataContents.filter((item) => item.Answer === true).length +
+          (dragDrop.Point_Drop / dragDrop.Drag.length) *
+            dataContents.filter((item) => item.Answer === true).length,
+      )
+        ? (dragDrop.Point_Stack / dragDrop.Drop.length) *
+            dataContents.filter((item) => item.Answer === true).length +
+          (dragDrop.Point_Drop / dragDrop.Drag.length) *
+            dataContents.filter((item) => item.Answer === true).length
+        : parseFloat(
+            (dragDrop.Point_Stack / dragDrop.Drop.length) *
+              dataContents.filter((item) => item.Answer === true).length +
+              (dragDrop.Point_Drop / dragDrop.Drag.length) *
+                dataContents.filter((item) => item.Answer === true).length,
+          ).toFixed(2),
+    })
+
+    if (modulCompleted) {
+      dataContent.push(...modulCompleted.attributes.Question)
+    }
+
+    let Total_Score = 0
+
+    dataContent.forEach((item) => {
+      Total_Score = Total_Score + parseFloat(item.Score)
+    })
+
+    let date = new Date()
+    let dd = String(date.getDate()).padStart(2, '0')
+    let mm = String(date.getMonth() + 1).padStart(2, '0') //January is 0!
+    let yyyy = date.getFullYear()
+
+    date = yyyy + '-' + mm + '-' + dd
+
+    if (modulCompleted) {
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/completeds/${modulCompleted.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            data: {
+              Question: dataContent,
+              Date: date,
+              Total_Score: Number.isInteger(Total_Score)
+                ? Total_Score
+                : parseFloat(Total_Score).toFixed(2),
+              finish: false,
+            },
+          }),
+        },
+      ).then(() => {
+        window.location.reload()
+      })
+    } else {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/completeds`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          data: {
+            idModule: modulId,
+            idUser: user.id,
+            User: user.Full_Name,
+            Module_Name: modul.Title,
+            Question: dataContent,
+            Date: date,
+            Total_Score: Number.isInteger(Total_Score)
+              ? Total_Score
+              : parseFloat(Total_Score).toFixed(2),
+            finish: false,
+          },
+        }),
+      }).then(() => {
+        window.location.reload()
+      })
+    }
+  }
+
+  const renderCard = useCallback(
+    (card, index) => {
+      return (
+        <Card
+          key={card.id}
+          index={index}
+          id={card.id}
+          dragDrop={dragDrop}
+          cardData={card}
+          moveCard={moveCard}
+          droppedBoxNames={droppedBoxNames}
+          setDroppedBoxNames={setDroppedBoxNames}
+          remove={remove}
+          setRemove={setRemove}
+        />
+      )
+    },
+    [remove, setRemove, droppedBoxNames, setDroppedBoxNames],
+  )
 
   const resetDnd = (data) => {
     data.Drag.forEach((item) => {
       document.getElementById(`dataDrag-${item.id}`).classList.remove('hidden')
     })
-    
+
     data.Drop.forEach((e) => {
-      e.Content.forEach((item,id) => {
+      e.Content.forEach((item, id) => {
         if (item.Answer) {
           document.getElementsByName(
-            `${data.Name}_${e.Name}_${id+1}`,
+            `${data.Name}_${e.Name}_${id + 1}`,
           )[0].textContent = '..........'
           document
-            .getElementsByName(`${data.Name}_${e.Name}_${id+1}`)[0]
+            .getElementsByName(`${data.Name}_${e.Name}_${id + 1}`)[0]
             .classList.remove('pointer-events-none')
         }
       })
@@ -299,27 +486,115 @@ const StackDragDrop = ({ dragDrop, idComponent }) => {
   return (
     <div className="w-full flex flex-col">
       <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-green-400 h-[80vh] overflow-y-auto">
-        <div className="flex flex-wrap drag">
-          {dragDrop.Drag.map((item, idDrag) => (
-            <Box
-              key={idDrag}
-              index={idDrag}
-              id={item.id}
-              children={item.Content}
-            />
-          ))}
-        </div>
+        {!modulCompleted?.attributes.Question.find(
+          (item) => item.Name === dragDrop.Name,
+        ) && (
+          <div className="flex flex-wrap drag">
+            {dragDrop.Drag.map((item, idDrag) => (
+              <Box
+                key={idDrag}
+                index={idDrag}
+                id={item.id}
+                children={item.Content}
+              />
+            ))}
+          </div>
+        )}
         <div className="w-full flex flex-col space-y-4" id={dragDrop.Name}>
-          {cards.map((card, i) => renderCard(card, i))}
+          {cards.map((card, i) =>
+            modulCompleted?.attributes.Question.find(
+              (item) => item.Name === dragDrop.Name,
+            ) ? (
+              <div className="w-full flex flex-col">
+                <div className="w-full grid grid-cols-12">
+                  <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-green-400 flex justify-center items-center">
+                    <span>{i + 1}</span>
+                  </div>
+                  <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
+                    {card.Content.map((i, idAnswer) =>
+                      !i.Answer ? (
+                        <span
+                          name={`${dragDrop.Name}_${card.Name}_${idAnswer + 1}`}
+                          key={idAnswer}
+                        >
+                          {i.Content}
+                        </span>
+                      ) : (
+                        <>
+                          &nbsp;
+                          <span
+                            className={`w-fit py-2 px-3 text-white text-center font-medium rounded-md ${
+                              modulCompleted?.attributes.Question.find(
+                                (item) => item.Name === dragDrop.Name,
+                              ).Drag_Drop.filter((e) => e.Name === card.Name)
+                                .find((e) => e.Index === idAnswer).Answer
+                                ? 'bg-green-500'
+                                : 'bg-red-500'
+                            }`}
+                          >
+                            {
+                              modulCompleted?.attributes.Question.find(
+                                (item) => item.Name === dragDrop.Name,
+                              )
+                                .Drag_Drop.filter((e) => e.Name === card.Name)
+                                .find((e) => e.Index === idAnswer).Key
+                            }
+                          </span>
+                          &nbsp;
+                        </>
+                      ),
+                    )}
+                  </div>
+                </div>
+                {remove.length > 0 ? (
+                  remove.find((data) => data === cardData.id) && (
+                    <div className="w-fit h-full mt-3 flex justify-center items-center">
+                      <FancyLink
+                        onClick={() => removeDrag(dragDrop.Name, cardData)}
+                        className="font-medium text-white bg-green-400 w-full px-4 py-2 rounded-md"
+                      >
+                        Remove
+                      </FancyLink>
+                    </div>
+                  )
+                ) : (
+                  <></>
+                )}
+              </div>
+            ) : (
+              renderCard(card, i)
+            ),
+          )}
         </div>
       </div>
       <div className="flex justify-end w-full mt-3">
-        <FancyLink
-          onClick={() => resetDnd(dragDrop)}
-          className="font-medium text-white bg-green-400 py-2 px-4 rounded-md"
-        >
-          Reset
-        </FancyLink>
+        {showButton ? (
+          <>
+            <FancyLink
+              onClick={() => resetDnd(dragDrop)}
+              className="font-medium text-white bg-green-400 py-2 px-4 rounded-md"
+            >
+              Reset
+            </FancyLink>
+            <FancyLink
+              onClick={doSubmit}
+              className="font-medium text-white bg-green-400 ml-4 py-2 px-4 rounded-md"
+            >
+              Submit
+            </FancyLink>
+          </>
+        ) : (
+          assessment && (
+            <span className="font-medium text-green-400">
+              Score{' '}
+              {
+                modulCompleted?.attributes.Question.find(
+                  (item) => item.Name === dragDrop.Name,
+                )?.Score
+              }
+            </span>
+          )
+        )}
       </div>
     </div>
   )
