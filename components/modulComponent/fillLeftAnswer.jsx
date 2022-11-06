@@ -146,7 +146,7 @@ const FillLeftAnswer = ({ fill, modulCompleted, user, token, assessment }) => {
                   }
                   name={`${fill.Name}_${idLeft + 1}`}
                   placeholder="..............."
-                  className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
+                  className="w-full pl-3 py-1 border-t border-black placeholder:text-blue-800 text-blue-800 outline-none"
                 />
               )
             ) : modulCompleted?.attributes.Question.find(
@@ -177,7 +177,7 @@ const FillLeftAnswer = ({ fill, modulCompleted, user, token, assessment }) => {
                 }
                 name={`${fill.Name}_${idLeft + 1}`}
                 placeholder="..............."
-                className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
+                className="w-full pl-3 py-1 placeholder:text-blue-800 text-blue-800 outline-none"
               />
             ),
           )}
@@ -206,13 +206,13 @@ const FillLeftAnswer = ({ fill, modulCompleted, user, token, assessment }) => {
         {showButton ? (
           <FancyLink
             onClick={doSubmit}
-            className="font-medium text-white bg-green-400 ml-4 py-2 px-4 rounded-md"
+            className="font-medium text-white bg-blue-800 ml-4 py-2 px-4 rounded-md"
           >
             Submit
           </FancyLink>
         ) : (
           assessment && (
-            <span className="font-medium text-green-400">
+            <span className="font-medium text-blue-800">
               Score{' '}
               {
                 modulCompleted?.attributes.Question.find(

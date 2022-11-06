@@ -581,7 +581,7 @@ export default function ModulBasedTitle({
                 </span>
               </div>
               <div className="w-full min-h-[10rem] flex mt-10 font-medium">
-                <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400">
+                <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-blue-800">
                   {user.Full_Name.split('')[0]}
                 </span>
                 <div className="w-full flex flex-col">
@@ -601,7 +601,7 @@ export default function ModulBasedTitle({
                     ></textarea>
                     <button
                       type="submit"
-                      className="w-fit mt-3 flex items-center font-medium text-white bg-green-400 py-2 px-3"
+                      className="w-fit mt-3 flex items-center font-medium text-white bg-blue-800 py-2 px-3"
                     >
                       Post
                     </button>
@@ -615,7 +615,7 @@ export default function ModulBasedTitle({
                     className="w-full border-b pb-3 flex flex-col space-y-5 mt-10"
                   >
                     <div className="w-full flex">
-                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
+                      <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-blue-800 font-medium">
                         {
                           userList
                             .find(
@@ -657,7 +657,7 @@ export default function ModulBasedTitle({
                       ) ? (
                         <FancyLink
                           onClick={() => doRemoveLike(data.id)}
-                          className="text-green-500 flex items-center"
+                          className="text-blue-800 flex items-center"
                         >
                           <AiFillLike size={22} className="mr-1" />
                           Liked{' '}
@@ -670,7 +670,7 @@ export default function ModulBasedTitle({
                       ) : (
                         <FancyLink
                           onClick={() => doLike(data.id)}
-                          className="text-green-500 flex items-center"
+                          className="text-blue-800 flex items-center"
                         >
                           <AiOutlineLike size={22} className="mr-1" />
                           Like{' '}
@@ -683,7 +683,7 @@ export default function ModulBasedTitle({
                       )}
                       <FancyLink
                         onClick={() => setReply([true, id])}
-                        className="text-green-500 flex items-center"
+                        className="text-blue-800 flex items-center"
                       >
                         <BsReply size={22} className="mr-1" />
                         Reply
@@ -695,7 +695,7 @@ export default function ModulBasedTitle({
                         className="w-full pl-14 flex flex-col space-y-5 mt-12"
                       >
                         <div className="w-full flex">
-                          <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
+                          <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-blue-800 font-medium">
                             {
                               userList
                                 .find(
@@ -735,7 +735,7 @@ export default function ModulBasedTitle({
                               onClick={() =>
                                 doRemoveLikeReply(data.id, dataReply)
                               }
-                              className="text-green-500 flex items-center"
+                              className="text-blue-800 flex items-center"
                             >
                               <AiFillLike size={22} className="mr-1" />
                               Liked{' '}
@@ -748,7 +748,7 @@ export default function ModulBasedTitle({
                           ) : (
                             <FancyLink
                               onClick={() => doLikeReply(data.id, dataReply)}
-                              className="text-green-500 flex items-center"
+                              className="text-blue-800 flex items-center"
                             >
                               <AiOutlineLike size={22} className="mr-1" />
                               Like{' '}
@@ -764,7 +764,7 @@ export default function ModulBasedTitle({
                     ))}
                     {reply[0] && reply[1] === id ? (
                       <div className="w-full min-h-[10rem] pl-14 flex mt-10 font-medium">
-                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400">
+                        <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-blue-800">
                           {user.Full_Name.split('')[0]}
                         </span>
                         <div className="w-full flex flex-col">
@@ -784,7 +784,7 @@ export default function ModulBasedTitle({
                             ></textarea>
                             <button
                               type="submit"
-                              className="w-fit mt-3 flex items-center font-medium text-white bg-green-400 py-2 px-3"
+                              className="w-fit mt-3 flex items-center font-medium text-white bg-blue-800 py-2 px-3"
                             >
                               Post
                             </button>
@@ -810,7 +810,7 @@ export default function ModulBasedTitle({
                             modulList.map((e) => e.id).indexOf(modulId) - 1
                           ].attributes.Slug
                         }`}
-                        className="flex items-center font-medium text-sm lg:text-base text-green-500"
+                        className="flex items-center font-medium text-sm lg:text-base text-blue-800"
                       >
                         <GrPrevious size={18} className="arrow mr-1" />
                         Previous
@@ -825,7 +825,7 @@ export default function ModulBasedTitle({
                 <div className="w-full h-full flex justify-center">
                   <button
                     onClick={doAnswer}
-                    className="flex items-center font-medium text-xs lg:text-base text-white bg-green-400 py-1 px-2"
+                    className="flex items-center font-medium text-xs lg:text-base text-white bg-blue-800 py-1 px-2"
                   >
                     <BsCheck2 size={28} className="mr-1" />
                     Mark as complete
@@ -841,7 +841,7 @@ export default function ModulBasedTitle({
                             modulList.map((e) => e.id).indexOf(modulId) + 1
                           ].attributes.Slug
                         }`}
-                        className="flex items-center font-medium text-sm lg:text-base text-green-500"
+                        className="flex items-center font-medium text-sm lg:text-base text-blue-800"
                       >
                         Next
                         <GrNext size={18} className="arrow ml-1" />

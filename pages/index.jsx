@@ -48,7 +48,7 @@ export default function Home({ user, home, seo }) {
 
                 {user && (
                   <FancyLink
-                    className="ml-8 text-green-500 font-medium text-xl hidden md:block"
+                    className="ml-8 text-blue-800 font-medium text-xl hidden md:block"
                     destination="/your-learning"
                   >
                     Your Learning
@@ -77,7 +77,7 @@ export default function Home({ user, home, seo }) {
                           status: !reveal.status,
                         })
                       }
-                      className="bg-green-400 py-2 px-3 w-10 font-medium text-white"
+                      className="bg-blue-800 py-2 px-3 w-10 font-medium text-white"
                     >
                       {user.Full_Name.split('')[0]}
                     </FancyLink>
@@ -88,13 +88,13 @@ export default function Home({ user, home, seo }) {
                     >
                       <FancyLink
                         destination="/account"
-                        className="font-medium text-green-500"
+                        className="font-medium text-blue-800"
                       >
                         Account
                       </FancyLink>
                       <FancyLink
                         onClick={logout}
-                        className="font-medium text-green-500"
+                        className="font-medium text-blue-800"
                       >
                         Sign out
                       </FancyLink>
@@ -104,7 +104,7 @@ export default function Home({ user, home, seo }) {
                   <div className="relative">
                     <FancyLink
                       destination="/login"
-                      className="bg-green-400 py-2 px-3 w-10 font-medium text-white"
+                      className="bg-blue-800 py-2 px-3 w-10 font-medium text-white"
                     >
                       Login
                     </FancyLink>
@@ -118,7 +118,7 @@ export default function Home({ user, home, seo }) {
       <div className={`border-t w-full min-h-[60vh] grow`}>
         <Container className="w-full h-screen flex gap-10">
           <div className="w-full h-full flex items-center">
-            <p className="text-blue-900 text-5xl max-w-2xl font-semibold leading-relaxed">
+            <p className="text-blue-800 text-5xl max-w-2xl font-semibold leading-relaxed">
               {home.content1}
             </p>
           </div>
@@ -131,30 +131,30 @@ export default function Home({ user, home, seo }) {
             />
           </div>
         </Container>
-        <div className="w-full h-auto py-7 bg-blue-900 flex justify-center">
+        <div className="w-full h-auto py-7 bg-blue-800 flex justify-center">
           <span className="text-white font-semibold text-4xl ">
             {home.content2}
           </span>
         </div>
         <Container className="w-full min-h-screen flex gap-10">
           <div className="w-full h-full py-16 flex flex-col justify-between">
-            <span className="max-w-fit text-lg font-semibold border-b-2 border-blue-900 pb-1 mb-14">
+            <span className="max-w-fit text-lg font-semibold border-b-2 border-blue-800 pb-1 mb-14">
               {home.content3.left_content.title}
             </span>
-            <div className="h-full text-blue-900 about font-medium">
+            <div className="h-full text-blue-800 about font-medium">
               {parse(home.content3.left_content.description)}
             </div>
           </div>
           <div className="w-full h-full py-16 flex flex-col justify-between">
-            <span className="max-w-fit text-lg font-semibold border-b-2 border-blue-900 pb-1 mb-14">
+            <span className="max-w-fit text-lg font-semibold border-b-2 border-blue-800 pb-1 mb-14">
               {home.content3.right_content.title}
             </span>
-            <div className="h-full text-blue-900 about font-medium">
+            <div className="h-full text-blue-800 about font-medium">
               {parse(home.content3.right_content.description)}
             </div>
           </div>
         </Container>
-        <Container className="w-full min-h-[400px] py-16 bg-blue-900 flex gap-10">
+        <Container className="w-full min-h-[400px] py-16 bg-blue-800 flex gap-10">
           <div className="relative w-full h-auto">
             <Image
               src={home.content4.left_content.image.data.attributes.url}

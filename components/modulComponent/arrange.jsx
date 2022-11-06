@@ -156,13 +156,13 @@ const Arrange = ({ arrange, modulCompleted, user, token, assessment }) => {
               key={idArrange}
               className="w-full grid grid-cols-4 grid-flow-col"
             >
-              <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-green-400 col-span-3 flex justify-center items-center">
+              <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-blue-800 col-span-3 flex justify-center items-center">
                 <span>{item.Content}</span>
               </div>
               <input
                 type="number"
                 name={`${arrange.Name}_${idArrange + 1}`}
-                className="outline-none text-center border rounded-r-md bg-green-400 text-white border-green-400"
+                className="outline-none text-center border rounded-r-md bg-blue-800 text-white border-blue-800"
               />
             </div>
           ),
@@ -172,13 +172,13 @@ const Arrange = ({ arrange, modulCompleted, user, token, assessment }) => {
         {showButton ? (
           <FancyLink
             onClick={doSubmit}
-            className="font-medium text-white bg-green-400 ml-4 py-2 px-4 rounded-md"
+            className="font-medium text-white bg-blue-800 ml-4 py-2 px-4 rounded-md"
           >
             Submit
           </FancyLink>
         ) : (
           assessment && (
-            <span className="font-medium text-green-400">
+            <span className="font-medium text-blue-800">
               Score{' '}
               {
                 modulCompleted?.attributes.Question.find(

@@ -182,10 +182,10 @@ const Essay = ({ essay, modulCompleted, user, token, assessment }) => {
       <div className="flex flex-col w-full space-y-4">
         {essay.Question.map((item, id) => (
           <div className="w-full grid grid-cols-12" key={id}>
-            <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-blue-500 flex justify-center items-center">
+            <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-blue-800 flex justify-center items-center">
               <span>{id + 1}</span>
             </div>
-            <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-blue-500 bg-blue-500 text-white">
+            <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-blue-800 bg-blue-800 text-white">
               {item.Content.map((i, idAnswer) =>
                 !i.Answer ? (
                   <span
@@ -234,7 +234,7 @@ const Essay = ({ essay, modulCompleted, user, token, assessment }) => {
                             }
                             placeholder="..............."
                             maxLength="15"
-                            className={`absolute left-0 w-full text-blue-500 bg-white px-2 rounded-md outline-none placeholder:text-green-500`}
+                            className={`absolute left-0 w-full text-blue-800 bg-white px-2 rounded-md outline-none placeholder:text-blue-800`}
                           />
                         </>
                       )}
@@ -251,13 +251,13 @@ const Essay = ({ essay, modulCompleted, user, token, assessment }) => {
         {showButton ? (
           <FancyLink
             onClick={doSubmit}
-            className="font-medium text-white bg-green-400 ml-4 py-2 px-4 rounded-md"
+            className="font-medium text-white bg-blue-800 ml-4 py-2 px-4 rounded-md"
           >
             Submit
           </FancyLink>
         ) : (
           assessment && (
-            <span className="font-medium text-green-400">
+            <span className="font-medium text-blue-800">
               Score{' '}
               {
                 modulCompleted?.attributes.Question.find(

@@ -70,10 +70,10 @@ const Card = ({ id, text, index, moveCard, name, cardName }) => {
       style={{ opacity }}
       data-handler-id={handlerId}
     >
-      <div className="outline-none rounded-l-md border border-green-400 flex justify-center items-center">
+      <div className="outline-none rounded-l-md border border-blue-800 flex justify-center items-center">
         <span>{index + 1}</span>
       </div>
-      <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
+      <div className="w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r border-blue-800 bg-blue-800 text-white">
         <span>{text}</span>
       </div>
     </div>
@@ -272,13 +272,13 @@ const StackDrag = ({ stack, modulCompleted, user, token, assessment }) => {
         {showButton ? (
           <FancyLink
             onClick={doSubmit}
-            className="font-medium text-white bg-green-400 ml-4 py-2 px-4 rounded-md"
+            className="font-medium text-white bg-blue-800 ml-4 py-2 px-4 rounded-md"
           >
             Submit
           </FancyLink>
         ) : (
           assessment && (
-            <span className="font-medium text-green-400">
+            <span className="font-medium text-blue-800">
               Score{' '}
               {
                 modulCompleted?.attributes.Question.find(

@@ -106,7 +106,7 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                           }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
-                          className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-blue-800 text-blue-800 outline-none"
                         />
                       ) : (
                         <input
@@ -117,7 +117,7 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                           }
                           name={`${data.Name}_${idLeft + 1}`}
                           placeholder="..............."
-                          className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
+                          className="w-full pl-3 py-1 placeholder:text-blue-800 text-blue-800 outline-none"
                         />
                       ),
                     )}
@@ -177,7 +177,7 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                             (e.target.value = e.target.value.replace(/\s/g, ''))
                           }
                           placeholder="..............."
-                          className="w-full pl-3 py-1 border-t border-black placeholder:text-green-500 text-green-500 outline-none"
+                          className="w-full pl-3 py-1 border-t border-black placeholder:text-blue-800 text-blue-800 outline-none"
                         />
                       ) : (
                         <input
@@ -188,7 +188,7 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                             (e.target.value = e.target.value.replace(/\s/g, ''))
                           }
                           placeholder="..............."
-                          className="w-full pl-3 py-1 placeholder:text-green-500 text-green-500 outline-none"
+                          className="w-full pl-3 py-1 placeholder:text-blue-800 text-blue-800 outline-none"
                         />
                       ),
                     )}
@@ -204,13 +204,13 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                       key={idArrange}
                       className="w-full grid grid-cols-4 grid-flow-col"
                     >
-                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-green-400 col-span-3 flex justify-center items-center">
+                      <div className="w-full h-full p-1 border-t border-l border-b rounded-l-md border-blue-800 col-span-3 flex justify-center items-center">
                         <span>{item.Content}</span>
                       </div>
                       <input
                         type="number"
                         name={`${data.Name}_${idArrange + 1}`}
-                        className="outline-none text-center border rounded-r-md bg-green-400 text-white border-green-400"
+                        className="outline-none text-center border rounded-r-md bg-blue-800 text-white border-blue-800"
                       />
                     </div>
                   ))}
@@ -245,10 +245,10 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                 >
                   {data.Question.map((item, id) => (
                     <div className="w-full grid grid-cols-12" key={id}>
-                      <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-green-400 flex justify-center items-center">
+                      <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-blue-800 flex justify-center items-center">
                         <span>{id + 1}</span>
                       </div>
-                      <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-green-400 bg-green-400 text-white">
+                      <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-blue-800 bg-blue-800 text-white">
                         {item.Content.map((i, idAnswer) =>
                           !i.Answer ? (
                             <span
@@ -281,7 +281,7 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
                                   }
                                   placeholder="..............."
                                   maxLength="15"
-                                  className={`absolute left-0 w-full text-green-500 bg-white px-2 rounded-md outline-none placeholder:text-green-500`}
+                                  className={`absolute left-0 w-full text-blue-800 bg-white px-2 rounded-md outline-none placeholder:text-blue-800`}
                                 />
                               </div>
                               &nbsp;
@@ -306,7 +306,7 @@ export default function PreviewModul({ userList, modul, seo, comments }) {
             <div className="flex flex-col w-full space-y-6">
               {comments.map((data, id) => (
                 <div key={id} className="w-full border-b pb-6 flex mt-10">
-                  <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-green-400 font-medium">
+                  <span className="h-[fit-content] w-10 py-2 px-3 mr-5 text-white bg-blue-800 font-medium">
                     {
                       userList
                         .find(

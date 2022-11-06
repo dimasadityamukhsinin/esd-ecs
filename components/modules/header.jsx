@@ -36,7 +36,7 @@ export default function Header({ className, user, notif, logo, title }) {
               </FancyLink>
 
               <FancyLink
-                className="ml-8 text-green-500 font-medium text-xl hidden md:block"
+                className="ml-8 text-blue-800 font-medium text-xl hidden md:block"
                 destination="/your-learning"
               >
                 Your Learning
@@ -62,7 +62,7 @@ export default function Header({ className, user, notif, logo, title }) {
                       status: !reveal.status,
                     })
                   }
-                  className="bg-green-400 py-2 px-3 w-10 font-medium text-white"
+                  className="bg-blue-800 py-2 px-3 w-10 font-medium text-white"
                 >
                   {user.Full_Name.split('')[0]}
                 </FancyLink>
@@ -73,13 +73,13 @@ export default function Header({ className, user, notif, logo, title }) {
                 >
                   <FancyLink
                     destination="/account"
-                    className="font-medium text-green-500"
+                    className="font-medium text-blue-800"
                   >
                     Account
                   </FancyLink>
                   <FancyLink
                     onClick={logout}
-                    className="font-medium text-green-500"
+                    className="font-medium text-blue-800"
                   >
                     Sign out
                   </FancyLink>
@@ -92,7 +92,7 @@ export default function Header({ className, user, notif, logo, title }) {
       <div className="block md:hidden py-4 border-b w-full z-10">
         <Container className="flex items-start">
           <FancyLink
-            className="text-green-500 font-medium text-xl"
+            className="text-blue-800 font-medium text-xl"
             destination="/your-learning"
           >
             Your Learning

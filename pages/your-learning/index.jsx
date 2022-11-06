@@ -47,19 +47,19 @@ export default function YourLearning({ user, modul, seo, checkNotif }) {
           <div className="flex space-x-8 mt-12 md:ml-[0.7rem] overflow-auto">
             <FancyLink
               destination="/your-learning"
-              className="border-b border-green-500 pb-2 text-green-500 text-xl font-medium"
+              className="border-b border-blue-800 pb-2 text-blue-800 text-xl font-medium"
             >
               Assignment
             </FancyLink>
             <FancyLink
               destination="/your-learning/missed"
-              className="pb-2 text-green-500 text-xl font-medium"
+              className="pb-2 text-blue-800 text-xl font-medium"
             >
               Missed
             </FancyLink>
             <FancyLink
               destination="/your-learning/completed"
-              className="pb-2 text-green-500 text-xl font-medium"
+              className="pb-2 text-blue-800 text-xl font-medium"
             >
               Completed
             </FancyLink>
@@ -103,7 +103,7 @@ export default function YourLearning({ user, modul, seo, checkNotif }) {
                         {attributes.Short_Description}
                       </p>
                     </div>
-                    <div className="bg-green-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
+                    <div className="bg-blue-800 w-full mt-6 text-center text-white font-medium py-2 px-3">
                       Go to Module
                     </div>
                   </div>
