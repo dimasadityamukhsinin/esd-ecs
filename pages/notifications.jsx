@@ -91,7 +91,7 @@ export default function Notifications({
                   ) && (
                     <FancyLink
                       onClick={() => doRead(data)}
-                      className="text-green-500 font-medium"
+                      className="text-blue-800 font-medium"
                     >
                       Mark as read
                     </FancyLink>

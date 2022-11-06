@@ -174,19 +174,19 @@ const Password = ({ seo, token, user, checkNotif }) => {
           <div className="setflex-center-row space-x-8">
             <FancyLink
               destination="/account"
-              className="pb-2 text-green-500 text-xl font-medium"
+              className="pb-2 text-blue-800 text-xl font-medium"
             >
               About you
             </FancyLink>
             <FancyLink
               destination="/account/email"
-              className="pb-2 text-green-500 text-xl font-medium"
+              className="pb-2 text-blue-800 text-xl font-medium"
             >
               Email address
             </FancyLink>
             <FancyLink
               destination="/account/password"
-              className="border-b border-green-500 pb-2 text-green-500 text-xl font-medium"
+              className="border-b border-blue-800 pb-2 text-blue-800 text-xl font-medium"
             >
               Password
             </FancyLink>
@@ -265,7 +265,7 @@ const Password = ({ seo, token, user, checkNotif }) => {
                     )}
                   </div>
                 </div>
-                <FancyLink className="bg-green-400 w-full mt-6 text-white font-medium py-2 px-3">
+                <FancyLink className="bg-blue-800 w-full mt-6 text-white font-medium py-2 px-3">
                   Change my password
                 </FancyLink>
               </form>

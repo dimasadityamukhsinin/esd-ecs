@@ -43,27 +43,27 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
         <Container className="mt-4 md:mt-6 xl:mt-8 pb-12">
           <div className="flex space-x-8 mt-12 md:ml-[0.7rem] overflow-auto">
             <FancyLink
-              destination="/"
-              className="pb-2 text-green-500 text-xl font-medium"
+              destination="/your-learning"
+              className="pb-2 text-blue-800 text-xl font-medium"
             >
               Assignment
             </FancyLink>
             <FancyLink
-              destination="/missed"
-              className="pb-2 text-green-500 text-xl font-medium"
+              destination="/your-learning/missed"
+              className="pb-2 text-blue-800 text-xl font-medium"
             >
               Missed
             </FancyLink>
             <FancyLink
-              destination="/completed"
-              className="border-b border-green-500 pb-2 text-green-500 text-xl font-medium"
+              destination="/your-learning/completed"
+              className="border-b border-blue-800 pb-2 text-blue-800 text-xl font-medium"
             >
               Completed
             </FancyLink>
           </div>
           <div className="flex flex-wrap modul mt-6">
             {modul.map(({ attributes, Total_Score, status }, id) =>
-              status === 'completed' ? (
+              status ? (
                 // countdownData(attributes.Assignment_Deadline) < 0 ? (
                 <div
                   key={id}
@@ -102,7 +102,7 @@ export default function Completed({ seo, user, token, modul, checkNotif }) {
                         {attributes.Short_Description}
                       </p>
                     </div>
-                    <div className="bg-green-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
+                    <div className="bg-blue-800 w-full mt-6 text-center text-white font-medium py-2 px-3">
                       Go to module
                     </div>
                   </div>
@@ -256,9 +256,11 @@ export async function getServerSideProps(ctx) {
         (data) =>
           parseInt(data.attributes.idModule) === parseInt(item.id) &&
           parseInt(data.attributes.idUser) === parseInt(user.data.id),
-      )
-        ? 'completed'
-        : '',
+      ) ? completed.data.data.find(
+        (data) =>
+          parseInt(data.attributes.idModule) === parseInt(item.id) &&
+          parseInt(data.attributes.idUser) === parseInt(user.data.id),
+      ).attributes.finish : false
     }
   })
 

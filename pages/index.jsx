@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import Layout from '@/components/modules/layout'
 import Container from '@/components/modules/container'
 import Header from '@/components/modules/header'
@@ -9,111 +9,170 @@ import SEO from '@/components/utils/seo'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import Footer from '@/components/modules/footer'
+import { IoNotificationsOutline } from 'react-icons/io5'
+import parse from 'html-react-parser'
 
-export default function Home({ user, modul, seo, checkNotif }) {
-  const router = useRouter()
+export default function Home({ user, home, seo }) {
+  const [reveal, setReveal] = useState({
+    option: '',
+    status: false,
+  })
+  const route = useRouter()
 
-  const countdownData = (date) => {
-    let today = new Date().toISOString().slice(0, 10)
-
-    const startDate = date
-    const endDate = today
-
-    const diffInMs = new Date(startDate) - new Date(endDate)
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24)
-    return diffInDays
+  const logout = () => {
+    nookies.destroy(null, 'token')
+    route.replace('/login')
   }
-
   return (
     <Layout>
       <SEO
-        title={'Your Learning'}
+        title={'Home'}
         defaultSEO={typeof seo !== 'undefined' && seo}
         webTitle={typeof seo !== 'undefined' && seo.Website_Title}
       />
       <div className="w-full flex flex-col">
-        <Header
-          user={user}
-          notif={checkNotif}
-          logo={seo.Logo.data.attributes.url}
-          title={seo.Website_Title}
-        />
-        <div className="w-full py-4 lg:py-8 flex justify-center items-center h-full font-medium">
-          <h2>Your Learning</h2>
-        </div>
-      </div>
-      <div className={`border-t bg-gray-50 w-full min-h-[60vh] grow`}>
-        <Container className="mt-4 md:mt-6 xl:mt-8 pb-12">
-          <div className="flex space-x-8 mt-12 md:ml-[0.7rem] overflow-auto">
-            <FancyLink
-              destination="/"
-              className="border-b border-green-500 pb-2 text-green-500 text-xl font-medium"
-            >
-              Assignment
-            </FancyLink>
-            <FancyLink
-              destination="/missed"
-              className="pb-2 text-green-500 text-xl font-medium"
-            >
-              Missed
-            </FancyLink>
-            <FancyLink
-              destination="/completed"
-              className="pb-2 text-green-500 text-xl font-medium"
-            >
-              Completed
-            </FancyLink>
-          </div>
-          <div className="flex flex-wrap modul mt-6">
-            {modul.map(
-              ({ attributes, status }, id) =>
-                status !== 'completed' &&
-                !(countdownData(attributes.Assignment_Deadline) < 0) && (
+        <header className={`relative py-6 border-b w-full z-20`}>
+          <Container className="flex flex-col">
+            <div className="flex justify-between items-center">
+              <div className="w-full flex items-center">
+                <FancyLink destination="/" className="font-medium text-xl">
+                  <div className="relative w-12 h-12 aspect-square">
+                    <Image
+                      src={seo.Logo.data.attributes.url}
+                      alt={seo.Website_Title}
+                      layout="fill"
+                      objectFit="contain"
+                    />
+                  </div>
+                </FancyLink>
+
+                {user && (
                   <FancyLink
-                    key={id}
-                    destination={`/modul/${attributes.Slug}`}
-                    className="relative bg-white border"
+                    className="ml-8 text-blue-800 font-medium text-xl hidden md:block"
+                    destination="/your-learning"
                   >
-                    <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-white font-medium">
-                      {`${countdownData(
-                        attributes.Assignment_Deadline,
-                      )} days left`}
-                    </span>
-                    <div className="relative flex justify-center w-full h-52">
-                      {attributes.Thumbnail && (
-                        <Image
-                          src={attributes.Thumbnail.data.attributes.url}
-                          alt={attributes.title}
-                          layout="fill"
-                          objectFit="contain"
-                        />
-                      )}
-                      <div className="absolute z-10 w-full h-full bg-black opacity-40" />
-                      <hr className="absolute bottom-0 z-20 mb-3 w-11/12 px-4 bg-white" />
-                    </div>
-                    <div className="w-full flex flex-col justify-between p-3 space-y-3">
-                      <div className="flex flex-col  space-y-3">
-                        <span className="font-medium text-gray-500">
-                          Module {id + 1}
-                        </span>
-                        <span className="font-medium text-lg text-left">
-                          {attributes.Title}
-                        </span>
-                        <p className="text-gray-500 font-medium text-sm text-left">
-                          {attributes.Short_Description}
-                        </p>
-                      </div>
-                      <div className="bg-green-400 w-full mt-6 text-center text-white font-medium py-2 px-3">
-                        Go to Module
-                      </div>
-                    </div>
+                    Your Learning
                   </FancyLink>
-                ),
-            )}
+                )}
+              </div>
+              <nav className="flex items-center space-x-5">
+                {user && (
+                  <FancyLink
+                    destination="/notifications"
+                    className="relative w-full h-full"
+                  >
+                    <IoNotificationsOutline size={23} />
+                    {/* {notif && (
+                    <div className="absolute top-0 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                  )} */}
+                  </FancyLink>
+                )}
+
+                {user ? (
+                  <div className="relative">
+                    <FancyLink
+                      onClick={() =>
+                        setReveal({
+                          option: 'profile',
+                          status: !reveal.status,
+                        })
+                      }
+                      className="bg-blue-800 py-2 px-3 w-10 font-medium text-white"
+                    >
+                      {user.Full_Name.split('')[0]}
+                    </FancyLink>
+                    <div
+                      className={`absolute w-36 right-0 top-12 flex flex-col items-center space-y-3 p-6 text-sm bg-white border shadow-[0_1px_5px_1px_rgb(0_0_0_/_5%)] ${
+                        reveal.status ? 'block' : 'hidden'
+                      }`}
+                    >
+                      <FancyLink
+                        destination="/account"
+                        className="font-medium text-blue-800"
+                      >
+                        Account
+                      </FancyLink>
+                      <FancyLink
+                        onClick={logout}
+                        className="font-medium text-blue-800"
+                      >
+                        Sign out
+                      </FancyLink>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <FancyLink
+                      destination="/login"
+                      className="bg-blue-800 py-2 px-3 w-10 font-medium text-white"
+                    >
+                      Login
+                    </FancyLink>
+                  </div>
+                )}
+              </nav>
+            </div>
+          </Container>
+        </header>
+      </div>
+      <div className={`border-t w-full min-h-[60vh] grow`}>
+        <Container className="w-full h-screen flex gap-10">
+          <div className="w-full h-full flex items-center">
+            <p className="text-blue-800 text-5xl max-w-2xl font-semibold leading-relaxed">
+              {home.content1}
+            </p>
+          </div>
+          <div className="relative w-full h-full max-h-96 m-auto">
+            <Image
+              src={seo.Logo.data.attributes.url}
+              alt={seo.Website_Title}
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+        </Container>
+        <div className="w-full h-auto py-7 bg-blue-800 flex justify-center">
+          <span className="text-white font-semibold text-4xl ">
+            {home.content2}
+          </span>
+        </div>
+        <Container className="w-full min-h-screen flex gap-10">
+          <div className="w-full h-full py-16 flex flex-col justify-between">
+            <span className="max-w-fit text-lg font-semibold border-b-2 border-blue-800 pb-1 mb-14">
+              {home.content3.left_content.title}
+            </span>
+            <div className="h-full text-blue-800 about font-medium">
+              {parse(home.content3.left_content.description)}
+            </div>
+          </div>
+          <div className="w-full h-full py-16 flex flex-col justify-between">
+            <span className="max-w-fit text-lg font-semibold border-b-2 border-blue-800 pb-1 mb-14">
+              {home.content3.right_content.title}
+            </span>
+            <div className="h-full text-blue-800 about font-medium">
+              {parse(home.content3.right_content.description)}
+            </div>
+          </div>
+        </Container>
+        <Container className="w-full min-h-[400px] py-16 bg-blue-800 flex gap-10">
+          <div className="relative w-full h-auto">
+            <Image
+              src={home.content4.left_content.image.data.attributes.url}
+              alt={home.content4.left_content.image.data.alternativeText}
+              layout="fill"
+              objectFit="contain"
+            />
+          </div>
+          <div className="w-full h-full flex flex-col justify-between">
+            <span className="max-w-fit text-lg font-semibold text-white border-b-2 border-white pb-1 mb-14">
+              {home.content4.right_content.title}
+            </span>
+            <div className="h-full text-white about font-medium">
+              {parse(home.content4.right_content.description)}
+            </div>
           </div>
         </Container>
       </div>
-      <Footer seo={seo} />
     </Layout>
   )
 }
@@ -121,91 +180,39 @@ export default function Home({ user, modul, seo, checkNotif }) {
 export async function getServerSideProps(ctx) {
   const cookies = nookies.get(ctx)
 
-  if (!cookies.token) {
-    return {
-      redirect: {
-        destination: '/login',
-      },
-    }
-  }
-
   const reqSeo = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/setting?populate=deep`,
   )
   const seo = await reqSeo.json()
 
-  const user = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
+  const home = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/home?populate=deep`,
+  )
+
+  if (cookies.token) {
+    const user = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/users/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies.token}`,
+        },
       },
-    },
-  )
+    )
 
-  const reqModul = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major?.Name}&populate=deep`,
-  )
-  const modul = await reqModul.json()
-
-  const reqNotifAll = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[All][$eq]=true&populate=deep`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
-      },
-    },
-  )
-  const notifAll = await reqNotifAll.json()
-
-  const reqNotifDetail = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[users_permissions_users][id][$eq]=${user.data.id}&populate=deep`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
-      },
-    },
-  )
-  const notifDetail = await reqNotifDetail.json()
-
-  const reqCheckNotif = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/notifications?filters[Read][idUser][$eq]=${user.data.id}&populate=deep`,
-    {
-      headers: {
-        Authorization: `Bearer ${cookies.token}`,
-      },
-    },
-  )
-  const checkNotif = await reqCheckNotif.json()
-
-  const all = [
-    ...notifAll.data,
-    ...notifDetail.data.filter((data) => data.attributes.All === false),
-  ]
-
-  const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
-  )
-
-  modul.data = modul.data.map((item, id) => {
     return {
-      ...item,
-      status: completed.data.data.find(
-        (data) =>
-          parseInt(data.attributes.idModule) === parseInt(item.id) &&
-          parseInt(data.attributes.idUser) === parseInt(user.data.id),
-      )
-        ? 'completed'
-        : '',
+      props: {
+        user: user.data,
+        seo: seo.data.attributes,
+        home: home.data.data.attributes,
+      },
     }
-  })
-
-  return {
-    props: {
-      user: user.data,
-      seo: seo.data.attributes,
-      modul: modul.data,
-      checkNotif: checkNotif.data.length === all.length ? false : true,
-    },
+  } else {
+    return {
+      props: {
+        user: null,
+        seo: seo.data.attributes,
+        home: home.data.data.attributes,
+      },
+    }
   }
 }
