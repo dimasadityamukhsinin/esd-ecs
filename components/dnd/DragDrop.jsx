@@ -205,7 +205,13 @@ const DragDrop = ({
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      Total_Score = Total_Score + parseFloat(item.Score)
+      if(item.Name === dragDrop.Name) {
+        if(assessment) {
+          Total_Score = Total_Score + parseFloat(item.Score)
+        }
+      }else {
+        Total_Score = Total_Score + parseFloat(item.Score)
+      }
     })
 
     let date = new Date()

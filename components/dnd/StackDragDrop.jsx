@@ -230,10 +230,12 @@ const Box = ({ id, index, children }) => {
 
 const StackDragDrop = ({
   dragDrop,
-  modulCompleted,
-  user,
   token,
-  assessment,
+  user,
+  modul,
+  modulId,
+  modulCompleted = false,
+  assessment = false,
 }) => {
   const [cards, setCards] = useState(dragDrop.Drop)
   const [remove, setRemove] = useState([])
@@ -368,7 +370,13 @@ const StackDragDrop = ({
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      Total_Score = Total_Score + parseFloat(item.Score)
+      if(item.Name === dragDrop.Name) {
+        if(assessment) {
+          Total_Score = Total_Score + parseFloat(item.Score)
+        }
+      }else {
+        Total_Score = Total_Score + parseFloat(item.Score)
+      }
     })
 
     let date = new Date()

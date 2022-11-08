@@ -1,6 +1,11 @@
 import FancyLink from "../utils/fancyLink"
 
-const FillRightAnswer = ({ fill, modulCompleted, user, token, assessment }) => {
+const FillRightAnswer = ({ fill, token,
+  user,
+  modul,
+  modulId,
+  modulCompleted = false,
+  assessment = false, }) => {
   const showButton = modulCompleted?.attributes.Question.find(
     (item) => item.Name === fill.Name,
   )
@@ -52,7 +57,13 @@ const FillRightAnswer = ({ fill, modulCompleted, user, token, assessment }) => {
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      Total_Score = Total_Score + parseFloat(item.Score)
+      if(item.Name === fill.Name) {
+        if(assessment) {
+          Total_Score = Total_Score + parseFloat(item.Score)
+        }
+      }else {
+        Total_Score = Total_Score + parseFloat(item.Score)
+      }
     })
 
     let date = new Date()
@@ -216,7 +227,7 @@ const FillRightAnswer = ({ fill, modulCompleted, user, token, assessment }) => {
               Score{' '}
               {
                 modulCompleted?.attributes.Question.find(
-                  (item) => item.Name === arrange.Name,
+                  (item) => item.Name === fill.Name,
                 )?.Score
               }
             </span>

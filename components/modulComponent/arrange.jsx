@@ -1,6 +1,11 @@
 import FancyLink from '../utils/fancyLink'
 
-const Arrange = ({ arrange, modulCompleted, user, token, assessment }) => {
+const Arrange = ({ arrange, token,
+  user,
+  modul,
+  modulId,
+  modulCompleted = false,
+  assessment = false, }) => {
   const showButton = modulCompleted?.attributes.Question.find(
     (item) => item.Name === arrange.Name,
   )
@@ -52,7 +57,13 @@ const Arrange = ({ arrange, modulCompleted, user, token, assessment }) => {
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      Total_Score = Total_Score + parseFloat(item.Score)
+      if(item.Name === arrange.Name) {
+        if(assessment) {
+          Total_Score = Total_Score + parseFloat(item.Score)
+        }
+      }else {
+        Total_Score = Total_Score + parseFloat(item.Score)
+      }
     })
 
     let date = new Date()

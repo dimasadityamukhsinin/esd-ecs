@@ -80,7 +80,12 @@ const Card = ({ id, text, index, moveCard, name, cardName }) => {
   )
 }
 
-const StackDrag = ({ stack, modulCompleted, user, token, assessment }) => {
+const StackDrag = ({ stack, token,
+  user,
+  modul,
+  modulId,
+  modulCompleted = false,
+  assessment = false, }) => {
   const showButton = modulCompleted?.attributes.Question.find(
     (item) => item.Name === stack.Name,
   )
@@ -153,7 +158,13 @@ const StackDrag = ({ stack, modulCompleted, user, token, assessment }) => {
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      Total_Score = Total_Score + parseFloat(item.Score)
+      if(item.Name === stack.Name) {
+        if(assessment) {
+          Total_Score = Total_Score + parseFloat(item.Score)
+        }
+      }else {
+        Total_Score = Total_Score + parseFloat(item.Score)
+      }
     })
 
     let date = new Date()
@@ -282,7 +293,7 @@ const StackDrag = ({ stack, modulCompleted, user, token, assessment }) => {
               Score{' '}
               {
                 modulCompleted?.attributes.Question.find(
-                  (item) => item.Name === arrange.Name,
+                  (item) => item.Name === stack.Name,
                 )?.Score
               }
             </span>
