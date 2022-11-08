@@ -498,47 +498,59 @@ export default function ModulBasedTitle({
                 ) : data.type === 'drag-drop' ? (
                   <div className="flex flex-col w-full" key={idComponent}>
                     <DragDrop
+                      dragDrop={data}
                       assessment={modulEditor[0].assessment}
                       modulCompleted={modulCompleted}
                       modulId={modulId}
                       modul={modul}
                       user={user}
                       token={token}
-                      dragDrop={data}
                       idComponent={idComponent}
                     />
                   </div>
                 ) : data.type === 'fill-left-answer' ? (
                   <FillLeftAnswer
                     fill={data}
-                    modulCompleted={modulCompleted}
-                    token={token}
-                    user={user}
                     assessment={modulEditor[0].assessment}
+                    modulCompleted={modulCompleted}
+                    modulId={modulId}
+                    modul={modul}
+                    user={user}
+                    token={token}
+                    idComponent={idComponent}
                   />
                 ) : data.type === 'fill-right-answer' ? (
                   <FillRightAnswer
                     fill={data}
-                    modulCompleted={modulCompleted}
-                    token={token}
-                    user={user}
                     assessment={modulEditor[0].assessment}
+                    modulCompleted={modulCompleted}
+                    modulId={modulId}
+                    modul={modul}
+                    user={user}
+                    token={token}
+                    idComponent={idComponent}
                   />
                 ) : data.type === 'arrange' ? (
                   <Arrange
                     arrange={data}
-                    modulCompleted={modulCompleted}
-                    token={token}
-                    user={user}
                     assessment={modulEditor[0].assessment}
+                    modulCompleted={modulCompleted}
+                    modulId={modulId}
+                    modul={modul}
+                    user={user}
+                    token={token}
+                    idComponent={idComponent}
                   />
                 ) : data.type === 'stack' ? (
                   <StackDrag
                     stack={data}
-                    modulCompleted={modulCompleted}
-                    token={token}
-                    user={user}
                     assessment={modulEditor[0].assessment}
+                    modulCompleted={modulCompleted}
+                    modulId={modulId}
+                    modul={modul}
+                    user={user}
+                    token={token}
+                    idComponent={idComponent}
                   />
                 ) : data.__component === 'editor.audio' ? (
                   <div className="w-full" key={idComponent}>
@@ -555,19 +567,25 @@ export default function ModulBasedTitle({
                   <div className="flex flex-col w-full" key={idComponent}>
                     <StackDragDrop
                       dragDrop={data}
-                      modulCompleted={modulCompleted}
-                      token={token}
-                      user={user}
                       assessment={modulEditor[0].assessment}
+                      modulCompleted={modulCompleted}
+                      modulId={modulId}
+                      modul={modul}
+                      user={user}
+                      token={token}
+                      idComponent={idComponent}
                     />
                   </div>
                 ) : data.type === 'essay' ? (
                   <Essay
                     essay={data}
-                    modulCompleted={modulCompleted}
-                    token={token}
-                    user={user}
                     assessment={modulEditor[0].assessment}
+                    modulCompleted={modulCompleted}
+                    modulId={modulId}
+                    modul={modul}
+                    user={user}
+                    token={token}
+                    idComponent={idComponent}
                   />
                 ) : (
                   <></>
