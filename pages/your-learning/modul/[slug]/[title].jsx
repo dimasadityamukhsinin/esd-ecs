@@ -902,7 +902,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const req = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate[Editor][populate]=%2A&populate[major]=%2a`,
   )
   const res = await req.json()
 
@@ -1109,7 +1109,7 @@ export async function getServerSideProps(ctx) {
       data.__component === 'editor.title'
     ) {
       modulEditor.push(data)
-      data.children.forEach((child) => modulEditor.push(child))
+      data.children?.forEach((child) => modulEditor.push(child))
     }
   })
 
