@@ -902,7 +902,7 @@ export async function getServerSideProps(ctx) {
   )
 
   const req = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate[Editor][populate]=%2A&populate[major]=%2a`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate[Editor][populate]=%2A&populate=major`,
   )
   const res = await req.json()
 
@@ -913,7 +913,7 @@ export async function getServerSideProps(ctx) {
   }
 
   const modulList = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major.Name}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${user.data.major.Name}`,
   )
 
   const countdownData = (date) => {
