@@ -265,9 +265,12 @@ const Password = ({ seo, token, user, checkNotif }) => {
                     )}
                   </div>
                 </div>
-                <FancyLink className="bg-blue-800 w-full mt-6 text-white font-medium py-2 px-3">
+                <button
+                  disabled={progress}
+                  type='submit'
+                  className="bg-blue-800 w-full mt-6 text-white font-medium py-2 px-3">
                   Change my password
-                </FancyLink>
+                </button>
               </form>
             </div>
           </div>
