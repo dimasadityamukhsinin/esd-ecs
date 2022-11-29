@@ -627,6 +627,9 @@ export async function getServerSideProps(ctx) {
     },
   )
 
+  const getMajor = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/majors?filters[users][id][$eq]=${user.data.id}`);
+  const userMajor = getMajor.data.data[0].attributes.Name;
+
   const req = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate=deep`,
   )
@@ -635,7 +638,7 @@ export async function getServerSideProps(ctx) {
   if (res.data[0].attributes.major.data?.attributes.Name) {
     if (
       !res.data[0].attributes.major.data?.attributes.Name ===
-      user.data.major.Name
+      userMajor
     ) {
       return {
         notFound: true,
