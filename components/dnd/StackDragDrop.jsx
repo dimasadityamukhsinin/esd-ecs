@@ -370,11 +370,11 @@ const StackDragDrop = ({
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      if(item.Name === dragDrop.Name) {
-        if(assessment) {
+      if (item.Name === dragDrop.Name) {
+        if (assessment) {
           Total_Score = Total_Score + parseFloat(item.Score)
         }
-      }else {
+      } else {
         Total_Score = Total_Score + parseFloat(item.Score)
       }
     })
@@ -534,7 +534,8 @@ const StackDragDrop = ({
                             className={`w-fit py-2 px-3 text-white text-center font-medium rounded-md ${
                               modulCompleted?.attributes.Question.find(
                                 (item) => item.Name === dragDrop.Name,
-                              ).Drag_Drop.filter((e) => e.Name === card.Name)
+                              )
+                                .Drag_Drop.filter((e) => e.Name === card.Name)
                                 .find((e) => e.Index === idAnswer).Answer
                                 ? 'bg-green-500'
                                 : 'bg-red-500'
@@ -575,6 +576,60 @@ const StackDragDrop = ({
           )}
         </div>
       </div>
+      {modulCompleted?.attributes.Question.find(
+        (item) => item.Name === dragDrop.Name,
+      ) && !assessment ? (
+        <div className="w-full flex flex-col mt-6 border-2 border-green-500 rounded-lg p-5">
+          <span className="mb-6 text-green-500 font-bold">
+            The Correct Answer :
+          </span>
+          <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-blue-800 h-[80vh] overflow-y-auto">
+            <div className="w-full flex flex-col space-y-4" id={dragDrop.Name}>
+              {cards
+                .sort(
+                  (a, b) =>
+                    a.Name.charAt(a.Name.length - 1) -
+                    b.Name.charAt(b.Name.length - 1),
+                )
+                .map((card, i) => (
+                  <div className="w-full flex flex-col">
+                    <div className="w-full grid grid-cols-12">
+                      <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-blue-800 flex justify-center items-center">
+                        <span>{i + 1}</span>
+                      </div>
+                      <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-blue-800 bg-blue-800 text-white">
+                        {card.Content.map((i, idAnswer) =>
+                          !i.Answer ? (
+                            <span
+                              name={`${dragDrop.Name}_${card.Name}_${
+                                idAnswer + 1
+                              }`}
+                              key={idAnswer}
+                            >
+                              {i.Content}
+                            </span>
+                          ) : (
+                            <>
+                              &nbsp;
+                              <span
+                                className={`w-fit py-2 px-3 text-white text-center font-medium rounded-md bg-green-500`}
+                              >
+                                {i.Content}
+                              </span>
+                              &nbsp;
+                            </>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="flex justify-end w-full mt-3">
         {showButton ? (
           <>

@@ -205,11 +205,11 @@ const DragDrop = ({
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      if(item.Name === dragDrop.Name) {
-        if(assessment) {
+      if (item.Name === dragDrop.Name) {
+        if (assessment) {
           Total_Score = Total_Score + parseFloat(item.Score)
         }
-      }else {
+      } else {
         Total_Score = Total_Score + parseFloat(item.Score)
       }
     })
@@ -377,6 +377,74 @@ const DragDrop = ({
           ))}
         </div>
       </div>
+      {modulCompleted?.attributes.Question.find(
+        (item) => item.Name === dragDrop.Name,
+      ) && !assessment ? (
+        <div className="w-full flex flex-col mt-6 border-2 border-green-500 rounded-lg p-5">
+          <span className="mb-6 text-green-500 font-bold">
+            The Correct Answer :
+          </span>
+          <div className="w-full flex flex-col space-y-6 p-4 mt-4 rounded-lg editor border-2 border-blue-800 h-[60vh] overflow-y-auto">
+            <div className="w-full flex flex-col space-y-4">
+              {dragDrop.Drop.map((item, id) => (
+                <div
+                  id={`${dragDrop.Name}_${item.Name}`}
+                  className="w-full flex flex-col"
+                  key={id}
+                >
+                  <div className="w-full grid grid-cols-12">
+                    <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-blue-800 flex justify-center items-center">
+                      <span>{id + 1}</span>
+                    </div>
+                    <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-blue-800 bg-blue-800 text-white">
+                      {item.Content.map((i, idAnswer) =>
+                        !i.Answer ? (
+                          <span
+                            name={`${dragDrop.Name}_${item.Name}_${
+                              idAnswer + 1
+                            }`}
+                            key={idAnswer}
+                          >
+                            {i.Content}
+                          </span>
+                        ) : (
+                          <>
+                            &nbsp;
+                            <span
+                              className={`text-white px-2 rounded-md border-2 border-transparent bg-green-500`}
+                            >
+                              {
+                                i.Content
+                              }
+                            </span>
+                            &nbsp;
+                          </>
+                        ),
+                      )}
+                    </div>
+                  </div>
+                  {remove.length > 0 ? (
+                    remove.find((data) => data === item.id) && (
+                      <div className="w-fit h-full mt-3 flex justify-center items-center">
+                        <FancyLink
+                          onClick={() => removeDrag(dragDrop.Name, item)}
+                          className="font-medium text-white bg-red-500 w-full px-4 py-2 rounded-md"
+                        >
+                          Remove
+                        </FancyLink>
+                      </div>
+                    )
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="flex justify-end w-full mt-3">
         {showButton ? (
           <>

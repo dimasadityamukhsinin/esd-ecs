@@ -80,12 +80,15 @@ const Card = ({ id, text, index, moveCard, name, cardName }) => {
   )
 }
 
-const StackDrag = ({ stack, token,
+const StackDrag = ({
+  stack,
+  token,
   user,
   modul,
   modulId,
   modulCompleted = false,
-  assessment = false, }) => {
+  assessment = false,
+}) => {
   const showButton = modulCompleted?.attributes.Question.find(
     (item) => item.Name === stack.Name,
   )
@@ -158,11 +161,11 @@ const StackDrag = ({ stack, token,
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      if(item.Name === stack.Name) {
-        if(assessment) {
+      if (item.Name === stack.Name) {
+        if (assessment) {
           Total_Score = Total_Score + parseFloat(item.Score)
         }
-      }else {
+      } else {
         Total_Score = Total_Score + parseFloat(item.Score)
       }
     })
@@ -279,6 +282,39 @@ const StackDrag = ({ stack, token,
           ),
         )}
       </div>
+      {modulCompleted?.attributes.Question.find(
+        (item) => item.Name === stack.Name,
+      ) && !assessment ? (
+        <div className="w-full flex flex-col mt-6 border-2 border-green-500 rounded-lg p-5">
+          <span className="mb-6 text-green-500 font-bold">
+            The Correct Answer :
+          </span>
+          <div id={stack.Name} className="w-full flex flex-col space-y-4">
+            {cards
+              .sort(
+                (a, b) =>
+                  a.Name.charAt(a.Name.length - 1) -
+                  b.Name.charAt(b.Name.length - 1),
+              )
+              .map((card, i) => (
+                <div className="w-full min-h-[2.5rem] grid grid-cols-12">
+                  <div
+                    className={`outline-none rounded-l-md border flex justify-center items-center border-green-500`}
+                  >
+                    <span>{i + 1}</span>
+                  </div>
+                  <div
+                    className={`w-full h-full p-3 col-span-11 rounded-r-md border-t border-b border-r text-white border-green-500 bg-green-500`}
+                  >
+                    <span>{card.Content}</span>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="flex justify-end w-full mt-3">
         {showButton ? (
           <FancyLink

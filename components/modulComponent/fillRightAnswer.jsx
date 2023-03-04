@@ -1,11 +1,14 @@
-import FancyLink from "../utils/fancyLink"
+import FancyLink from '../utils/fancyLink'
 
-const FillRightAnswer = ({ fill, token,
+const FillRightAnswer = ({
+  fill,
+  token,
   user,
   modul,
   modulId,
   modulCompleted = false,
-  assessment = false, }) => {
+  assessment = false,
+}) => {
   const showButton = modulCompleted?.attributes.Question.find(
     (item) => item.Name === fill.Name,
   )
@@ -57,11 +60,11 @@ const FillRightAnswer = ({ fill, token,
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      if(item.Name === fill.Name) {
-        if(assessment) {
+      if (item.Name === fill.Name) {
+        if (assessment) {
           Total_Score = Total_Score + parseFloat(item.Score)
         }
-      }else {
+      } else {
         Total_Score = Total_Score + parseFloat(item.Score)
       }
     })
@@ -213,6 +216,57 @@ const FillRightAnswer = ({ fill, token,
           )}
         </div>
       </div>
+      {modulCompleted?.attributes.Question.find(
+        (item) => item.Name === fill.Name,
+      ) && !assessment ? (
+        <div className="w-full flex flex-col mt-6 border-2 border-green-500 rounded-lg p-5">
+          <span className="mb-6 text-green-500 font-bold">
+            The Correct Answer :
+          </span>
+          <div className="grid grid-cols-[2fr,1fr,2fr] grid-flow-col w-full border border-black">
+            <div className="w-full border-r border-black h-full flex flex-col">
+              {fill.question_and_answer.map((item, idRight) =>
+                idRight !== 0 ? (
+                  <div
+                    key={idRight}
+                    className="w-full pl-3 py-1 border-t border-black"
+                  >
+                    {item.Question}
+                  </div>
+                ) : (
+                  <div key={idRight} className="w-full pl-3 py-1">
+                    {item.Question}
+                  </div>
+                ),
+              )}
+            </div>
+            <div className="w-full flex justify-center items-center h-full">
+              <span>{fill.Verb}</span>
+            </div>
+            <div className="w-full border-l border-black h-full flex flex-col">
+              {fill.question_and_answer.map((item, idRight) =>
+                idRight !== 0 ? (
+                  <input
+                    key={idRight}
+                    className={`w-full pl-3 py-1 border-t border-black text-white outline-none bg-green-500`}
+                    value={item.Answer}
+                    readOnly
+                  />
+                ) : (
+                  <input
+                    key={idRight}
+                    className={`w-full pl-3 py-1 text-white outline-none bg-green-500`}
+                    value={item.Answer}
+                    readOnly
+                  />
+                ),
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="flex justify-end w-full mt-3">
         {showButton ? (
           <FancyLink

@@ -421,6 +421,13 @@ export default function ModulBasedTitle({
   }
 
   useEffect(() => {
+    if (!modulEditor[0].assessment) {
+      modulCompleted?.attributes.Question.forEach((data) => {
+        if(modulEditor.find((e) => e.Name === data.Name)) {
+          modulEditor.find((e) => e.Name === data.Name).completed = true;
+        }
+      })
+    }
     scrollToTop()
   }, [])
 
@@ -901,8 +908,10 @@ export async function getServerSideProps(ctx) {
     },
   )
 
-  const getMajor = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/majors?filters[users][id][$eq]=${user.data.id}`);
-  const userMajor = getMajor.data.data[0].attributes.Name;
+  const getMajor = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/majors?filters[users][id][$eq]=${user.data.id}`,
+  )
+  const userMajor = getMajor.data.data[0].attributes.Name
 
   const req = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[slug][$eq]=${ctx.params.slug}&populate[Editor][populate]=%2A&populate=major`,
@@ -931,10 +940,7 @@ export async function getServerSideProps(ctx) {
   }
 
   if (res.data[0]?.attributes.major.data?.attributes.Name) {
-    if (
-      !res.data[0].attributes.major.data?.attributes.Name ===
-      userMajor
-    ) {
+    if (!res.data[0].attributes.major.data?.attributes.Name === userMajor) {
       return {
         notFound: true,
       }
@@ -1116,7 +1122,7 @@ export async function getServerSideProps(ctx) {
     }
   })
 
-  if(newEditor.find((e) => e.id === parseInt(ctx.params.title))) {
+  if (newEditor.find((e) => e.id === parseInt(ctx.params.title))) {
     return {
       props: {
         user: user.data,
@@ -1132,7 +1138,8 @@ export async function getServerSideProps(ctx) {
         )
           ? completed.data.data.find(
               (data) =>
-                parseInt(data.attributes.idModule) === parseInt(res.data[0].id) &&
+                parseInt(data.attributes.idModule) ===
+                  parseInt(res.data[0].id) &&
                 parseInt(data.attributes.idUser) === parseInt(user.data.id),
             )
           : null,
@@ -1142,7 +1149,7 @@ export async function getServerSideProps(ctx) {
         checkNotif: checkNotif.data.length === all.length ? false : true,
       },
     }
-  }else {
+  } else {
     return {
       notFound: true,
     }

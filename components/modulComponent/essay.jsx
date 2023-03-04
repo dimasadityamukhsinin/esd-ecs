@@ -79,11 +79,11 @@ const Essay = ({
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      if(item.Name === essay.Name) {
-        if(assessment) {
+      if (item.Name === essay.Name) {
+        if (assessment) {
           Total_Score = Total_Score + parseFloat(item.Score)
         }
-      }else {
+      } else {
         Total_Score = Total_Score + parseFloat(item.Score)
       }
     })
@@ -263,6 +263,52 @@ const Essay = ({
           </div>
         ))}
       </div>
+      {modulCompleted?.attributes.Question.find(
+        (item) => item.Name === essay.Name,
+      ) && !assessment ? (
+        <div className="w-full flex flex-col mt-6 border-2 border-green-500 rounded-lg p-5">
+          <span className="mb-6 text-green-500 font-bold">
+            The Correct Answer :
+          </span>
+          <div className="flex flex-col w-full space-y-4">
+            {essay.Question.map((item, id) => (
+              <div className="w-full grid grid-cols-12" key={id}>
+                <div className="outline-none col-span-2 lg:col-span-1 rounded-l-md border border-blue-800 flex justify-center items-center">
+                  <span>{id + 1}</span>
+                </div>
+                <div className="w-full h-full p-3 leading-loose col-span-10 lg:col-span-11 rounded-r-md border-t border-b border-r border-blue-800 bg-blue-800 text-white">
+                  {item.Content.map((i, idAnswer) =>
+                    !i.Answer ? (
+                      <span
+                        name={`${essay.Name}_${item.Name}_${idAnswer + 1}`}
+                        key={idAnswer}
+                      >
+                        {i.Content}
+                      </span>
+                    ) : (
+                      <>
+                        &nbsp;
+                        <div className="relative inline-block min-w-[4em]">
+                          <span
+                            className={`block w-full py-1 px-2 rounded-md text-center text-white bg-green-500`}
+                          >
+                            {
+                              i.Content
+                            }
+                          </span>
+                        </div>
+                        &nbsp;
+                      </>
+                    ),
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="flex justify-end w-full mt-3">
         {showButton ? (
           <FancyLink

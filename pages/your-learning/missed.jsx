@@ -68,9 +68,9 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
             {modul.map(({ attributes, status }, id) =>
               !status ? (
                 countdownData(attributes.Assignment_Deadline) < 0 && (
-                  <FancyLink
+                  <div
                     key={id}
-                    className="relative bg-white border w-96 opacity-60 pointer-events-none"
+                    className="relative bg-white border opacity-60 pointer-events-none"
                   >
                     <span className="absolute top-0 right-0 z-20 mt-2 mr-3 text-red-400 font-medium">
                       Missed
@@ -101,7 +101,7 @@ export default function Missed({ modul, seo, user, token, checkNotif }) {
                         Go to module
                       </div>
                     </div>
-                  </FancyLink>
+                  </div>
                 )
               ) : (
                 <></>

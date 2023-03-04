@@ -1,11 +1,14 @@
 import FancyLink from '../utils/fancyLink'
 
-const Arrange = ({ arrange, token,
+const Arrange = ({
+  arrange,
+  token,
   user,
   modul,
   modulId,
   modulCompleted = false,
-  assessment = false, }) => {
+  assessment = false,
+}) => {
   const showButton = modulCompleted?.attributes.Question.find(
     (item) => item.Name === arrange.Name,
   )
@@ -57,11 +60,11 @@ const Arrange = ({ arrange, token,
     let Total_Score = 0
 
     dataContent.forEach((item) => {
-      if(item.Name === arrange.Name) {
-        if(assessment) {
+      if (item.Name === arrange.Name) {
+        if (assessment) {
           Total_Score = Total_Score + parseFloat(item.Score)
         }
-      }else {
+      } else {
         Total_Score = Total_Score + parseFloat(item.Score)
       }
     })
@@ -179,6 +182,37 @@ const Arrange = ({ arrange, token,
           ),
         )}
       </div>
+      {modulCompleted?.attributes.Question.find(
+        (item) => item.Name === arrange.Name,
+      ) && !assessment ? (
+        <div className="w-full flex flex-col mt-6 border-2 border-green-500 rounded-lg p-5">
+          <span className="mb-6 text-green-500 font-bold">
+            The Correct Answer :
+          </span>
+          <div className="w-full grid grid-cols-3 gap-6">
+            {arrange.Arrange.map((item, idArrange) => (
+              <div
+                key={idArrange}
+                className="w-full grid grid-cols-4 grid-flow-col"
+              >
+                <div
+                  className={`w-full h-full p-1 border-t border-l border-b rounded-l-md col-span-3 flex justify-center items-center border-blue-800`}
+                >
+                  <span>{item.Content}</span>
+                </div>
+                <input
+                  type="number"
+                  className={`outline-none text-center border rounded-r-md pointer-events-none text-white border-blue-800 bg-blue-800`}
+                  value={item.Number}
+                  readOnly
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="flex justify-end w-full mt-3">
         {showButton ? (
           <FancyLink
