@@ -127,7 +127,7 @@ export async function getServerSideProps(ctx) {
   }
 
   const reqModul = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?populate[Editor][fields][0]=id&populate[Thumbnail][fields][0]=url`,
   )
   const modul = await reqModul.json()
 

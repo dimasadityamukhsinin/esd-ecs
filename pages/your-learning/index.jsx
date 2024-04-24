@@ -149,7 +149,7 @@ export async function getServerSideProps(ctx) {
   const userMajor = getMajor.data.data[0].attributes.Name;
 
   const reqModul = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${userMajor}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${userMajor}&populate[Editor][fields][0]=id&populate[Thumbnail][fields][0]=url`,
   )
   const modul = await reqModul.json()
 
@@ -189,7 +189,7 @@ export async function getServerSideProps(ctx) {
   ]
 
   const completed = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}&populate=deep`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/completeds?filters[idUser][$eq]=${user.data.id}`,
   )
 
   modul.data = modul.data.map((item, id) => {
