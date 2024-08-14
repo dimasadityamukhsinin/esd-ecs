@@ -423,8 +423,8 @@ export default function ModulBasedTitle({
   useEffect(() => {
     if (!modulEditor[0].assessment) {
       modulCompleted?.attributes.Question.forEach((data) => {
-        if(modulEditor.find((e) => e.Name === data.Name)) {
-          modulEditor.find((e) => e.Name === data.Name).completed = true;
+        if (modulEditor.find((e) => e.Name === data.Name)) {
+          modulEditor.find((e) => e.Name === data.Name).completed = true
         }
       })
     }
@@ -834,6 +834,10 @@ export default function ModulBasedTitle({
                           modulList[
                             modulList.map((e) => e.id).indexOf(modulId) - 1
                           ].attributes.Slug
+                        }/${
+                          modulList[
+                            modulList.map((e) => e.id).indexOf(modulId) - 1
+                          ].attributes.Editor[0].id
                         }`}
                         className="flex items-center font-medium text-sm lg:text-base text-blue-800"
                       >
@@ -865,6 +869,10 @@ export default function ModulBasedTitle({
                           modulList[
                             modulList.map((e) => e.id).indexOf(modulId) + 1
                           ].attributes.Slug
+                        }/${
+                          modulList[
+                            modulList.map((e) => e.id).indexOf(modulId) + 1
+                          ].attributes.Editor[0].id
                         }`}
                         className="flex items-center font-medium text-sm lg:text-base text-blue-800"
                       >
@@ -925,7 +933,7 @@ export async function getServerSideProps(ctx) {
   }
 
   const modulList = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${userMajor}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/moduls?filters[major][Name][$eq]=${userMajor}&populate[Editor][fields][0]=id`,
   )
 
   const countdownData = (date) => {
